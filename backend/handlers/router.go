@@ -1,0 +1,55 @@
+package handlers
+
+import (
+	"sfpr/middleware"
+	"sfpr/util"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
+)
+
+func SetupRouter(db *gorm.DB) *gin.Engine {
+
+	if util.EnvIsProd(){
+		gin.SetMode(gin.ReleaseMode)
+	}
+	
+	r := gin.Default()
+
+	if util.EnvIsProd(){
+		trustedProxies := []string{"http://localhost", "http://127.0.0.1", "https://schoenfeld.fun"}
+		r.SetTrustedProxies(trustedProxies)
+	}
+	
+	
+	r.Use(middleware.CorsMiddleware())
+	// Routes
+	api := r.Group("/api")
+
+	api.POST("/register", Register(db))
+	api.POST("/login", Login(db))
+
+	protected := api.Group("/user")
+	protected.Use(middleware.AuthMiddleware())
+
+	protected.POST("/logout", Logout(db))
+	protected.GET("/me", GetMe(db))
+	protected.PUT("/me", PutMe(db))
+	protected.PUT("/me/pw", PutMePW(db))
+	protected.GET("/spots/", GetSpots(db))
+
+	admin := api.Group("/admin")
+	admin.Use(middleware.AdminMiddleware(db))
+
+	admin.GET("/users/", GetUsers(db))
+	admin.POST("/users/", CreateUser(db))
+	admin.PUT("/users/:id", PutUser(db))
+	admin.PUT("/users/:id/pw", PutUserPW(db))
+	admin.DELETE("/users/:id", DeleteUser(db))
+
+	admin.GET("/spots/", GetSpots(db))
+	admin.POST("/spots/", CreateSpot(db))
+	admin.PUT("/spots/:id", PutSpot(db))
+	admin.DELETE("/spots/:id", DeleteSpot(db))
+	return r
+}
