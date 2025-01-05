@@ -8,7 +8,7 @@ export default function RegisterForm() {
     nickname: '',
     fullName: '',
     phone: '',
-    sitePasswort: '',
+    sitePassword: '',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -23,7 +23,7 @@ export default function RegisterForm() {
       const response = await axios.post('/register', formData);
       if (response.status === 201) {
         alert('Subbbi, des hat klappt!');
-        setFormData({ username: '', password: '', nickname: '', fullName: '', phone: '' , sitePasswort: ''});
+        setFormData({ username: '', password: '', nickname: '', fullName: '', phone: '' , sitePassword: ''});
       }
     } catch (error) {
       console.error('Registration error:', error);
@@ -92,8 +92,8 @@ export default function RegisterForm() {
         <label className="block text-gray-700">Passwort der Seite (bitte bei Admins erfragen)</label>
         <input
           type="text"
-          name="sitePasswort"
-          value={formData.sitePasswort}
+          name="sitePassword"
+          value={formData.sitePassword}
           onChange={handleChange}
           className="w-full p-2 border rounded"
           required
