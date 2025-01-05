@@ -12,6 +12,7 @@ export default function RegisterForm() {
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(e.target.name, e.target.value);
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -91,7 +92,7 @@ export default function RegisterForm() {
         <label className="block text-gray-700">Passwort der Seite (bitte bei Admins erfragen)</label>
         <input
           type="text"
-          name="sitePassword"
+          name="sitePasswort"
           value={formData.sitePasswort}
           onChange={handleChange}
           className="w-full p-2 border rounded"
