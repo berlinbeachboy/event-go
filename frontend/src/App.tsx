@@ -1,34 +1,30 @@
-import { useEffect, useState } from 'react';
+// src/App.tsx
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { useAuth } from '@/api/hooks/use-auth';
-import { useSpots } from '@/api/hooks/use-spots';
 import { Toaster } from '@/components/ui/toaster';
-import { SidebarProvider } from '@/components/ui/sidebar';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { MusicPlayer } from './components/MusicPlayer';
 
-// Components
+// Pages
+import HomePage from '@/pages/home';
+import UserPage from '@/pages/user';
+import AdminPage from '@/pages/admin';
 import AuthScreen from './components/AuthScreen';
-import SpotSelectionCard from '@/components/SpotSelection';
-import AdminTable from '@/components/AdminTable';
-import AdminSpotTable from '@/components/SpotTypeTable';
-import { AppSidebar } from '@/components/SidebarNew';
-import { SidebarTrigger } from '@/components/ui/sidebar';
-
-// View type management
-type ViewType = 'spotSelect' | 'changeMe' | 'userTable' | 'spotTable';
-const DEFAULT_VIEW: ViewType = 'spotSelect';
+import { Navbar } from '@/components/Navbar';
+import { useSpots } from './api/hooks/use-spots';
 
 const App = () => {
   const { toast } = useToast();
-  const { user, isLoading: authLoading, fetchUser, logout } = useAuth();
-  const { spots, isLoading: spotsLoading, fetchSpots } = useSpots();
-  const [view, setView] = useState<ViewType>(DEFAULT_VIEW);
+  const { user, isLoading, fetchUser } = useAuth();
+  const { userSpots, fetchUserSpots } = useSpots()
 
-  // Initial data fetch
   useEffect(() => {
     const initializeApp = async () => {
       try {
-        await Promise.all([fetchUser(), fetchSpots()]);
+        await fetchUser();
+        fetchUserSpots()
+
       } catch (error) {
         console.log(error)
         toast({
@@ -40,79 +36,36 @@ const App = () => {
     };
 
     initializeApp();
-  }, [fetchUser, fetchSpots, toast]);
+  }, [fetchUser, fetchUserSpots, user?.type, toast]);
 
-  // Handle logout
-  const handleLogout = async () => {
-    try {
-      console.log('Logging out');
-      await logout();
-      setView(DEFAULT_VIEW);
-    } catch (error) {
-      toast({
-        title: "Error logging out: " + error,
-        description: "Please try again",
-        variant: "destructive",
-      });
-    }
-  };
-
-  if (authLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
-
-  const isAdmin = user?.type === 'admin';
 
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-screen bg-background">
+    <Router>
+      <div className="min-h-screen w-screen bg-background">
         {!user ? (
-          <AuthScreen onSuccess={async () => {
-            await Promise.allSettled([fetchUser(), fetchSpots()]);
-          }} />
+          <AuthScreen onSuccess={fetchUser} />
         ) : (
-          <div className="flex w-full">
-            <SidebarTrigger className="-ml-1 p-2 rounded fixed top-4 left-4 z-50 block md:hidden" />
-            <AppSidebar 
-              user={user} 
-              handleLogout={handleLogout} 
-              changeView={setView}
-            />
-            <main className="flex-1 p-2 md:p-8">
-              {spotsLoading ? (
-                <div className="flex items-center justify-center h-full">
-                  <Loader2 className="h-8 w-8 animate-spin" />
-                </div>
-              ) : (
-                <div className="w-full">
-                  {view === 'spotSelect' && (
-                    <SpotSelectionCard 
-                      user={user} 
-                      spotTypes={spots} 
-                      onUpdate={fetchSpots}
-                    />
-                  )}
-                  {view === 'userTable' && isAdmin && (
-                    <AdminTable spotTypes={spots} />
-                  )}
-                  {view === 'spotTable' && isAdmin && (
-                    <AdminSpotTable 
-                      spotTypes={spots} 
-                      onUpdate={fetchSpots}
-                    />
-                  )}
-                </div>
-              )}
-            </main>
-          </div>
+          <>
+            <Navbar />
+            <MusicPlayer />
+            <div className="pt-24">
+              <Routes>
+                <Route path="/" element={<Navigate to="/home" replace />} />
+                <Route path="/home" element={<HomePage />} />
+                <Route path="/user" element={<UserPage userSpots={userSpots} />} />
+                <Route
+                  path="/admin"
+                  element={
+                    user.type === 'admin' ? <AdminPage /> : <Navigate to="/home" replace />
+                  }
+                />
+              </Routes>
+            </div>
+          </>
         )}
       </div>
       <Toaster />
-    </SidebarProvider>
+    </Router>
   );
 };
 
