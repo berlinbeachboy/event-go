@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import axios from '../axiosConfig';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,10 +39,11 @@ import {
   Search,
   UserPlus,
 } from "lucide-react";
-import { UserType , SpotType } from '../models';
+import { SpotType, User } from '@/models/models';
+import { useAdmin } from '@/api/hooks/use-admin';
 
 interface AdminTableProps {
-  spotTypes: SpotType[]
+  spotTypes: SpotType[];
 }
 
 const UserForm = ({ 
@@ -52,12 +52,12 @@ const UserForm = ({
   onSubmit, 
   isCreating = false,
 }: { 
-  user?: UserType; 
+  user?: User;
   spotTypes: SpotType[]; 
-  onSubmit: (data: Partial<UserType>) => void;
+  onSubmit: (data: Partial<User>) => void;
   isCreating?: boolean;
 }) => {
-  const [formData, setFormData] = useState<Partial<UserType>>(
+  const [formData, setFormData] = useState<Partial<User>>(
     user ?? {
       type: 'reg',
       amountPaid: 0,
@@ -65,7 +65,7 @@ const UserForm = ({
     }
   );
 
-  const handleChange = (field: keyof UserType, value: any) => {
+  const handleChange = (field: keyof User, value: string | number | boolean) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -166,64 +166,46 @@ const UserForm = ({
 };
 
 const AdminTable = ({ spotTypes }: AdminTableProps) => {
+  const { users, fetchUsers, createUser, updateUser, deleteUser, isLoading } = useAdmin();
   const [searchTerm, setSearchTerm] = useState('');
   const [isCreating, setIsCreating] = useState(false);
-  const [isEditing, setisEditing] = useState(false);
-  const [users, setUsers] = useState<UserType[]>([]);
+  const [isEditing, setIsEditing] = useState(false);
 
-  const fetchUsers = async () => {
-
-     try {
-         const { data }  = await axios.get('/admin/users/');
-         setUsers(data);
-
-       } catch (error) {
-         console.error('Could not fetch users:', error);
-       }
-   };
-
-   const onUpdateUser = async (userId: number, updatedData: Partial<UserType>) => {
-    try {
-      const response = await axios.put('/admin/users/' + userId, updatedData);
-      if (response.status === 200) {
-        fetchUsers();
-      }
-    } catch (error) {
-      console.error('Could not Update user', error);
-    }
-  };
-
-  const onCreateUser = async (userData: Partial<UserType>) => {
-    try {
-      const response = await axios.post('/admin/users/', userData);
-      if (response.status === 201) {
-        fetchUsers();
-      }
-    } catch (error) {
-      console.error('Could not Create user', error);
-    }
-  };
-
-  const onDeleteUser = async (userId: number) => {
-    try {
-      const response = await axios.delete('/admin/users/' + userId,);
-      if (response.status === 200) {
-        fetchUsers();
-      }
-    } catch (error) {
-      console.error('Could not Delete user', error);
-    }
-  };
-
-   useEffect(() => {
-     fetchUsers();
-   }, []);
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   const filteredUsers = users.filter(user => 
     user.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.nickname?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleCreateUser = async (userData: Partial<User>) => {
+    try {
+      await createUser(userData);
+      setIsCreating(false);
+    } catch (error) {
+      console.error('Could not create user:', error);
+    }
+  };
+
+  const handleUpdateUser = async (userId: number, userData: Partial<User>) => {
+    try {
+      await updateUser(userId, userData);
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Could not update user:', error);
+    }
+  };
+
+  const handleDeleteUser = async (userId: number) => {
+    try {
+      await deleteUser(userId);
+    } catch (error) {
+      console.error('Could not delete user:', error);
+    }
+  };
 
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString();
@@ -243,7 +225,6 @@ const AdminTable = ({ spotTypes }: AdminTableProps) => {
           />
         </div>
         <Sheet open={isCreating} onOpenChange={setIsCreating}>
-          
           <SheetTrigger asChild>
             <Button>
               <UserPlus className="h-4 w-4 mr-2" />
@@ -253,14 +234,11 @@ const AdminTable = ({ spotTypes }: AdminTableProps) => {
           <SheetContent>
             <SheetHeader>
               <SheetTitle>Create New User</SheetTitle>
-              <SheetDescription className="hidden"></SheetDescription> {/*👈🏻 */}
+              <SheetDescription className="hidden"></SheetDescription>
             </SheetHeader>
             <UserForm
               spotTypes={spotTypes}
-              onSubmit={(userData) => {
-                onCreateUser(userData);
-                setIsCreating(false);
-              }}
+              onSubmit={handleCreateUser}
               isCreating={true}
             />
           </SheetContent>
@@ -269,84 +247,89 @@ const AdminTable = ({ spotTypes }: AdminTableProps) => {
 
       {/* User Table */}
       <div className="rounded-md border">
-      {users && <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Full Name</TableHead>
-              <TableHead className="hidden sm:block">Username</TableHead>
-              <TableHead>Nickname</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Spot</TableHead>
-              <TableHead>Payment</TableHead>
-              <TableHead>Last Login</TableHead>
-              <TableHead></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredUsers.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell>{user.fullName}</TableCell>
-                <TableCell className="hidden sm:block">{user.username}</TableCell>
-                <TableCell>{user.nickname}</TableCell>
-                <TableCell>
-                  <span className={`px-2 py-1 rounded-full text-xs ${
-                    user.type === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
-                  }`}>
-                    {user.type}
-                  </span>
-                </TableCell>
-                <TableCell>{user.spotType?.name || 'No spot'}</TableCell>
-                <TableCell>
-                  <span className={`px-2 py-1 rounded-full text-xs ${
-                    user.amountPaid >= user.amountToPay ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                  }`}>
-                    {user.amountPaid}€ / {user.amountToPay}€
-                  </span>
-                </TableCell>
-                <TableCell>{user.lastLogin !== null ? formatDate(user.lastLogin) : "-"}</TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0" onClick={() => {setisEditing(true)}}>
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <Sheet open={isEditing} onOpenChange={setisEditing}>
-                        <SheetTrigger asChild>
-                          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit User
-                          </DropdownMenuItem>
-                        </SheetTrigger>
-                        <SheetContent>
-                          <SheetHeader>
-                            <SheetTitle>Edit User: {user.fullName}</SheetTitle>
-                          </SheetHeader>
-                          <UserForm
-                            user={user}
-                            spotTypes={spotTypes}
-                            onSubmit={(updatedData) => {onUpdateUser(user.id, updatedData); setisEditing(false)}}
-                          />
-                        </SheetContent>
-                      </Sheet>
-                      <DropdownMenuItem
-                        className="text-red-600"
-                        onClick={() => onDeleteUser(user.id)}
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Delete User
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
+        {isLoading ? (
+          <div className="p-4 text-center">Loading...</div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Full Name</TableHead>
+                <TableHead className="hidden sm:block">Username</TableHead>
+                <TableHead>Nickname</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Spot</TableHead>
+                <TableHead>Payment</TableHead>
+                <TableHead>Last Login</TableHead>
+                <TableHead></TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>}
+            </TableHeader>
+            <TableBody>
+              {filteredUsers.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell>{user.fullName}</TableCell>
+                  <TableCell className="hidden sm:block">{user.username}</TableCell>
+                  <TableCell>{user.nickname}</TableCell>
+                  <TableCell>
+                    <span className={`px-2 py-1 rounded-full text-xs ${
+                      user.type === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
+                    }`}>
+                      {user.type}
+                    </span>
+                  </TableCell>
+                  <TableCell>{user.spotType?.name || 'No spot'}</TableCell>
+                  <TableCell>
+                    <span className={`px-2 py-1 rounded-full text-xs ${
+                      user.amountPaid >= user.amountToPay ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {user.amountPaid}€ / {user.amountToPay}€
+                    </span>
+                  </TableCell>
+                  <TableCell>{user.lastLogin !== null ? formatDate(user.lastLogin) : "-"}</TableCell>
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <Sheet open={isEditing} onOpenChange={setIsEditing}>
+                          <SheetTrigger asChild>
+                            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                              <Edit className="mr-2 h-4 w-4" />
+                              Edit User
+                            </DropdownMenuItem>
+                          </SheetTrigger>
+                          <SheetContent>
+                            <SheetHeader>
+                              <SheetTitle>Edit User: {user.fullName}</SheetTitle>
+                            </SheetHeader>
+                            <UserForm
+                              user={user}
+                              spotTypes={spotTypes}
+                              onSubmit={(updatedData) => handleUpdateUser(user.id, updatedData)}
+                            />
+                          </SheetContent>
+                        </Sheet>
+                        <DropdownMenuItem
+                          className="text-red-600"
+                          onClick={() => handleDeleteUser(user.id)}
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Delete User
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </div>
     </div>
   );
 };
+
 
 export default AdminTable;

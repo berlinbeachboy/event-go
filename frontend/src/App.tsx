@@ -1,111 +1,119 @@
-import { useState, useEffect } from 'react';
-import axios from './axiosConfig';
-import RegisterForm from './components/RegisterForm';
-import LoginForm from './components/LoginForm';
-import SpotSelectionCard from './components/SpotSelection';
-import { UserType , SpotType } from './models';
-import AdminTable from './components/AdminTable';
-import AdminSpotTable from './components/SpotTypeTable';
-import { AppSidebar } from './components/SidebarNew';
-import { SidebarProvider, SidebarTrigger } from './components/ui/sidebar';
+import { useEffect, useState } from 'react';
+import { useAuth } from '@/api/hooks/use-auth';
+import { useSpots } from '@/api/hooks/use-spots';
+import { Toaster } from '@/components/ui/toaster';
+import { SidebarProvider } from '@/components/ui/sidebar';
+import { useToast } from '@/hooks/use-toast';
+import { Loader2 } from 'lucide-react';
 
-function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userInfo, setUserInfo] = useState<UserType | null>(null);
-  const [spots, setSpots] = useState<SpotType[]>([]);
-  const [noLoginView, setNoLoginView] = useState<'login' | 'register'>('login');
-  const [view, setView] = useState<'spotSelect' | 'changeMe' | 'userTable' | 'spotTable'>('spotSelect');
-  const [isAdmin, setIsAdmin] = useState(false);
+// Components
+import AuthScreen from './components/AuthScreen';
+import SpotSelectionCard from '@/components/SpotSelection';
+import AdminTable from '@/components/AdminTable';
+import AdminSpotTable from '@/components/SpotTypeTable';
+import { AppSidebar } from '@/components/SidebarNew';
+import { SidebarTrigger } from '@/components/ui/sidebar';
+
+// View type management
+type ViewType = 'spotSelect' | 'changeMe' | 'userTable' | 'spotTable';
+const DEFAULT_VIEW: ViewType = 'spotSelect';
+
+const App = () => {
+  const { toast } = useToast();
+  const { user, isLoading: authLoading, fetchUser, logout } = useAuth();
+  const { spots, isLoading: spotsLoading, fetchSpots } = useSpots();
+  const [view, setView] = useState<ViewType>(DEFAULT_VIEW);
+
+  // Initial data fetch
   useEffect(() => {
-    fetchUserInfo();
-    fetchSpotInfo();
-  }, []);
-  const fetchUserInfo = async () => {
-    try {
-      const { data } = await axios.get('/user/me');
-      setUserInfo(data);
-      setIsLoggedIn(true);
-      setIsAdmin(data.type === "admin");
-      console.log("Last Login: " + data.lastLogin)
-    } catch (error) {
-      console.error('Error fetching user info', error);
-    }
-  };
-  const fetchSpotInfo = async () => {
-    try {
-      const { data } = await axios.get('/user/spots/');
-      setSpots(data);
-    } catch (error) {
-      console.error('Error fetching Spot Types', error);
-    }
-  };
+    const initializeApp = async () => {
+      try {
+        await Promise.all([fetchUser(), fetchSpots()]);
+      } catch (error) {
+        console.log(error)
+        toast({
+          title: "Error loading app data",
+          description: "Please try refreshing the page",
+          variant: "destructive",
+        });
+      }
+    };
 
-  const handleLogin = async () => {
-    fetchUserInfo();
-    fetchSpotInfo();
-  };
+    initializeApp();
+  }, [fetchUser, fetchSpots, toast]);
 
+  // Handle logout
   const handleLogout = async () => {
     try {
-      await axios.post('/user/logout');
-      setIsLoggedIn(false);
-      setUserInfo(null);
-      setNoLoginView('login');
+      console.log('Logging out');
+      await logout();
+      setView(DEFAULT_VIEW);
     } catch (error) {
-      console.error('Error during logout', error);
+      toast({
+        title: "Error logging out: " + error,
+        description: "Please try again",
+        variant: "destructive",
+      });
     }
   };
 
-  return (
-    <div className="flex w-full">
-      
-      {isLoggedIn && userInfo && <SidebarProvider>
-        <SidebarTrigger className="-ml-1 p-2 rounded fixed top-4 left-4 z-50 block md:hidden" />
-        <AppSidebar user={userInfo} handleLogout={handleLogout} changeView={setView}/>
-      </SidebarProvider>}
-      {/* {isLoggedIn && userInfo ? (
-        <Sidebar userInfo={userInfo} onLogout={handleLogout} isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
-      ) : null} */}
-      <div className={`flex-2 p-2 w-full md:p-8 `}>
-        <div className="w-full">
-          {!isLoggedIn ? (
-            <div>
-              {noLoginView === 'login' ? <LoginForm onLogin={handleLogin} /> : <RegisterForm />}
-              <p className="text-center mt-4 text-gray-800">
-                {noLoginView === 'login' ? (
-                  <>
-                    Don't have an account?{' '}
-                    <button
-                      onClick={() => setNoLoginView('register')}
-                      className="text-blue-500 hover:underline"
-                    >
-                      Register here
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    Already have an account?{' '}
-                    <button
-                      onClick={() => setNoLoginView('login')}
-                      className="text-blue-500 hover:underline"
-                    >
-                      Login here
-                    </button>
-                  </>
-                )}
-              </p>
-            </div>
-          ) : (
-            <div className={`flex-2 p-2 w-full md:p-8 `}>
-              {view === 'spotSelect' && userInfo && spots && <SpotSelectionCard user={userInfo} spotTypes={spots} onUpdate={handleLogin}/>}
-              {view === 'userTable' && userInfo && spots && isAdmin && <AdminTable spotTypes={spots} />}
-              {view === 'spotTable' && userInfo && spots && isAdmin && <AdminSpotTable spotTypes={spots} onUpdate={fetchSpotInfo}/>}
-            </div>
-          )}
-        </div>
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin" />
       </div>
-    </div>
+    );
+  }
+
+  const isAdmin = user?.type === 'admin';
+
+  return (
+    <SidebarProvider>
+      <div className="flex min-h-screen w-screen bg-background">
+        {!user ? (
+          <AuthScreen onSuccess={async () => {
+            await Promise.allSettled([fetchUser(), fetchSpots()]);
+          }} />
+        ) : (
+          <div className="flex w-full">
+            <SidebarTrigger className="-ml-1 p-2 rounded fixed top-4 left-4 z-50 block md:hidden" />
+            <AppSidebar 
+              user={user} 
+              handleLogout={handleLogout} 
+              changeView={setView}
+            />
+            <main className="flex-1 p-2 md:p-8">
+              {spotsLoading ? (
+                <div className="flex items-center justify-center h-full">
+                  <Loader2 className="h-8 w-8 animate-spin" />
+                </div>
+              ) : (
+                <div className="w-full">
+                  {view === 'spotSelect' && (
+                    <SpotSelectionCard 
+                      user={user} 
+                      spotTypes={spots} 
+                      onUpdate={fetchSpots}
+                    />
+                  )}
+                  {view === 'userTable' && isAdmin && (
+                    <AdminTable spotTypes={spots} />
+                  )}
+                  {view === 'spotTable' && isAdmin && (
+                    <AdminSpotTable 
+                      spotTypes={spots} 
+                      onUpdate={fetchSpots}
+                    />
+                  )}
+                </div>
+              )}
+            </main>
+          </div>
+        )}
+      </div>
+      <Toaster />
+    </SidebarProvider>
   );
-}
+};
 
 export default App;

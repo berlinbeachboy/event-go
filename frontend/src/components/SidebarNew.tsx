@@ -13,11 +13,11 @@ import {
   SidebarRail,
   SidebarSeparator,
 } from "@/components/ui/sidebar"
-import { UserType } from "@/models";
+import { User } from "@/models/models";
 import { Button } from "./ui/button";
 
 export interface AnimalTableProps extends React.ComponentProps<typeof Sidebar> {
-    user: UserType;
+    user: User;
     handleLogout: () => void;
     changeView: (view: any) => void
 }
@@ -80,7 +80,7 @@ export function AppSidebar({ user, handleLogout, changeView,...props }: AnimalTa
               <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                <Button variant={"destructive"} onClick={()=>{handleLogout}}> Logout </Button>
+                <Button variant={"destructive"} onClick={handleLogout}> Logout </Button>
                 </SidebarMenuButton>
                 </SidebarMenuItem>
               </SidebarMenu>

@@ -1,6 +1,3 @@
-import { UserType , SpotType } from '../models';
-
-
 import { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,15 +5,17 @@ import { Badge } from '@/components/ui/badge';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Euro, Users } from 'lucide-react';
-import axios from '../axiosConfig';
+import { useAuth } from '@/api/hooks/use-auth';
+import { SpotType, User } from '@/models/models';
 
 interface SpotSelectionCardProps {
-  user: UserType;
+  user: User;
   spotTypes: SpotType[];
   onUpdate: () => void;
 }
 
 const SpotSelectionCard = ({ user, spotTypes, onUpdate}: SpotSelectionCardProps) => {
+  const { updateUser } = useAuth();
   const [userUpdate, setUserUpdate] = useState({
     givesSoli: user.givesSoli,
     takesSoli: user.takesSoli,
@@ -37,19 +36,17 @@ const SpotSelectionCard = ({ user, spotTypes, onUpdate}: SpotSelectionCardProps)
 
   const updateMe = async () => {
     try {
-      const response = await axios.put('/user/me', userUpdate);
-      if (response.status === 200) {
-        onUpdate()
-      }
+      await updateUser(userUpdate);
+      onUpdate();
     } catch (error) {
-      console.error('Error fetching user info after login', error);
+      console.error('Error updating user info', error);
     }
   };
 
   const handleSoliChange = (value: string) => {
     setSoliSelection(value)
-    var givesSoli = value === "give";
-    var takesSoli = value === "take";
+    const givesSoli = value === "give";
+    const takesSoli = value === "take";
     setUserUpdate({givesSoli: givesSoli, takesSoli: takesSoli, spotTypeID: userUpdate.spotTypeID});
   };
 
@@ -58,7 +55,7 @@ const SpotSelectionCard = ({ user, spotTypes, onUpdate}: SpotSelectionCardProps)
       <Card className="w-full max-w-2xl">
         <CardHeader>
           <CardTitle className="flex justify-between items-center">
-            <span>{hasSpot ? "Dein Platz: " + user.spotType.name : "Bitte wähle deinen Platz :)"}</span>
+            <span>{hasSpot && user.spotType ? "Dein Platz: " + user.spotType.name : "Bitte wähle deinen Platz :)"}</span>
             {hasSpot && (
               <Badge className={remainingToPay <= 0 ? "bg-green-500" : "bg-yellow-500"}>
                 {remainingToPay <= 0 ? "Paid" : `${remainingToPay}€ remaining`}
