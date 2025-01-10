@@ -1,6 +1,27 @@
 services:
-  backend-8080:
-    container_name: backend-8080
+
+
+  caddy:
+    container_name: caddy
+    image: caddy:2
+    restart: unless-stopped
+    # environment:
+      # Controls what port the Caddy server binds to inside its container.
+      # PRIVATE_BACKEND_URL: ${PRIVATE_BACKEND_URL:-http://backend:8080}
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend/dist:/srv/frontend/dist
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_logs:/var/log/caddy
+      - caddy_data:/data
+
+  backend:
+    container_name: backend
+    hostname: backend
     build:
       context: backend
       dockerfile: Dockerfile
@@ -14,8 +35,7 @@ services:
   db:
     image: postgres:17-alpine
     container_name: db
-    ports:
-      - "5432:5432"
+    hostname: db
     env_file:
       - ./.env
     volumes:
@@ -23,3 +43,5 @@ services:
 
 volumes:
   db_data:
+  caddy_data:
+  caddy_logs:

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"net/http"
 	"sfpr/middleware"
 	"sfpr/util"
 
@@ -8,24 +9,30 @@ import (
 	"gorm.io/gorm"
 )
 
+func HealthEP(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"success": "ok"})
+	}
+}
+
 func SetupRouter(db *gorm.DB) *gin.Engine {
 
-	if util.EnvIsProd(){
+	if util.EnvIsProd() {
 		gin.SetMode(gin.ReleaseMode)
 	}
-	
+
 	r := gin.Default()
 
-	if util.EnvIsProd(){
+	if util.EnvIsProd() {
 		trustedProxies := []string{"http://localhost", "http://127.0.0.1", "https://schoenfeld.fun"}
 		r.SetTrustedProxies(trustedProxies)
 	}
-	
-	
+
 	r.Use(middleware.CorsMiddleware())
 	// Routes
 	api := r.Group("/api")
 
+	api.GET("/health", HealthEP(db))
 	api.POST("/register", Register(db))
 	api.POST("/login", Login(db))
 
