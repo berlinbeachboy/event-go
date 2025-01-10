@@ -1,0 +1,65 @@
+localhost {
+    # Handle API requests - proxy to backend container
+    handle /api/* {
+        reverse_proxy backend:8080
+    }
+
+    # Handle all other paths - serve static frontend files
+    handle {
+        root * /srv/frontend/dist
+        try_files {path} /index.html
+        file_server
+        encode gzip
+    }
+}
+
+# Main Domain (PROD)
+schoenfeld.fun {
+    handle /api/* {
+
+        reverse_proxy backend:8080 {
+            # Health checks for the backend
+            health_uri /api/health
+            health_interval 30s
+            health_timeout 5s
+            
+            
+            # Headers
+            # header_up Host {upstream_hostport}
+            # header_up X-Real-IP {remote_host}
+            # header_up X-Forwarded-For {remote_host}
+            # header_up X-Forwarded-Proto {scheme}
+        }
+    }
+
+    respond /caddy-health-check 200
+
+    # Handle all other paths - serve static frontend files
+    handle {
+        root * /srv/frontend/dist
+        try_files {path} /index.html
+        file_server
+        encode gzip
+    }
+
+    # Security headers
+    header {
+        # Enable HSTS
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        # Prevent XSS attacks
+        X-XSS-Protection "1; mode=block"
+        # Prevent clickjacking
+        X-Frame-Options "DENY"
+        # Prevent MIME type sniffing
+        X-Content-Type-Options "nosniff"
+        # Enable referrer policy
+        Referrer-Policy "strict-origin-when-cross-origin"
+        # Remove Server header
+        -Server
+    }
+
+    # Enable logs
+    log {
+        output file /var/log/caddy/access.log
+    }
+}
