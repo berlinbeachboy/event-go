@@ -16,7 +16,7 @@ import { useSpots } from './api/hooks/use-spots';
 
 const App = () => {
   const { toast } = useToast();
-  const { user, isLoading, fetchUser } = useAuth();
+  const { user, fetchUser } = useAuth();
   const { userSpots, fetchUserSpots } = useSpots()
 
   useEffect(() => {

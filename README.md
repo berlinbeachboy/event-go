@@ -23,13 +23,15 @@ cd frontend
 npm run dev
 ```
 
-## To To
+## To Do
 
 ### Before Launch
 - [Frontend] Sidebar coloring on mobile
 - [Frontend] Container width
 - [Frontend] Component for Users for changing their own info such as `fullName`
 - [Frontend] Changing a users (or your own) password
+- [Frontend] Toaster instread of alert, information about wrong password in login and register form
+- [Frontend] Restyling Login / Register components
 - [Backend] SMTP Email Sending for Account Verification
 - [DevOps] Reverse Proxy for Production (probably Caddy?)
 - [DevOps] Dockerize Frontend for Production

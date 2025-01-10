@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { User, PartyPopper, Menu, X } from 'lucide-react';
+import { User, PartyPopper, Menu} from 'lucide-react';
 import { MarqueeText } from '@/components/MarqueeText';
 import {
     DropdownMenu,
