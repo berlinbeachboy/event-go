@@ -1,8 +1,13 @@
 package handlers
 
 import (
+	"crypto/rand"
+	"encoding/base64"
+	"errors"
+	"fmt"
 	"net/http"
 	"time"
+	"unicode/utf8"
 
 	"sfpr/models"
 	"sfpr/util"
@@ -27,6 +32,32 @@ type UserRegister struct {
 	SitePassword string `json:"sitePassword"`
 }
 
+type ResetPWStruct struct {
+	Token           string `json:"token" binding:"required"`
+	Password        string `json:"password" binding:"required"`
+	PasswordConfirm string `json:"passwordConfirm" binding:"required"`
+}
+
+func CheckPasswords(password, passwordConfirm string) error {
+	if password != passwordConfirm {
+		return errors.New("passwords don't match")
+	}
+	if utf8.RuneCountInString(password) < 6 {
+		return errors.New("password needs to be at least 6 characters")
+	}
+	return nil
+}
+
+// generateVerificationToken creates a random token
+func generateVerificationToken() (string, error) {
+	b := make([]byte, 32)
+	_, err := rand.Read(b)
+	if err != nil {
+		return "", err
+	}
+	return base64.URLEncoding.EncodeToString(b), nil
+}
+
 func Register(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var ur UserRegister
@@ -41,16 +72,42 @@ func Register(db *gorm.DB) gin.HandlerFunc {
 		}
 		var userExist models.User
 		if err := db.First(&userExist, "username = ?", &ur.Username).Error; err == nil {
-			// If the user exists but does not have a password, an admin might have created it
+			// If the user exists but is not activated, an admin might have created it
 			// it will then be filled by an actual user
-			if userExist.Password == nil {
-				userExist.Nickname = ur.Nickname
-				userExist.FullName = &ur.FullName
-				userExist.Phone = &ur.Phone
-				UpdatePassword(&userExist, ur.Password)
-				db.Save(&userExist)
+			if userExist.IsActivated {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "User with this email already exists, please login"})
+				return
 			}
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Username already exists, please login"})
+			userExist.Nickname = ur.Nickname
+			userExist.FullName = &ur.FullName
+			userExist.Phone = &ur.Phone
+			UpdatePassword(&userExist, ur.Password)
+
+			// Generate verification token
+			token, err := generateVerificationToken()
+			if err != nil {
+				c.JSON(500, gin.H{"error": "Failed to generate verification token"})
+				return
+			}
+			expiryTime := time.Now().Add(24 * time.Hour)
+			// Set token and expiry time
+			userExist.VerificationToken = &token
+			userExist.TokenExpiryTime = &expiryTime
+
+			db.Save(&userExist)
+
+			// Send verification email
+			verificationLink := fmt.Sprintf("%s/verify?token=%s", util.ApiBaseURL(), token)
+			if util.EmailsEnabled {
+				if err := util.SendVerificationEmail(*userExist.Username, verificationLink, userExist.Nickname); err != nil {
+					c.JSON(500, gin.H{"error": "Failed to send verification email"})
+					return
+				}
+			} else {
+				fmt.Printf("Cannot send Email to %s", *userExist.Username)
+				fmt.Printf("Their verification Link is:  %s", verificationLink)
+			}
+			c.IndentedJSON(http.StatusCreated, userExist.ToResponse())
 			return
 		}
 
@@ -67,11 +124,35 @@ func Register(db *gorm.DB) gin.HandlerFunc {
 			Nickname: ur.Nickname,
 			FullName: &ur.FullName,
 		}
+		// Generate verification token
+		token, err := generateVerificationToken()
+		if err != nil {
+			c.JSON(500, gin.H{"error": "Failed to generate verification token"})
+			return
+		}
+		expiryTime := time.Now().Add(24 * time.Hour)
+		// Set token and expiry time
+		user.VerificationToken = &token
+		user.TokenExpiryTime = &expiryTime
+
 		if err := db.Create(&user).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to register user"})
 			return
 		}
-		c.IndentedJSON(http.StatusCreated, user)
+
+		verificationLink := fmt.Sprintf("%s/verify?token=%s", util.ApiBaseURL(), token)
+		// Send verification email
+		if util.EmailsEnabled {
+			if err := util.SendVerificationEmail(*user.Username, verificationLink, user.Nickname); err != nil {
+				c.JSON(500, gin.H{"error": "Failed to send verification email"})
+				return
+			}
+		} else {
+			fmt.Printf("Cannot send Email to %s", *user.Username)
+			fmt.Printf("Their verification Link is:  %s", verificationLink)
+		}
+
+		c.IndentedJSON(http.StatusCreated, user.ToResponse())
 	}
 }
 
@@ -93,6 +174,10 @@ func Login(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 			return
 		}
+		if !user.IsActivated {
+			c.JSON(http.StatusForbidden, gin.H{"error": "User not nicht verifiziert. Bitte den Email Link benutzen."})
+			return
+		}
 
 		tokenString, err := util.MakeJWT(creds.Username)
 		if err != nil {
@@ -108,11 +193,115 @@ func Login(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
+func Verify(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token := c.Query("token")
+		if token == "" {
+			c.JSON(400, gin.H{"error": "Invalid verification token"})
+			return
+		}
+
+		// Find user by token (implement your database logic here)
+		var user models.User
+		result := db.Where("verification_token = ?", token).First(&user)
+		if result.Error != nil {
+			c.JSON(404, gin.H{"error": "Invalid verification token"})
+			return
+		}
+
+		// Check token expiry
+		if time.Now().After(*user.TokenExpiryTime) {
+			c.JSON(400, gin.H{"error": "Verification token has expired"})
+			return
+		}
+
+		// Activate user
+		user.IsActivated = true
+		user.VerificationToken = util.StrPtr("")
+		db.Save(&user)
+
+		c.JSON(200, gin.H{"message": "Email verified successfully"})
+	}
+}
+
 func Logout(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		c.SetSameSite(http.SameSiteLaxMode)
 		c.SetCookie("jwt", "", -1, "/", "localhost", false, true)
 		c.JSON(http.StatusOK, "ok")
+	}
+}
+
+// Request a link to reset password in email
+func RequestPWReset(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		username := c.Query("username")
+		if username == "" {
+			c.JSON(400, gin.H{"error": "No username/email set."})
+			return
+		}
+		var userExist models.User
+		if err := db.First(&userExist, "username = ?", username).Error; err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "User is not in DB."})
+			c.Abort()
+			return
+		}
+
+		// Generate verification token
+		token, err := generateVerificationToken()
+		if err != nil {
+			c.JSON(500, gin.H{"error": "Failed to generate verification token"})
+			return
+		}
+		expiryTime := time.Now().Add(24 * time.Hour)
+		// Set token and expiry time
+		userExist.VerificationToken = &token
+		userExist.TokenExpiryTime = &expiryTime
+		db.Save(&userExist)
+
+		verificationLink := fmt.Sprintf("%s/resetpw?token=%s", util.ApiBaseURL(), token)
+		// Send pw reset email
+		if util.EmailsEnabled {
+			if err := util.SendPWResetEmail(*userExist.Username, verificationLink, userExist.Nickname); err != nil {
+				c.JSON(500, gin.H{"error": "Failed to send verification email"})
+				return
+			}
+		} else {
+			fmt.Printf("Cannot send PW Reset Email to %s", *userExist.Username)
+			fmt.Printf("Their PW Reset Link is:  %s", verificationLink)
+		}
+
+		c.JSON(http.StatusOK, "Ok")
+
+	}
+}
+
+func ResetPW(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		var pwu ResetPWStruct
+		if err := c.ShouldBindJSON(&pwu); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+			return
+		}
+
+		// Find user by token
+		var userExist models.User
+		result := db.Where("verification_token = ?", pwu.Token).First(&userExist)
+		if result.Error != nil {
+			c.JSON(404, gin.H{"error": "Invalid verification token"})
+			return
+		}
+
+		if err := CheckPasswords(pwu.Password, pwu.PasswordConfirm); err != nil {
+			c.JSON(400, gin.H{"error": err.Error()})
+			return
+		}
+
+		UpdatePassword(&userExist, pwu.Password)
+
+		db.Save(&userExist)
+		c.JSON(http.StatusOK, "Ok")
 	}
 }

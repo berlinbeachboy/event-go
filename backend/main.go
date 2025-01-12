@@ -25,10 +25,11 @@ func addAdmin(db *gorm.DB) {
 		hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(adminPW), bcrypt.DefaultCost)
 		hpstring := string(hashedPassword)
 		user := models.User{
-			Username: &mainAdmin,
-			Password: &hpstring,
-			Type:     "admin",
-			Nickname: "Pete",
+			Username:    &mainAdmin,
+			Password:    &hpstring,
+			Type:        "admin",
+			Nickname:    "Pete",
+			IsActivated: true,
 		}
 		if err := db.Create(&user).Error; err != nil {
 			log.Println("could not create admin user")
@@ -75,6 +76,8 @@ func main() {
 	if env != "" {
 		util.SetEnv(env)
 	}
+	util.SetEmailConfig()
+
 	fmt.Println("Starting Backend... Waiting 3s for DB to come up")
 	time.Sleep(3 * time.Second)
 
@@ -104,6 +107,7 @@ func main() {
 	if sitePW == "" {
 		sitePW = "schoenfeld_wird_supa"
 	}
+
 	// Set the Site Password globally
 	util.SetSitePW(sitePW)
 

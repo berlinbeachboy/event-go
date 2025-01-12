@@ -30,11 +30,11 @@ npm run dev
 - [Frontend] Container width
 - [Frontend] Component for Users for changing their own info such as `fullName`
 - [Frontend] Changing a users (or your own) password
+- [Frontend] Adding components for Password Reset and Verifying Email 
 - [Frontend] Toaster instread of alert, information about wrong password in login and register form
 - [Frontend] Restyling Login / Register components
-- [Backend] SMTP Email Sending for Account Verification
-- [DevOps] Reverse Proxy for Production (probably Caddy?)
-- [DevOps] Dockerize Frontend for Production
+- ✅ [Backend] SMTP Email Sending for Account Verification
+- ✅ [DevOps] Reverse Proxy for Production (probably Caddy?)
 
 ### Future Features
 

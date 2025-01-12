@@ -167,8 +167,8 @@ func PutMePW(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 			return
 		}
-		if pwu.Password != pwu.PasswordConfirm {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Passwords don't match."})
+		if err := CheckPasswords(pwu.Password, pwu.PasswordConfirm); err != nil {
+			c.JSON(400, gin.H{"error": err.Error()})
 			return
 		}
 		UpdatePassword(&userExist, pwu.Password)
@@ -281,8 +281,8 @@ func PutUserPW(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 			return
 		}
-		if pwu.Password != pwu.PasswordConfirm {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Passwords don't match."})
+		if err := CheckPasswords(pwu.Password, pwu.PasswordConfirm); err != nil {
+			c.JSON(400, gin.H{"error": err.Error()})
 			return
 		}
 		UpdatePassword(&userExist, pwu.Password)

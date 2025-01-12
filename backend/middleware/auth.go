@@ -41,9 +41,20 @@ func getTokenUsername(c *gin.Context) string {
 	return claims.Username
 }
 
-func AuthMiddleware() gin.HandlerFunc {
+func AuthMiddleware(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		username := getTokenUsername(c)
+		var userExist models.User
+		if err := db.First(&userExist, "username = ?", username).Error; err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "User is not in DB."})
+			c.Abort()
+			return
+		}
+		if !userExist.IsActivated {
+			c.JSON(http.StatusForbidden, gin.H{"error": "User ist not activated yet. Please activate by clicking the Link in the Verfication Email."})
+			c.Abort()
+			return
+		}
 		c.Set("username", username)
 		c.Next()
 	}
@@ -55,6 +66,11 @@ func AdminMiddleware(db *gorm.DB) gin.HandlerFunc {
 		var userExist models.User
 		if err := db.First(&userExist, "username = ?", username).Error; err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "User is not in DB."})
+			c.Abort()
+			return
+		}
+		if !userExist.IsActivated {
+			c.JSON(http.StatusForbidden, gin.H{"error": "User ist not activated yet. Please activate by clicking the Link in the Verfication Email."})
 			c.Abort()
 			return
 		}
