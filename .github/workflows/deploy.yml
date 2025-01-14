@@ -31,6 +31,6 @@ jobs:
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $REMOTE_USER@$REMOTE_HOST "cd ~/event-go && "\
+          ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "cd ~/event-go && "\
             "git fetch --all --prune && git pull && "\
             "cd frontend && npm install && npm run build && cd .. && docker compose up -d --force-recreate"
