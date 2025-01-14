@@ -8,6 +8,7 @@ on:
 jobs:
   deploy:
     name: Deploy to VM
+    environment: PROD
     runs-on: ubuntu-latest
 
     steps:
@@ -20,10 +21,13 @@ jobs:
       - name: Prepare private key
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
         run: |
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan $REMOTE_HOST >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
 
       - name: Deploy application on remote server
         env:
@@ -31,6 +35,6 @@ jobs:
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
         run: |
-          ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST "cd ~/event-go && "\
+          ssh $REMOTE_USER@$REMOTE_HOST "cd ~/event-go && "\
             "git fetch --all --prune && git pull && "\
             "cd frontend && npm install && npm run build && cd .. && docker compose up -d --force-recreate"
