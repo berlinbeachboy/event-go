@@ -35,7 +35,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	api.GET("/health", HealthEP(db))
 	api.POST("/register", Register(db))
 	api.POST("/login", Login(db))
-	api.POST("/verify", Verify(db))
+	api.GET("/verify", Verify(db))
 	api.POST("/requestPasswordReset", RequestPWReset(db))
 	api.POST("/resetPassword", ResetPW(db))
 

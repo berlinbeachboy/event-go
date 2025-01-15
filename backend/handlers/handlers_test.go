@@ -168,12 +168,12 @@ func TestRegister(t *testing.T) {
 
 	// bad token - should not verify
 	verifyPath := "/api/verify?token=xxx"
-	code, _ = sendReq(router, "POST", verifyPath, &userJsonString, nil)
+	code, _ = sendReq(router, "GET", verifyPath, &userJsonString, nil)
 	assert.Equal(t, 404, code)
 
 	// verification successful
 	verifyPath = fmt.Sprintf("/api/verify?token=%s", *userExist.VerificationToken)
-	code, _ = sendReq(router, "POST", verifyPath, &userJsonString, nil)
+	code, _ = sendReq(router, "GET", verifyPath, &userJsonString, nil)
 	assert.Equal(t, 200, code)
 }
 

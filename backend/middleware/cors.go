@@ -9,7 +9,7 @@ import (
 // CORS middleware function definition
 func CorsMiddleware() gin.HandlerFunc {
 	// Define allowed origins as a comma-separated string
-	originsString := "https://localhost/,http://localhost,https://localhost,https://localhost:80,https://schoenfeld.fun"
+	originsString := "https://localhost/,http://localhost,http://localhost:5173,https://localhost,https://localhost:80,https://schoenfeld.fun"
 	var allowedOrigins []string
 	if originsString != "" {
 		// Split the originsString into individual origins and store them in allowedOrigins slice

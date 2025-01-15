@@ -15,12 +15,19 @@
     givesSoli?: boolean;
     takesSoli?: boolean;
   }
+  interface ResetPasswordData {
+    token: string;
+    password: string;
+    passwordConfirm: string;
+  }
   
   interface AuthState {
     user: UserResponse | null;
     isLoading: boolean;
     error: Error | null;
     login: (data: LoginData) => Promise<void>;
+    requestPasswordReset: (email: string) => Promise<void>;
+    resetPassword: (data: ResetPasswordData) => Promise<void>;
     register: (data: RegisterData) => Promise<void>;
     logout: () => Promise<void>;
     fetchUser: () => Promise<void>;
@@ -42,12 +49,38 @@
         throw error;
       }
     },
+
+    requestPasswordReset: async (email: string) => {
+      try {
+        set({ isLoading: true, error: null });
+        const response = await axiosInstance.post<UserResponse>('/requestPasswordReset?username='+email, );
+        set({ isLoading: false });
+        if (response.status == 200) {
+          // redirect to login
+          // toast success
+        }
+      } catch (error) {
+        set({ error: error as Error, isLoading: false });
+        throw error;
+      }
+    },
+
+    resetPassword: async (data: ResetPasswordData) => {
+      try {
+        set({ isLoading: true, error: null });
+        await axiosInstance.post<UserResponse>('/resetPassword', data);
+        set({isLoading: false });
+      } catch (error) {
+        set({ error: error as Error, isLoading: false });
+        throw error;
+      }
+    },
   
     register: async (data: RegisterData) => {
       try {
         set({ isLoading: true, error: null });
-        const response = await axiosInstance.post<UserResponse>('/register', data);
-        set({ user: response.data, isLoading: false });
+        await axiosInstance.post<UserResponse>('/register', data);
+        set({ isLoading: false });
       } catch (error) {
         set({ error: error as Error, isLoading: false });
         throw error;

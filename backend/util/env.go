@@ -18,7 +18,7 @@ func EnvIsProd() bool{
 	return env == "PROD"
 }
 
-var apiBaseURL string = "https://localhost"
+var apiBaseURL string = "http://localhost:8080"
 
 
 func ApiBaseURL() string {

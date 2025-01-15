@@ -97,7 +97,7 @@ func Register(db *gorm.DB) gin.HandlerFunc {
 			db.Save(&userExist)
 
 			// Send verification email
-			verificationLink := fmt.Sprintf("%s/verify?token=%s", util.ApiBaseURL(), token)
+			verificationLink := fmt.Sprintf("%s/api/verify?token=%s", util.ApiBaseURL(), token)
 			if util.EmailsEnabled {
 				if err := util.SendVerificationEmail(*userExist.Username, verificationLink, userExist.Nickname); err != nil {
 					c.JSON(500, gin.H{"error": "Failed to send verification email"})
@@ -140,7 +140,7 @@ func Register(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		verificationLink := fmt.Sprintf("%s/verify?token=%s", util.ApiBaseURL(), token)
+		verificationLink := fmt.Sprintf("%s/api/verify?token=%s", util.ApiBaseURL(), token)
 		// Send verification email
 		if util.EmailsEnabled {
 			if err := util.SendVerificationEmail(*user.Username, verificationLink, user.Nickname); err != nil {
@@ -260,7 +260,7 @@ func RequestPWReset(db *gorm.DB) gin.HandlerFunc {
 		userExist.TokenExpiryTime = &expiryTime
 		db.Save(&userExist)
 
-		verificationLink := fmt.Sprintf("%s/resetpw?token=%s", util.ApiBaseURL(), token)
+		verificationLink := fmt.Sprintf("%s/api/resetpw?token=%s", util.ApiBaseURL(), token)
 		// Send pw reset email
 		if util.EmailsEnabled {
 			if err := util.SendPWResetEmail(*userExist.Username, verificationLink, userExist.Nickname); err != nil {

@@ -27,11 +27,11 @@ const App = () => {
 
       } catch (error) {
         console.log(error)
-        toast({
-          title: "Error loading app data",
-          description: "Please try refreshing the page",
-          variant: "destructive",
-        });
+        // toast({
+        //   title: "Error loading app data",
+        //   description: "Please try refreshing the page",
+        //   variant: "destructive",
+        // });
       }
     };
 

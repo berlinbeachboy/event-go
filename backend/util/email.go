@@ -51,7 +51,7 @@ func SendVerificationEmail(email, verificationLink string, nickname string) erro
 			"To: %s\r\n"+
 			"Subject: Bitte deine Email bestätigen\r\n"+
 			"\r\n"+
-			"Moin %s, du geile Schnegge,\r\n"+
+			"Moin %s du geile Schnegge 🐌\r\n"+
 			"\r\n"+
 			"geil, dass du am Start bist! Dieses Jahr wird nochmal richtig fett! 🌟\r\n"+
 			"Bitte klicke auf den folgenden Link um die Registrierung für Schönfeld 2025 abzuschließen:\r\n"+

@@ -13,7 +13,7 @@ import { Icons } from "@/components/ui/icons";
 import { useToast } from "@/hooks/use-toast";
 
 interface RegisterFormProps {
-  onSuccess: () => Promise<void>;
+  onSuccess: () => void;
 }
 
 export default function RegisterForm({ onSuccess }: RegisterFormProps) {
@@ -38,8 +38,8 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
       await register(formData);
       await onSuccess();
       toast({
-        title: "Registration successful!",
-        description: "Welcome to the community!",
+        title: "Top, jetzt nur noch die Mail bestätigen",
+        description: "Check deine Mails (auch Spam) und verfiziere dein Mail!",
       });
     } catch (error) {
       console.error('Registration error:', error);
