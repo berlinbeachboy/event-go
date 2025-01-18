@@ -37,4 +37,4 @@ jobs:
         run: |
           ssh $REMOTE_USER@$REMOTE_HOST "cd ~/event-go && "\
             "git fetch --all --prune && git pull && "\
-            "cd frontend && npm install && npm run build && cd .. && docker compose up -d --force-recreate"
+            "cd frontend && npm install && npm run build && cd .. && docker compose up --build -d --force-recreate"

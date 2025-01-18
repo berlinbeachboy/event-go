@@ -196,7 +196,7 @@ func Login(db *gorm.DB) gin.HandlerFunc {
 		c.SetSameSite(http.SameSiteLaxMode)
 		var site string
 		var secureCookie bool
-		if util.EnvIsProd(){
+		if util.EnvIsProd() {
 			site = "schoenfeld.fun"
 			secureCookie = true
 		} else {
@@ -235,7 +235,8 @@ func Verify(db *gorm.DB) gin.HandlerFunc {
 		user.VerificationToken = util.StrPtr("")
 		db.Save(&user)
 
-		c.JSON(200, gin.H{"message": "Email verified successfully"})
+		// c.JSON(200, gin.H{"message": "Email verified successfully"})
+		c.Redirect(307, "https://schoenfeld.fun?verify=success")
 	}
 }
 

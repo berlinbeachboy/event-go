@@ -65,7 +65,11 @@ func updateUser(ue *models.User, uu UserUpdate) {
 	if uu.TakesSoli != nil {
 		ue.TakesSoli = *uu.TakesSoli
 	}
-	ue.SpotTypeID = uu.SpotTypeID
+	zero := uint(0)
+	if uu.SpotTypeID != nil && uu.SpotTypeID != &zero {
+		ue.SpotTypeID = uu.SpotTypeID
+	}
+
 }
 
 func checkSpot(db *gorm.DB, spotTypeId int) error {
@@ -123,9 +127,9 @@ func PutMe(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 			return
 		}
-
+		zero := uint(0)
 		// check SpotType
-		if uu.SpotTypeID != nil {
+		if uu.SpotTypeID != nil && uu.SpotTypeID != &zero {
 			if err := checkSpot(db, int(*uu.SpotTypeID)); err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": "Bad Spottype."})
 				return

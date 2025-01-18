@@ -2,12 +2,11 @@ package util
 
 import (
 	"crypto/tls"
+	"fmt"
 	"net"
 	"net/smtp"
-	"fmt"
 	"os"
 )
-
 
 // EmailConfig holds SMTP configuration
 type EmailConfigClass struct {
@@ -42,7 +41,7 @@ func SetEmailConfig() {
 		EmailsEnabled = false
 		fmt.Printf("WARNING: Email Sending is disabled. SMTP ENV variables are not fully set.")
 	}
-	fmt.Printf("Email Sending is enabled from server %s and address %s.", emailConfig.Host, emailConfig.Username)
+	fmt.Println("Email Sending is enabled from server", emailConfig.Host, "and address", emailConfig.Username)
 }
 
 // sendVerificationEmail sends an email with verification link
