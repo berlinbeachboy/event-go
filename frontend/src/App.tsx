@@ -16,7 +16,7 @@ import { useSpots } from './api/hooks/use-spots';
 
 const App = () => {
   const { toast } = useToast();
-  const { user, fetchUser } = useAuth();
+  var { user, fetchUser } = useAuth();
   const { userSpots, fetchUserSpots } = useSpots()
   
 
@@ -29,6 +29,7 @@ const App = () => {
 
       } catch (error) {
         console.log(error)
+        user = null
       }
     };
 
@@ -43,7 +44,7 @@ const App = () => {
           <AuthScreen onSuccess={fetchUser} />
         ) : (
           <>
-            <Navbar />
+            <Navbar onLogout={fetchUser}/>
             {/* <MusicPlayer /> */}
             <div className="pt-24">
               <Routes>

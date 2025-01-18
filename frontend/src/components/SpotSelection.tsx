@@ -83,6 +83,18 @@ const SpotSelectionCard = ({ user, spotTypes, onUpdate}: SpotSelectionCardProps)
           {/* Spot Selection */}
           {(!hasSpot || isSelectingSpot) && (
             <div className="grid gap-4 md:grid-cols-2">
+              <Button
+                  key={0}
+                  variant={!userUpdate.spotTypeID || userUpdate.spotTypeID == null ? "default" : "outline"}
+                  onClick={() => {
+                    setUserUpdate({givesSoli: userUpdate.givesSoli, takesSoli: userUpdate.takesSoli, spotTypeID: 0})
+                  }}
+                  className="w-full p-4 h-auto flex flex-col items-start text-left"
+                >
+                  <div className="flex justify-between w-full  items-start">
+                    <span className="font-bold">{"Komme leider nicht :("} </span>
+                  </div>
+                </Button>
               {spotTypes.map(spot => (
                 <Button
                   key={spot.id}
@@ -90,7 +102,6 @@ const SpotSelectionCard = ({ user, spotTypes, onUpdate}: SpotSelectionCardProps)
                   disabled={spot.currentCount >= spot.limit}
                   onClick={() => {
                     setUserUpdate({givesSoli: userUpdate.givesSoli, takesSoli: userUpdate.takesSoli, spotTypeID: spot.id})
-                    // updateMe();
                   }}
                   className="w-full p-4 h-auto flex flex-col items-start text-left"
                 >

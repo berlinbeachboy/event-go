@@ -21,7 +21,7 @@ type UserUpdate struct {
 	AmountPaid *float32 `json:"amountPaid"`
 	GivesSoli  *bool    `json:"givesSoli"`
 	TakesSoli  *bool    `json:"takesSoli"`
-	SpotTypeID *uint    `json:"spotTypeId,omitempty"`
+	SpotTypeID *uint    `json:"spotTypeId"`
 }
 
 type UserCreate struct {
@@ -65,14 +65,19 @@ func updateUser(ue *models.User, uu UserUpdate) {
 	if uu.TakesSoli != nil {
 		ue.TakesSoli = *uu.TakesSoli
 	}
-	zero := uint(0)
-	if uu.SpotTypeID != nil && uu.SpotTypeID != &zero {
+	if uu.SpotTypeID != nil && int(*uu.SpotTypeID) != 0 {
 		ue.SpotTypeID = uu.SpotTypeID
+	}
+	if int(*uu.SpotTypeID) == 0 {
+		ue.SpotTypeID = nil
 	}
 
 }
 
 func checkSpot(db *gorm.DB, spotTypeId int) error {
+	if spotTypeId == 0 {
+		return nil
+	}
 	spot, err := GetSpotById(db, strconv.Itoa(spotTypeId))
 	if err != nil {
 		return errors.New("bad Spottype")

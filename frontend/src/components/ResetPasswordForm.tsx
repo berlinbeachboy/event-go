@@ -70,8 +70,8 @@ export default function PasswordResetForm({ token, onReset }: PasswordResetFormP
               id="passwordConfirm"
               name="passwordConfirm"
               placeholder="Weisch's noch?"
-              type="passwordConfirm"
-              value={formData.password}
+              type="password"
+              value={formData.passwordConfirm}
               onChange={handleChange}
               required
             />

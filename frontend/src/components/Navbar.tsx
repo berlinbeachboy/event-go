@@ -17,14 +17,18 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/api/hooks/use-auth';
 import { MusicPlayer } from './MusicPlayer';
 
+interface NavBarProps {
+    onLogout: () => Promise<void>;
+  }
 
-export const Navbar = () => {
+export const Navbar = ({ onLogout }: NavBarProps) => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
 
     const handleLogout = async () => {
         try {
             await logout();
+            await onLogout()
             navigate('/');
         } catch (error) {
             console.error('Logout error:', error);
@@ -42,7 +46,7 @@ export const Navbar = () => {
     return (
         <div className="fixed w-full z-10">
             <MarqueeText
-                text="Jetzt Zuschlagen! 20% Rabatt auf alle Produkte - Nur vom 01.12. bis 24.12."
+                text="Jetzt Zuschlagen! 20% Rabatt auf alle Tickets - Nur vom 15.01. bis 15.02."
                 speed={5}
                 className="bg-custom-aquamarine py-2 border-b"
                 textClassName="text-black font-medium tracking-wider text-sm"

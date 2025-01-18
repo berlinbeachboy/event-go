@@ -12,6 +12,9 @@ func SetEnv(env_in string) {
 	if env == "PROD" {
 		SetApiBaseURL("https://schoenfeld.fun")
 	}
+	if env == "PROD" {
+		SetFrontendBaseURL("https://schoenfeld.fun")
+	}
 }
 
 func EnvIsProd() bool{
@@ -27,4 +30,15 @@ func ApiBaseURL() string {
 
 func SetApiBaseURL(apiBaseURL_in string) {
 	apiBaseURL = apiBaseURL_in
+}
+
+var frontendBaseURL string = "http://localhost:5173"
+
+
+func FrontendBaseURL() string {
+	return frontendBaseURL
+}
+
+func SetFrontendBaseURL(frontendBaseURL_in string) {
+	frontendBaseURL = frontendBaseURL_in
 }

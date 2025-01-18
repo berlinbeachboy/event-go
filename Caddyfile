@@ -19,16 +19,16 @@ schoenfeld.fun {
 
         reverse_proxy backend:8080 {
             # Health checks for the backend
-            health_uri /api/health
-            health_interval 300s
-            health_timeout 5s
+            # health_uri /api/health
+            # health_interval s
+            # health_timeout 5s
             
             
             # Headers
-            # header_up Host {upstream_hostport}
-            # header_up X-Real-IP {remote_host}
-            # header_up X-Forwarded-For {remote_host}
-            # header_up X-Forwarded-Proto {scheme}
+            header_up Host {upstream_hostport}
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
         }
     }
 

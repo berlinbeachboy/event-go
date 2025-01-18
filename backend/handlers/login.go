@@ -201,7 +201,7 @@ func Login(db *gorm.DB) gin.HandlerFunc {
 			secureCookie = true
 		} else {
 			site = "localhost"
-			secureCookie = true
+			secureCookie = false
 		}
 		c.SetCookie("jwt", tokenString, 3600, "/api", site, secureCookie, true)
 		c.JSON(http.StatusOK, gin.H{"status": "success"})
@@ -236,7 +236,7 @@ func Verify(db *gorm.DB) gin.HandlerFunc {
 		db.Save(&user)
 
 		// c.JSON(200, gin.H{"message": "Email verified successfully"})
-		c.Redirect(307, "https://schoenfeld.fun?verify=success")
+		c.Redirect(307, util.FrontendBaseURL()+"/home?verify=success")
 	}
 }
 
@@ -244,7 +244,16 @@ func Logout(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		c.SetSameSite(http.SameSiteLaxMode)
-		c.SetCookie("jwt", "", -1, "/", "localhost", false, true)
+		var site string
+		var secureCookie bool
+		if util.EnvIsProd() {
+			site = "schoenfeld.fun"
+			secureCookie = true
+		} else {
+			site = "localhost"
+			secureCookie = false
+		}
+		c.SetCookie("jwt", "", -1, "/api", site, secureCookie, true)
 		c.JSON(http.StatusOK, "ok")
 	}
 }
@@ -276,7 +285,7 @@ func RequestPWReset(db *gorm.DB) gin.HandlerFunc {
 		userExist.TokenExpiryTime = &expiryTime
 		db.Save(&userExist)
 
-		verificationLink := fmt.Sprintf("%s?resetToken=%s", util.ApiBaseURL(), token)
+		verificationLink := fmt.Sprintf("%s/home?resetToken=%s", util.FrontendBaseURL(), token)
 		// Send pw reset email
 		if util.EmailsEnabled {
 			if err := util.SendPWResetEmail(*userExist.Username, verificationLink, userExist.Nickname); err != nil {

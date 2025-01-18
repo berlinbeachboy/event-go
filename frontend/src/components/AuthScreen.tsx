@@ -5,7 +5,7 @@ import RegisterForm from '@/components/RegisterForm';
 import { Button } from "@/components/ui/button";
 import RequestPasswordForm from './RequestPassword';
 import PasswordResetForm from './ResetPasswordForm';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 
 interface AuthScreenProps {
@@ -14,10 +14,12 @@ interface AuthScreenProps {
 
 const AuthScreen = ({ onSuccess }: AuthScreenProps) => {
   const [view, setView] = useState<'login' | 'register' | 'requestPw' | 'updatePw'>('login');
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [searchParams, _] = useSearchParams();
   const resetToken = searchParams.get("resetToken")
   const emailVerify = searchParams.get("verify")
+  const resetTokenPass = resetToken as string
 
   useEffect(() => {
     if (emailVerify === "success"){
@@ -25,11 +27,15 @@ const AuthScreen = ({ onSuccess }: AuthScreenProps) => {
          title: "Dein Account wurde verfiziert!",
          description: "Ab geht die Post!",
        });
-  }})
-  const resetTokenPass = resetToken as string
+  }
   if (resetToken !== null){
+    console.log("Reset Token "+ resetToken)
     setView('updatePw')
   }
+
+  })
+  
+  console.log("View: "+view)
 
 
   return (
@@ -54,13 +60,13 @@ const AuthScreen = ({ onSuccess }: AuthScreenProps) => {
       {/* Right side - Auth form */}
       <div className="flex flex-col items-center justify-center p-4 lg:p-8">
         <div className="w-full max-w-sm mx-auto space-y-6">
-          {view === 'updatePw' ? (
-            <PasswordResetForm token={resetTokenPass} onReset={() => setView('login')} />
-          ) : view === 'login' ? (
+          {view === 'login' ? (
             <LoginForm onLogin={onSuccess} />
           ) : view === 'register' ? (
             <RegisterForm onSuccess={() => setView('login')} />
-          ) : <RequestPasswordForm onSuccess={() => setView('login')}/>}
+          ) : view === 'requestPw' ? (
+            <RequestPasswordForm onSuccess={() => setView('login')}/>
+          ) : <PasswordResetForm token={resetTokenPass} onReset={() => navigate('/')} />}
           
           <Button
             variant="ghost"
@@ -71,7 +77,7 @@ const AuthScreen = ({ onSuccess }: AuthScreenProps) => {
               ? "Du willst dich registrieren?"
               : "Du bist schon angemeldet? Dann hier entlang!"}
           </Button>
-          {view !== 'requestPw' && <Button
+          {view !== 'requestPw' && view !== 'updatePw' && <Button
             variant="ghost"
             className="w-full text-muted-foreground hover:text-primary"
             onClick={() => setView('requestPw')}

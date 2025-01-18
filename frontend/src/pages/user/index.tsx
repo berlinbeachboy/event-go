@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
-import { Loader2, Gift, Home, Tent } from 'lucide-react';
+import { Loader2, Gift, Home, Tent, Frown } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { SpotType } from '@/models/models';
 import { cn } from '@/lib/utils';
@@ -25,7 +25,14 @@ const SpotCard = ({
   onSelect: () => void;
   disabled: boolean;
 }) => {
-  const Icon = spot.name.toLowerCase().includes('haus') ? Home : Tent;
+  var Icon
+  if (spot.name.toLowerCase().includes('haus')){
+    Icon = Home
+  }else if (spot.name.toLowerCase().includes('zelt')){
+    Icon = Tent
+  } else {
+    Icon = Frown
+  }
 
   return (
     <div
@@ -68,6 +75,14 @@ const SpotCard = ({
       soliType: user?.givesSoli ? 'give' : user?.takesSoli ? 'take' : 'none',
       spotTypeId: user?.spotTypeId || 0,
     });
+    const noSpot = {
+      id: 0,
+      name: "leider nicht dabei",
+      price: 0,
+      limit: 0,
+      description: ":(",
+      currentCount: 0
+    }
 
   const handleChange = (field: keyof typeof formData, value: any) => {
     setFormData(prev => ({
@@ -146,6 +161,13 @@ const SpotCard = ({
           <div className="space-y-6">
             <h3 className="text-lg font-semibold">Spot Selection</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <SpotCard
+                  key={0}
+                  spot={noSpot}
+                  selected={formData.spotTypeId === 0 || !formData.spotTypeId || formData.spotTypeId == null}
+                  onSelect={() => handleChange('spotTypeId', 0)}
+                  disabled={!isEditing}
+                />
               {userSpots.map(spot => (
                 <SpotCard
                   key={spot.id}
