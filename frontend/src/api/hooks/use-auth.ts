@@ -42,8 +42,8 @@
     login: async (data: LoginData) => {
       try {
         set({ isLoading: true, error: null });
-        const response = await axiosInstance.post<UserResponse>('/login', data);
-        set({ user: response.data, isLoading: false });
+        await axiosInstance.post<UserResponse>('/login', data);
+        set({ isLoading: false });
       } catch (error) {
         set({ error: error as Error, isLoading: false });
         throw error;

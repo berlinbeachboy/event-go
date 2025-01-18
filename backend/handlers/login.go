@@ -195,13 +195,16 @@ func Login(db *gorm.DB) gin.HandlerFunc {
 		db.Save(&user)
 		c.SetSameSite(http.SameSiteLaxMode)
 		var site string
+		var secureCookie bool
 		if util.EnvIsProd(){
 			site = "schoenfeld.fun"
+			secureCookie = true
 		} else {
 			site = "localhost"
+			secureCookie = true
 		}
-		c.SetCookie("jwt", tokenString, 3600, "/", site, false, true)
-		c.JSON(http.StatusOK, gin.H{"token": tokenString})
+		c.SetCookie("jwt", tokenString, 3600, "/api", site, secureCookie, true)
+		c.JSON(http.StatusOK, gin.H{"status": "success"})
 	}
 }
 

@@ -20,7 +20,7 @@ schoenfeld.fun {
         reverse_proxy backend:8080 {
             # Health checks for the backend
             health_uri /api/health
-            health_interval 30s
+            health_interval 300s
             health_timeout 5s
             
             

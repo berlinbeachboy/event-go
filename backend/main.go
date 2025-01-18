@@ -78,7 +78,7 @@ func main() {
 	}
 	util.SetEmailConfig()
 
-	fmt.Println("Starting Backend... Waiting 3s for DB to come up")
+	fmt.Println("Starting Backend in ENV", env, " ... Waiting 3s for DB to come up")
 	time.Sleep(3 * time.Second)
 
 	dsn := util.DBDSN()

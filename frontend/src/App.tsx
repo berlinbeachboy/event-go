@@ -23,7 +23,7 @@ const App = () => {
     const initializeApp = async () => {
       try {
         await fetchUser();
-        fetchUserSpots()
+        await fetchUserSpots()
 
       } catch (error) {
         console.log(error)
