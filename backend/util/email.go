@@ -42,6 +42,7 @@ func SetEmailConfig() {
 		EmailsEnabled = false
 		fmt.Printf("WARNING: Email Sending is disabled. SMTP ENV variables are not fully set.")
 	}
+	fmt.Printf("Email Sending is enabled from server %s and address %s.", emailConfig.Host, emailConfig.Username)
 }
 
 // sendVerificationEmail sends an email with verification link

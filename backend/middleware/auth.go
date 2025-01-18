@@ -44,6 +44,9 @@ func getTokenUsername(c *gin.Context) string {
 func AuthMiddleware(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		username := getTokenUsername(c)
+		if username == "" {
+			return
+		}
 		var userExist models.User
 		if err := db.First(&userExist, "username = ?", username).Error; err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "User is not in DB."})
@@ -63,6 +66,9 @@ func AuthMiddleware(db *gorm.DB) gin.HandlerFunc {
 func AdminMiddleware(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		username := getTokenUsername(c)
+		if username == "" {
+			return
+		}
 		var userExist models.User
 		if err := db.First(&userExist, "username = ?", username).Error; err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "User is not in DB."})

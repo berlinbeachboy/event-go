@@ -100,6 +100,9 @@ func Register(db *gorm.DB) gin.HandlerFunc {
 			verificationLink := fmt.Sprintf("%s/api/verify?token=%s", util.ApiBaseURL(), token)
 			if util.EmailsEnabled {
 				if err := util.SendVerificationEmail(*userExist.Username, verificationLink, userExist.Nickname); err != nil {
+					fmt.Printf("Failed to send Verification Email to %s", *userExist.Username)
+					fmt.Printf("Error was %s", err.Error())
+					fmt.Printf("Their verification Link is:  %s", verificationLink)
 					c.JSON(500, gin.H{"error": "Failed to send verification email"})
 					return
 				}
@@ -144,6 +147,9 @@ func Register(db *gorm.DB) gin.HandlerFunc {
 		// Send verification email
 		if util.EmailsEnabled {
 			if err := util.SendVerificationEmail(*user.Username, verificationLink, user.Nickname); err != nil {
+				fmt.Printf("Failed to send Verification Email to %s", *userExist.Username)
+				fmt.Printf("Error was %s", err.Error())
+				fmt.Printf("Their verification Link is:  %s", verificationLink)
 				c.JSON(500, gin.H{"error": "Failed to send verification email"})
 				return
 			}
@@ -188,7 +194,13 @@ func Login(db *gorm.DB) gin.HandlerFunc {
 		user.LastLogin = &now
 		db.Save(&user)
 		c.SetSameSite(http.SameSiteLaxMode)
-		c.SetCookie("jwt", tokenString, 3600, "/", "localhost", false, true)
+		var site string
+		if util.EnvIsProd(){
+			site = "schoenfeld.fun"
+		} else {
+			site = "localhost"
+		}
+		c.SetCookie("jwt", tokenString, 3600, "/", site, false, true)
 		c.JSON(http.StatusOK, gin.H{"token": tokenString})
 	}
 }

@@ -47,7 +47,7 @@ const App = () => {
         ) : (
           <>
             <Navbar />
-            <MusicPlayer />
+            {/* <MusicPlayer /> */}
             <div className="pt-24">
               <Routes>
                 <Route path="/" element={<Navigate to="/home" replace />} />
