@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useAuth } from '@/api/hooks/use-auth';
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
-import { MusicPlayer } from './components/MusicPlayer';
+//import { MusicPlayer } from './components/MusicPlayer';
 
 // Pages
 import HomePage from '@/pages/home';
