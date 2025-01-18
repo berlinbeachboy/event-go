@@ -1,5 +1,5 @@
 // src/App.tsx
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useSearchParams } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useAuth } from '@/api/hooks/use-auth';
 import { Toaster } from '@/components/ui/toaster';
@@ -18,20 +18,24 @@ const App = () => {
   const { toast } = useToast();
   const { user, fetchUser } = useAuth();
   const { userSpots, fetchUserSpots } = useSpots()
+  const [searchParams, setSearchParams] = useSearchParams();
+  const resetToken = searchParams.get("resetToken")
+  const emailVerify = searchParams.get("verify")
 
   useEffect(() => {
     const initializeApp = async () => {
       try {
         await fetchUser();
         await fetchUserSpots()
+        if (emailVerify === "success"){
+          toast({
+               title: "Dein Account wurde verfiziert!",
+               description: "Ab geht die Post!",
+             });
+        }
 
       } catch (error) {
         console.log(error)
-        // toast({
-        //   title: "Error loading app data",
-        //   description: "Please try refreshing the page",
-        //   variant: "destructive",
-        // });
       }
     };
 
@@ -43,7 +47,7 @@ const App = () => {
     <Router>
       <div className="min-h-screen w-screen bg-background">
         {!user ? (
-          <AuthScreen onSuccess={fetchUser} />
+          <AuthScreen pwResetToken={resetToken} onSuccess={fetchUser} />
         ) : (
           <>
             <Navbar />

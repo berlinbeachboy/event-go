@@ -276,7 +276,7 @@ func RequestPWReset(db *gorm.DB) gin.HandlerFunc {
 		userExist.TokenExpiryTime = &expiryTime
 		db.Save(&userExist)
 
-		verificationLink := fmt.Sprintf("%s/api/resetpw?token=%s", util.ApiBaseURL(), token)
+		verificationLink := fmt.Sprintf("%s?resetToken=%s", util.ApiBaseURL(), token)
 		// Send pw reset email
 		if util.EmailsEnabled {
 			if err := util.SendPWResetEmail(*userExist.Username, verificationLink, userExist.Nickname); err != nil {

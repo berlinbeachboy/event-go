@@ -3,14 +3,20 @@ import LoginForm from '@/components/LoginForm';
 import RegisterForm from '@/components/RegisterForm';
 import { Button } from "@/components/ui/button";
 import RequestPasswordForm from './RequestPassword';
+import PasswordResetForm from './ResetPasswordForm';
 
 interface AuthScreenProps {
-  // viewMode: <'login' | 'register' | 'requestPw' | 'updatePw'>; 
+  pwResetToken: string | null; 
   onSuccess: () => Promise<void>;
 }
 
-const AuthScreen = ({ onSuccess }: AuthScreenProps) => {
+const AuthScreen = ({ pwResetToken, onSuccess }: AuthScreenProps) => {
   const [view, setView] = useState<'login' | 'register' | 'requestPw' | 'updatePw'>('login');
+  const resetToken = pwResetToken
+  if (pwResetToken !== null){
+    setView('updatePw')
+  }
+  const resetTokenPass = resetToken as string
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 w-screen h-screen">
@@ -34,11 +40,13 @@ const AuthScreen = ({ onSuccess }: AuthScreenProps) => {
       {/* Right side - Auth form */}
       <div className="flex flex-col items-center justify-center p-4 lg:p-8">
         <div className="w-full max-w-sm mx-auto space-y-6">
-          {view === 'login' ? (
+          {view === 'updatePw' ? (
+            <PasswordResetForm token={resetTokenPass} onReset={() => setView('login')} />
+          ) : view === 'login' ? (
             <LoginForm onLogin={onSuccess} />
           ) : view === 'register' ? (
             <RegisterForm onSuccess={() => setView('login')} />
-          ) : <RequestPasswordForm onRequest={() => setView('login')}/>}
+          ) : <RequestPasswordForm onSuccess={() => setView('login')}/>}
           
           <Button
             variant="ghost"

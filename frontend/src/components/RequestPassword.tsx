@@ -13,10 +13,10 @@ import { Icons } from "@/components/ui/icons";
 import { useToast } from '@/hooks/use-toast';
 
 interface RequestPasswordResetProps {
-  onRequest: () => void;
+  onSuccess: () => void;
 }
 
-export default function RequestPasswordForm({ onRequest }: RequestPasswordResetProps) {
+export default function RequestPasswordForm({ onSuccess }: RequestPasswordResetProps) {
   const [emailPWReset, setEmailPWReset] = useState('');
   const { requestPasswordReset, isLoading } = useAuth();
   const { toast } = useToast();
@@ -29,11 +29,12 @@ export default function RequestPasswordForm({ onRequest }: RequestPasswordResetP
     e.preventDefault();
     try {
       await requestPasswordReset(emailPWReset);
-      await onRequest();
+      
       toast({
         title: "Email isch raus",
         description: "Auch im Spam schauen bidde",
       });
+      onSuccess();
     } catch (error) {
       console.error(error);
       toast({

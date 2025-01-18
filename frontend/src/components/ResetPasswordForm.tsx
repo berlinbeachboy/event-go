@@ -14,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 
 interface PasswordResetFormProps {
   token: string;
-  onReset: () => Promise<void>;
+  onReset: () => void;
 }
 
 export default function PasswordResetForm({ token, onReset }: PasswordResetFormProps) {
@@ -30,11 +30,11 @@ export default function PasswordResetForm({ token, onReset }: PasswordResetFormP
     e.preventDefault();
     try {
       await resetPassword(formData);
-      await onReset();
       toast({
         title: "Hat geklappt!",
         description: "Jetzt nochmal anmelden mit die neue Password bidde",
       });
+      onReset()
     } catch (error) {
       console.error(error);
       toast({
