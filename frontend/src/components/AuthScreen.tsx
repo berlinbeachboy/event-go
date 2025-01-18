@@ -1,22 +1,36 @@
 import { useState } from 'react';
+import { useEffect } from 'react';
 import LoginForm from '@/components/LoginForm';
 import RegisterForm from '@/components/RegisterForm';
 import { Button } from "@/components/ui/button";
 import RequestPasswordForm from './RequestPassword';
 import PasswordResetForm from './ResetPasswordForm';
+import { useSearchParams } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 
 interface AuthScreenProps {
-  pwResetToken: string | null; 
   onSuccess: () => Promise<void>;
 }
 
-const AuthScreen = ({ pwResetToken, onSuccess }: AuthScreenProps) => {
+const AuthScreen = ({ onSuccess }: AuthScreenProps) => {
   const [view, setView] = useState<'login' | 'register' | 'requestPw' | 'updatePw'>('login');
-  const resetToken = pwResetToken
-  if (pwResetToken !== null){
+  const { toast } = useToast();
+  const [searchParams, _] = useSearchParams();
+  const resetToken = searchParams.get("resetToken")
+  const emailVerify = searchParams.get("verify")
+
+  useEffect(() => {
+    if (emailVerify === "success"){
+    toast({
+         title: "Dein Account wurde verfiziert!",
+         description: "Ab geht die Post!",
+       });
+  }})
+  const resetTokenPass = resetToken as string
+  if (resetToken !== null){
     setView('updatePw')
   }
-  const resetTokenPass = resetToken as string
+
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 w-screen h-screen">

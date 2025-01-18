@@ -18,21 +18,14 @@ const App = () => {
   const { toast } = useToast();
   const { user, fetchUser } = useAuth();
   const { userSpots, fetchUserSpots } = useSpots()
-  const [searchParams, _] = useSearchParams();
-  const resetToken = searchParams.get("resetToken")
-  const emailVerify = searchParams.get("verify")
+  
 
   useEffect(() => {
     const initializeApp = async () => {
       try {
         await fetchUser();
         await fetchUserSpots()
-        if (emailVerify === "success"){
-          toast({
-               title: "Dein Account wurde verfiziert!",
-               description: "Ab geht die Post!",
-             });
-        }
+        
 
       } catch (error) {
         console.log(error)
@@ -47,7 +40,7 @@ const App = () => {
     <Router>
       <div className="min-h-screen w-screen bg-background">
         {!user ? (
-          <AuthScreen pwResetToken={resetToken} onSuccess={fetchUser} />
+          <AuthScreen onSuccess={fetchUser} />
         ) : (
           <>
             <Navbar />
