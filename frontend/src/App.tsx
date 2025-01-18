@@ -18,7 +18,7 @@ const App = () => {
   const { toast } = useToast();
   const { user, fetchUser } = useAuth();
   const { userSpots, fetchUserSpots } = useSpots()
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, _] = useSearchParams();
   const resetToken = searchParams.get("resetToken")
   const emailVerify = searchParams.get("verify")
 
