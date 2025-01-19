@@ -22,16 +22,18 @@ const AuthScreen = ({ onSuccess }: AuthScreenProps) => {
   const resetTokenPass = resetToken as string
 
   useEffect(() => {
+    if (resetToken !== null){
+      setView('updatePw')
+    }
     if (emailVerify === "success"){
-    toast({
-         title: "Dein Account wurde verfiziert!",
-         description: "Ab geht die Post!",
-       });
-  }
-  if (resetToken !== null){
-    setView('updatePw')
-  }
-
+      const timeout = setTimeout(() => {
+        toast({
+          title: "Dein Account wurde verfiziert!",
+          description: "Ab geht die Post!",
+        });
+        return (() => clearTimeout(timeout))
+      }, 10)
+    }    
   })
   
 

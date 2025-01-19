@@ -13,6 +13,7 @@ import AdminPage from '@/pages/admin';
 import AuthScreen from './components/AuthScreen';
 import { Navbar } from '@/components/Navbar';
 import { useSpots } from './api/hooks/use-spots';
+import { MusicPlayer } from './components/MusicPlayer';
 
 const App = () => {
   const { toast } = useToast();
@@ -45,12 +46,12 @@ const App = () => {
         ) : (
           <>
             <Navbar onLogout={fetchUser}/>
-            {/* <MusicPlayer /> */}
+            <MusicPlayer />
             <div className="pt-24">
               <Routes>
                 <Route path="/" element={<Navigate to="/home" replace />} />
                 <Route path="/home" element={<HomePage spotTypes={userSpots}/>} />
-                <Route path="/user" element={<UserPage userSpots={userSpots}/>} />
+                <Route path="/user" element={<UserPage userSpots={userSpots} />} />
                 <Route
                   path="/admin"
                   element={

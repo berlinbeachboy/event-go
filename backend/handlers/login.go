@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 	"unicode/utf8"
 
@@ -71,7 +72,8 @@ func Register(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 		var userExist models.User
-		if err := db.First(&userExist, "username = ?", &ur.Username).Error; err == nil {
+		usernameLower := strings.ToLower(ur.Username)
+		if err := db.First(&userExist, "username = ?", &usernameLower).Error; err == nil {
 			// If the user exists but is not activated, an admin might have created it
 			// it will then be filled by an actual user
 			if userExist.IsActivated {
@@ -123,7 +125,7 @@ func Register(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 		user := models.User{
-			Username: &ur.Username,
+			Username: &usernameLower,
 			Password: &hpstring,
 			Type:     "reg",
 			Nickname: ur.Nickname,
@@ -175,7 +177,8 @@ func Login(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		var user models.User
-		if err := db.Where("username = ?", &creds.Username).First(&user).Error; err != nil {
+		usernameLower := strings.ToLower(creds.Username)
+		if err := db.Where("username = ?", &usernameLower).First(&user).Error; err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Email not found"})
 			return
 		}
@@ -189,7 +192,7 @@ func Login(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		tokenString, err := util.MakeJWT(creds.Username)
+		tokenString, err := util.MakeJWT(usernameLower)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
 			return
@@ -271,7 +274,8 @@ func RequestPWReset(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 		var userExist models.User
-		if err := db.First(&userExist, "username = ?", username).Error; err != nil {
+		usernameLower := strings.ToLower(username)
+		if err := db.First(&userExist, "username = ?", usernameLower).Error; err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "User is not in DB."})
 			c.Abort()
 			return

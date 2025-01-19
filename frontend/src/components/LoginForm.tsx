@@ -10,6 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Icons } from "@/components/ui/icons";
+import { useToast } from '@/hooks/use-toast';
 
 interface LoginFormProps {
   onLogin: () => Promise<void>;
@@ -18,6 +19,7 @@ interface LoginFormProps {
 export default function LoginForm({ onLogin }: LoginFormProps) {
   const [formData, setFormData] = useState({ username: '', password: '' });
   const { login, isLoading } = useAuth();
+  const { toast } = useToast();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -30,6 +32,11 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
       await onLogin();
     } catch (error) {
       console.error(error);
+      toast({
+        title: "Hat leider nicht geklappt",
+        description: "Vielleicht das Passwort nochmal überprüfen?",
+        variant: "destructive",
+      });
     }
   };
 

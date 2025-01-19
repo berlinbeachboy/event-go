@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/api/hooks/use-auth';
-import { MusicPlayer } from './MusicPlayer';
 
 interface NavBarProps {
     onLogout: () => Promise<void>;
@@ -36,11 +35,11 @@ export const Navbar = ({ onLogout }: NavBarProps) => {
     };
 
 
-    const navigationItems = [
-        { name: 'Programm', path: '#programm' },
-        { name: 'Galery', path: '#galery' },
+    // const navigationItems = [
+    //     { name: 'Programm', path: '#programm' },
+    //     { name: 'Galery', path: '#galery' },
 
-    ];
+    // ];
 
 
     return (
@@ -78,7 +77,7 @@ export const Navbar = ({ onLogout }: NavBarProps) => {
                                 </Link>
                             ))} */}
 
-                            <MusicPlayer />
+                            {/* <MusicPlayer /> */}
 
                             {user?.type === 'admin' && (
                                 <Link to="/admin">
@@ -136,7 +135,7 @@ export const Navbar = ({ onLogout }: NavBarProps) => {
                                 <SheetContent className="w-64 bg-gradient-to-br from-custom-light-cyan to-custom-aquamarine/90 backdrop-blur-md border-custom-mauve/40">
                                     <div className="flex flex-col gap-4 mt-8">
                                         {/* Mobile Navigation Items */}
-                                        {navigationItems.map((item) => (
+                                        {/* {navigationItems.map((item) => (
                                             <SheetClose key={item.name} asChild>
                                                 <Link to={item.path}>
                                                     <Button
@@ -147,9 +146,9 @@ export const Navbar = ({ onLogout }: NavBarProps) => {
                                                     </Button>
                                                 </Link>
                                             </SheetClose>
-                                        ))}
+                                        ))} */}
 
-                                        <MusicPlayer />
+                                        {/* <MusicPlayer /> */}
 
                                         {user?.type === 'admin' && (
                                             <SheetClose asChild>
