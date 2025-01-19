@@ -5,7 +5,7 @@ import { PLAYLIST } from '@/config/playlist';
 
 export const MusicPlayer = () => {
     const [isPlaying, setIsPlaying] = useState(false);
-    const [isMuted, setIsMuted] = useState(false);
+    const [isMuted, setIsMuted] = useState(true);
     const [currentTrack, setCurrentTrack] = useState(0);
     const [volume] = useState(0.5);
     const audioRef = useRef<HTMLAudioElement | null>(null);

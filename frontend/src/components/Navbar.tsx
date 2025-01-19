@@ -44,9 +44,9 @@ export const Navbar = ({ onLogout }: NavBarProps) => {
 
 
     return (
-        <div className="fixed w-full z-10">
+        <div className="fixed w-full z-20">
             <MarqueeText
-                text="Jetzt Zuschlagen! 20% Rabatt auf alle Tickets - Nur vom 15.01. bis 15.02."
+                text="Jetzt Zuschlagen! 0% Rabatt auf alle Tickets - Nur vom 15.01. bis 15.02."
                 speed={5}
                 className="bg-custom-aquamarine py-2 border-b"
                 textClassName="text-black font-medium tracking-wider text-sm"
