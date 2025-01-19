@@ -35,8 +35,21 @@ export const HomePage = ({spotTypes}: HomePageProps) => {
     // ];
 
     return (
-        <div className="min-h-screen bg-white pt-20">
+        <div className="min-h-screen bg-white relative">
+            {/* Background Image Container */}
+            <div className="absolute top-0 left-0 w-full h-[50vh] z-0">
+                <div 
+                    className="w-full h-full bg-[url('/images/group.jpg')] bg-cover bg-center"
+                    style={{
+                        maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1.0) 0%, transparent 100%)',
+                        WebkitMaskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1.0) 0%, transparent 100%)'
+                    }}
+                />
+            </div>
             {/* Hero Section */}
+            {/* Content Container */}
+            <div className="relative z-10">
+                <br></br><br></br><br></br><br></br><br></br><br></br><br></br>
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -169,6 +182,7 @@ export const HomePage = ({spotTypes}: HomePageProps) => {
                     ))}
                 </div>
             </motion.div>
+            </div>
         </div>
     );
 };
