@@ -5,7 +5,7 @@ import { PLAYLIST } from '@/config/playlist';
 
 export const MusicPlayer = () => {
     const [isPlaying, setIsPlaying] = useState(false);
-    const [isMuted, setIsMuted] = useState(true);
+    const [isMuted, setIsMuted] = useState(false);
     const [currentTrack, setCurrentTrack] = useState(0);
     const [volume] = useState(0.5);
     const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -16,20 +16,20 @@ export const MusicPlayer = () => {
         audioRef.current = new Audio(PLAYLIST[currentTrack].url);
         audioRef.current.volume = volume;
 
-        const attemptAutoplay = async () => {
-            try {
-                if (audioRef.current) {
-                    await audioRef.current.play();
-                    setIsPlaying(true);
-                    setIsInitialized(true);
-                }
-            } catch {
-                console.log('Autoplay failed - waiting for user interaction');
-                setIsInitialized(true);
-            }
-        };
-
-        attemptAutoplay();
+        // const attemptAutoplay = async () => {
+        //     try {
+        //         if (audioRef.current) {
+        //             await audioRef.current.play();
+        //             setIsPlaying(true);
+        //             setIsInitialized(true);
+        //         }
+        //     } catch {
+        //         console.log('Autoplay failed - waiting for user interaction');
+        //         setIsInitialized(true);
+        //     }
+        // };
+        setIsInitialized(true);
+        // attemptAutoplay();
 
         return () => {
             if (audioRef.current) {
