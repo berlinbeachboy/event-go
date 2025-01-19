@@ -98,17 +98,19 @@ func Register(db *gorm.DB) gin.HandlerFunc {
 
 			// Send verification email
 			verificationLink := fmt.Sprintf("%s/api/verify?token=%s", util.ApiBaseURL(), token)
-			if util.EmailsEnabled {
-				if err := util.SendVerificationEmail(*userExist.Username, verificationLink, userExist.Nickname); err != nil {
-					fmt.Printf("Failed to send Verification Email to %s", *userExist.Username)
-					fmt.Printf("Error was %s", err.Error())
-					fmt.Printf("Their verification Link is:  %s", verificationLink)
-					c.JSON(500, gin.H{"error": "Failed to send verification email"})
-					return
-				}
-			} else {
+			if !util.EmailsEnabled {
 				fmt.Printf("Cannot send Email to %s", *userExist.Username)
 				fmt.Printf("Their verification Link is:  %s", verificationLink)
+				c.IndentedJSON(http.StatusCreated, userExist.ToResponse())
+			return
+			}
+
+			if err:= util.SendVerificationEmail(*userExist.Username, verificationLink, userExist.Nickname); err != nil {
+				fmt.Printf("Failed to send Verification Email to %s", *userExist.Username)
+				fmt.Printf("Error was %s", err.Error())
+				fmt.Printf("Their verification Link is:  %s", verificationLink)
+				c.JSON(500, gin.H{"error": "Failed to send verification email"})
+				return
 			}
 			c.IndentedJSON(http.StatusCreated, userExist.ToResponse())
 			return
@@ -146,16 +148,18 @@ func Register(db *gorm.DB) gin.HandlerFunc {
 		verificationLink := fmt.Sprintf("%s/api/verify?token=%s", util.ApiBaseURL(), token)
 		// Send verification email
 		if util.EmailsEnabled {
-			if err := util.SendVerificationEmail(*user.Username, verificationLink, user.Nickname); err != nil {
-				fmt.Printf("Failed to send Verification Email to %s", *userExist.Username)
-				fmt.Printf("Error was %s", err.Error())
-				fmt.Printf("Their verification Link is:  %s", verificationLink)
-				c.JSON(500, gin.H{"error": "Failed to send verification email"})
-				return
-			}
-		} else {
 			fmt.Printf("Cannot send Email to %s", *user.Username)
 			fmt.Printf("Their verification Link is:  %s", verificationLink)
+			c.IndentedJSON(http.StatusCreated, user.ToResponse())
+			return
+		}
+		
+		if err := util.SendVerificationEmail(*user.Username, verificationLink, user.Nickname); err != nil {
+			fmt.Printf("Failed to send Verification Email to %s", *userExist.Username)
+			fmt.Printf("Error was %s", err.Error())
+			fmt.Printf("Their verification Link is:  %s", verificationLink)
+			c.JSON(500, gin.H{"error": "Failed to send verification email"})
+			return
 		}
 
 		c.IndentedJSON(http.StatusCreated, user.ToResponse())

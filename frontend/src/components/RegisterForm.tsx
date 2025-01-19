@@ -54,7 +54,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle className="text-2xl text-center">Create Account</CardTitle>
+        <CardTitle className="text-2xl text-center">Jetzt Registrieren</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -65,7 +65,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
               id="username"
               name="username"
               type="email"
-              placeholder="Enter your email"
+              placeholder="Deine Email Adresse"
               value={formData.username}
               onChange={handleChange}
               required
@@ -79,7 +79,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
               id="password"
               name="password"
               type="password"
-              placeholder="Create a password"
+              placeholder="Mindestens 6 Zeichen"
               value={formData.password}
               onChange={handleChange}
               required
@@ -88,12 +88,12 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
 
           {/* Nickname field */}
           <div className="space-y-2">
-            <Label htmlFor="nickname">Nickname</Label>
+            <Label htmlFor="nickname">Spitzname</Label>
             <Input
               id="nickname"
               name="nickname"
               type="text"
-              placeholder="Choose a nickname"
+              placeholder="Dein Spitzname"
               value={formData.nickname}
               onChange={handleChange}
               required
@@ -102,12 +102,12 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
 
           {/* Full Name field */}
           <div className="space-y-2">
-            <Label htmlFor="fullName">Full Name</Label>
+            <Label htmlFor="fullName">Vor- und Nachname</Label>
             <Input
               id="fullName"
               name="fullName"
               type="text"
-              placeholder="Enter your full name"
+              placeholder="Dein Nachname"
               value={formData.fullName}
               onChange={handleChange}
               required
@@ -116,12 +116,12 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
 
           {/* Phone field */}
           <div className="space-y-2">
-            <Label htmlFor="phone">Phone Number (Optional)</Label>
+            <Label htmlFor="phone">Handynr. (Optional für Whatsapp)</Label>
             <Input
               id="phone"
               name="phone"
               type="tel"
-              placeholder="For WhatsApp group (optional)"
+              placeholder="+49 1500 123456"
               value={formData.phone}
               onChange={handleChange}
             />
@@ -129,12 +129,12 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
 
           {/* Site Password field */}
           <div className="space-y-2">
-            <Label htmlFor="sitePassword">Site Password</Label>
+            <Label htmlFor="sitePassword">Passwort der Seite</Label>
             <Input
               id="sitePassword"
               name="sitePassword"
               type="password"
-              placeholder="Enter site password from admin"
+              placeholder="Frag hierfür ein Orgamitglied"
               value={formData.sitePassword}
               onChange={handleChange}
               required
@@ -150,7 +150,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
             {isLoading && (
               <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
             )}
-            Create Account
+            Los geht's!
           </Button>
         </form>
       </CardContent>

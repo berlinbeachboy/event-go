@@ -1,11 +1,11 @@
 package util
 
 import (
-	"crypto/tls"
+	"errors"
 	"fmt"
-	"net"
 	"net/smtp"
 	"os"
+	"time"
 )
 
 // EmailConfig holds SMTP configuration
@@ -17,6 +17,8 @@ type EmailConfigClass struct {
 	From     string
 	FromName string
 }
+
+var smtpPort int = 587
 
 // Initialize email configuration
 var emailConfig EmailConfigClass
@@ -30,7 +32,7 @@ func EmailConfig() EmailConfigClass {
 func SetEmailConfig() {
 	emailConfig = EmailConfigClass{
 		Host:     os.Getenv("SMTP_SERVER"),
-		Port:     465,
+		Port:     smtpPort,
 		Username: os.Getenv("SMTP_EMAIL"),
 		From:     os.Getenv("SMTP_EMAIL"),
 		FromName: "Peter Schoenfelder",
@@ -70,13 +72,22 @@ func SendVerificationEmail(email, verificationLink string, nickname string) erro
 	)
 
 	addr := fmt.Sprintf("%s:%d", emailConfig.Host, emailConfig.Port)
-	return TlsMailSmtp(
-		addr,
-		auth,
-		emailConfig.From,
-		[]string{email},
-		message,
-	)
+	// return TlsMailSmtp(
+	// 	addr,
+	// 	auth,
+	// 	emailConfig.From,
+	// 	[]string{email},
+	// 	message,
+	// )
+	ch := make(chan error, 1)
+	go func() { ch <- smtp.SendMail(addr, auth, emailConfig.From, []string{email}, message) } ()
+	select {
+	case err := <-ch:
+		return err
+		
+	case <-time.After(10 * time.Second):
+		return errors.New("timout sending email")
+	}
 }
 
 // sendVerificationEmail sends an email with verification link
@@ -88,10 +99,10 @@ func SendPWResetEmail(email, verificationLink string, nickname string) error {
 			"\r\n"+
 			"Moin %s,\r\n"+
 			"du hast dein Passwort also vergessen... lol\r\n"+
-			"Na gut eine letzte Chance. Klicke auf den folgenden Link, um es zurückzusetzen:\r\n"+
+			"Na gut eine letzte Chance. Klicke auf den folgenden Link, um es zurueckzusetzen:\r\n"+
 			"\r\n"+
 			"%s\r\n"+
-			"\r\nDer Link ist 24h gültig.\r\n"+
+			"\r\nDer Link ist 24h gueltig.\r\n"+
 			"Ciao Kakao <3",
 		emailConfig.Username, email, nickname, verificationLink,
 	))
@@ -104,72 +115,81 @@ func SendPWResetEmail(email, verificationLink string, nickname string) error {
 	)
 
 	addr := fmt.Sprintf("%s:%d", emailConfig.Host, emailConfig.Port)
-	return TlsMailSmtp(
-		addr,
-		auth,
-		emailConfig.From,
-		[]string{email},
-		message,
-	)
+	// return TlsMailSmtp(
+	// 	addr,
+	// 	auth,
+	// 	emailConfig.From,
+	// 	[]string{email},
+	// 	message,
+	// )
+	ch := make(chan error, 1)
+	go func() { ch <- smtp.SendMail(addr, auth, emailConfig.From, []string{email}, message) } ()
+	select {
+	case err := <-ch:
+		return err
+		
+	case <-time.After(10 * time.Second):
+		return errors.New("timout sending email")
+	}
 }
 
 // This is shamelessly copied from https://gist.github.com/chrisgillis/10888032
 // A little low lowel and clunky but it does everything we need it to
-func TlsMailSmtp(servername string, auth smtp.Auth, from string, to []string, message []byte) error {
-	// TLS config
+// func TlsMailSmtp(servername string, auth smtp.Auth, from string, to []string, message []byte) error {
+// 	// TLS config
 
-	host, _, _ := net.SplitHostPort(servername)
+// 	host, _, _ := net.SplitHostPort(servername)
 
-	tlsconfig := &tls.Config{
-		InsecureSkipVerify: true,
-		ServerName:         host,
-	}
+// 	tlsconfig := &tls.Config{
+// 		InsecureSkipVerify: true,
+// 		ServerName:         host,
+// 	}
 
-	// Here is the key, you need to call tls.Dial instead of smtp.Dial
-	// for smtp servers running on 465 that require an ssl connection
-	// from the very beginning (no starttls)
-	conn, err := tls.Dial("tcp", servername, tlsconfig)
-	if err != nil {
-		return err
-	}
+// 	// Here is the key, you need to call tls.Dial instead of smtp.Dial
+// 	// for smtp servers running on 465 that require an ssl connection
+// 	// from the very beginning (no starttls)
+// 	conn, err := tls.Dial("tcp", servername, tlsconfig)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	c, err := smtp.NewClient(conn, host)
-	if err != nil {
-		return err
-	}
+// 	c, err := smtp.NewClient(conn, host)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	// Auth
-	if err = c.Auth(auth); err != nil {
-		return err
-	}
+// 	// Auth
+// 	if err = c.Auth(auth); err != nil {
+// 		return err
+// 	}
 
-	// To && From
-	if err = c.Mail(from); err != nil {
-		return err
-	}
+// 	// To && From
+// 	if err = c.Mail(from); err != nil {
+// 		return err
+// 	}
 
-	for _, addr := range to {
-		if err = c.Rcpt(addr); err != nil {
-			return err
-		}
-	}
+// 	for _, addr := range to {
+// 		if err = c.Rcpt(addr); err != nil {
+// 			return err
+// 		}
+// 	}
 
-	// Data
-	w, err := c.Data()
-	if err != nil {
-		return err
-	}
+// 	// Data
+// 	w, err := c.Data()
+// 	if err != nil {
+// 		return err
+// 	}
 
-	_, err = w.Write(message)
-	if err != nil {
-		return err
-	}
+// 	_, err = w.Write(message)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	err = w.Close()
-	if err != nil {
-		return err
-	}
+// 	err = w.Close()
+// 	if err != nil {
+// 		return err
+// 	}
 
-	c.Quit()
-	return nil
-}
+// 	c.Quit()
+// 	return nil
+// }

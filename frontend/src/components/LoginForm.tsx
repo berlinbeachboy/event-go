@@ -36,7 +36,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle className="text-2xl text-center">Sign In</CardTitle>
+        <CardTitle className="text-2xl text-center">Anmelden</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -72,7 +72,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
             {isLoading && (
               <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
             )}
-            Sign In
+            Anmelden
           </Button>
         </form>
       </CardContent>

@@ -113,12 +113,12 @@ const AdminTable = ({
           <SheetTrigger asChild>
             <Button>
               <UserPlus className="h-4 w-4 mr-2" />
-              New User
+              Neuer User
             </Button>
           </SheetTrigger>
           <SheetContent>
             <SheetHeader>
-              <SheetTitle>Create New User</SheetTitle>
+              <SheetTitle>Neuen User erstellen</SheetTitle>
               <SheetDescription className="hidden"></SheetDescription>
             </SheetHeader>
             <AdminUserForm
@@ -138,13 +138,13 @@ const AdminTable = ({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Full Name</TableHead>
+                <TableHead>Vor- und Nachname</TableHead>
                 <TableHead className="hidden sm:block">Username</TableHead>
-                <TableHead>Nickname</TableHead>
-                <TableHead>Type</TableHead>
+                <TableHead>Spitzname</TableHead>
+                <TableHead>Typ</TableHead>
                 <TableHead>Spot</TableHead>
-                <TableHead>Payment</TableHead>
-                <TableHead>Last Login</TableHead>
+                <TableHead>Zahlung</TableHead>
+                <TableHead>Letzter Login</TableHead>
                 <TableHead></TableHead>
               </TableRow>
             </TableHeader>
@@ -182,12 +182,12 @@ const AdminTable = ({
                           <SheetTrigger asChild>
                             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                               <Edit className="mr-2 h-4 w-4" />
-                              Edit User
+                              Update User
                             </DropdownMenuItem>
                           </SheetTrigger>
                           <SheetContent>
                             <SheetHeader>
-                              <SheetTitle>Edit User: {user.fullName}</SheetTitle>
+                              <SheetTitle>Update User: {user.fullName}</SheetTitle>
                             </SheetHeader>
                             <AdminUserForm
                               user={user}
@@ -201,7 +201,7 @@ const AdminTable = ({
                           onClick={() => handleDeleteUser(user.id)}
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
-                          Delete User
+                          User löschen
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

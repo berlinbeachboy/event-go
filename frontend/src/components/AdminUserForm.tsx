@@ -27,7 +27,6 @@ const AdminUserForm = ({
     onSubmit: (data: Partial<User>) => void;
     isCreating?: boolean;
 }) => {
-    console.log(spotTypes)
     const [formData, setFormData] = useState<Partial<User>>(
         user ?? {
             type: 'reg',

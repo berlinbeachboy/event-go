@@ -49,8 +49,8 @@ const App = () => {
             <div className="pt-24">
               <Routes>
                 <Route path="/" element={<Navigate to="/home" replace />} />
-                <Route path="/home" element={<HomePage />} />
-                <Route path="/user" element={<UserPage userSpots={userSpots} />} />
+                <Route path="/home" element={<HomePage spotTypes={userSpots}/>} />
+                <Route path="/user" element={<UserPage userSpots={userSpots}/>} />
                 <Route
                   path="/admin"
                   element={

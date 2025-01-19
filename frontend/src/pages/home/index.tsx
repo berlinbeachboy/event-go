@@ -1,35 +1,38 @@
+import { SpotType } from '@/models/models';
 import { motion } from 'framer-motion';
-import { Calendar, MapPin, Users, Clock, Music, Utensils, Sun } from 'lucide-react';
-
-export const HomePage = () => {
-    const programItems = [
-        {
-            time: "Donnerstag",
-            events: [
-                { name: "Anreise", description: "Ab 14 Uhr", icon: Sun },
-                { name: "Abendessen", description: "19 Uhr", icon: Utensils },
-                { name: "Clubkeller", description: "Ab 22 Uhr", icon: Music },
-            ]
-        },
-        {
-            time: "Freitag",
-            events: [
-                { name: "Frühstück", description: "Ab 9 Uhr", icon: Utensils },
-                { name: "Olympiade", description: "14 Uhr", icon: Utensils },
-                { name: "Abendessen", description: "19 Uhr", icon: Utensils },
-                { name: "Party", description: "Ab 22 Uhr", icon: Music },
-            ]
-        },
-        {
-            time: "Samstag",
-            events: [
-                { name: "Brunch", description: "Ab 10 Uhr", icon: Utensils },
-                { name: "Pool Time", description: "Ab 14 Uhr", icon: Sun },
-                { name: "BBQ", description: "19 Uhr", icon: Utensils },
-                { name: "Bingo Night", description: "Ab 22 Uhr", icon: Utensils },
-            ]
-        }
-    ];
+import { Calendar, MapPin, Users, Clock} from 'lucide-react';
+interface HomePageProps {
+    spotTypes: SpotType[];
+  }
+export const HomePage = ({spotTypes}: HomePageProps) => {
+    // const programItems = [
+    //     {
+    //         time: "Donnerstag",
+    //         events: [
+    //             { name: "Anreise", description: "Ab 14 Uhr", icon: Sun },
+    //             { name: "Abendessen", description: "19 Uhr", icon: Utensils },
+    //             { name: "Clubkeller", description: "Ab 22 Uhr", icon: Music },
+    //         ]
+    //     },
+    //     {
+    //         time: "Freitag",
+    //         events: [
+    //             { name: "Frühstück", description: "Ab 9 Uhr", icon: Utensils },
+    //             { name: "Olympiade", description: "14 Uhr", icon: Utensils },
+    //             { name: "Abendessen", description: "19 Uhr", icon: Utensils },
+    //             { name: "Party", description: "Ab 22 Uhr", icon: Music },
+    //         ]
+    //     },
+    //     {
+    //         time: "Samstag",
+    //         events: [
+    //             { name: "Brunch", description: "Ab 10 Uhr", icon: Utensils },
+    //             { name: "Pool Time", description: "Ab 14 Uhr", icon: Sun },
+    //             { name: "BBQ", description: "19 Uhr", icon: Utensils },
+    //             { name: "Bingo Night", description: "Ab 22 Uhr", icon: Utensils },
+    //         ]
+    //     }
+    // ];
 
     return (
         <div className="min-h-screen bg-white pt-20">
@@ -48,59 +51,45 @@ export const HomePage = () => {
                     <div className="space-y-4">
                         <h2 className="text-2xl font-medium text-black">Executive Summary</h2>
                         <p className="text-gray-700 leading-relaxed">
-                            Drei Tage Spaß in der Uckermark! Pool | Hot Tub | Olympiade | Bingo | Clubkeller | Geiles Essen uvm
+                            Drei Tage Spaß in der Uckermark! Pool | Hot Tub | Olympiade | Bingo | Clubkeller | Geiles Essen uvm.
+                            <br></br>
+                            Dieses Jahr an Pfingsten!
                         </p>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="flex items-center space-x-2 text-gray-600">
                             <Calendar className="h-5 w-5" />
-                            <span>3 Tage</span>
+                            <span>3. bis 6. Juni 2025</span>
                         </div>
                         <div className="flex items-center space-x-2 text-gray-600">
                             <MapPin className="h-5 w-5" />
-                            <span>Uckermark</span>
+                            <a href="https://www.airbnb.de/rooms/43994007">Schönfeld in der Uckermark</a>
                         </div>
                         <div className="flex items-center space-x-2 text-gray-600">
                             <Users className="h-5 w-5" />
-                            <span>Gemeinschaft</span>
+                            <span>Bis zu 60 geile Schneggen</span>
                         </div>
                         <div className="flex items-center space-x-2 text-gray-600">
                             <Clock className="h-5 w-5" />
-                            <span>Flexibel</span>
+                            <span>Nur Full Weekend</span>
                         </div>
                     </div>
                 </div>
 
                 {/* Accommodation Options */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-                    {[
-                        {
-                            title: "Bettplatz",
-                            status: "Verfügbar",
-                            description: "Bett oder Matratze inkl. Bettwäsche im gewohnten Mehrbettzimmer."
-                        },
-                        {
-                            title: "Zeltplatz",
-                            status: "Verfügbar",
-                            description: "Platz im Zelt (oder unten im Haus); Iso, Schlafsack & ggfls. Zelt sind mitzubringen."
-                        },
-                        {
-                            title: "Samstag",
-                            status: "Verfügbar",
-                            description: "Anreise ab Samstag Mittag. Schlafen (sofern benötigt) wie Zeltplatz. (ca. 45€ inkl. Essen)"
-                        }
-                    ].map((option) => (
+                    {spotTypes.map((option) => (
                         <motion.div
-                            key={option.title}
+                            key={option.name}
                             whileHover={{ y: -5 }}
                             className="p-6 border border-gray-200 rounded-lg hover:shadow-lg transition-shadow"
                         >
-                            <h3 className="text-xl font-medium text-black mb-2">{option.title}</h3>
-                            <span className={`inline-block px-2 py-1 rounded text-sm mb-4 ${option.status === "Ausgebucht"
+                            <h3 className="text-xl font-medium text-black mb-2">{option.name}</h3>
+                            <span className={`inline-block px-2 py-1 rounded text-sm mb-4 ${option.currentCount === option.limit
                                 ? "bg-gray-200 text-gray-700"
                                 : "bg-black text-white"
                                 }`}>
-                                {option.status}
+                                {option.currentCount}/{option.limit}
                             </span>
                             <p className="text-gray-600">{option.description}</p>
                         </motion.div>
@@ -109,21 +98,21 @@ export const HomePage = () => {
 
                 {/* Shifts Section */}
                 <div className="mb-16">
-                    <h2 className="text-3xl font-medium text-black mb-6">Schichten</h2>
+                    <h2 className="text-3xl font-medium text-black mb-6">Was gibt's neues?</h2>
                     <div className="prose prose-gray max-w-none">
                         <ul className="space-y-2 text-gray-700">
-                            <li>Schichten geben entweder 1 Punkt oder 2 Punkte. Diese Info steht in Klammern hinter den Schichten.</li>
-                            <li>Wer Do oder Fr ankommt, braucht 2 Punkte, wer Sa ankommt, braucht nur 1 Punkt.</li>
-                            <li>Ihr könnt die Schichten im Nachhinein ändern und auch mit anderen tauschen.</li>
-                            <li>Nehmt bitte zwei unterschiedliche Schichten, nicht 2x Keller aufräumen.</li>
-                            <li>Bei Fragen zu eurer Schicht bitte auf Geisch zugehen.</li>
+                            <li>Es gibt dieses Jahr aus finanziellen und organisatorischen Gründen keine Samstagstickets.</li>
+                            <li>Dafür gibt es weitere Abstufung der Tickets, z.B. für Tipis.</li>
+                            <li>Das Programm wird um Workshops und Kulturelles erweitert. Bitte melden, wer Workshops o.ä. anbieten möchte!</li>
+                            <li>Musik tagsüber draußen 👯‍♂️</li>
+                            <li>Das Schichtsystem wird etwas angepasst: Alle müssen nun am Sonntag zwischen 10 und 12 eine Aufräumschicht machen.</li>
                         </ul>
                     </div>
                 </div>
             </motion.div>
 
             {/* Program Section */}
-            <motion.div
+            {/* <motion.div
                 id="home/#programm"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -152,7 +141,7 @@ export const HomePage = () => {
                         </motion.div>
                     ))}
                 </div>
-            </motion.div>
+            </motion.div> */}
 
             {/* Gallery Section */}
             <motion.div

@@ -29,14 +29,11 @@ const AuthScreen = ({ onSuccess }: AuthScreenProps) => {
        });
   }
   if (resetToken !== null){
-    console.log("Reset Token "+ resetToken)
     setView('updatePw')
   }
 
   })
   
-  console.log("View: "+view)
-
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 w-screen h-screen">
@@ -47,11 +44,11 @@ const AuthScreen = ({ onSuccess }: AuthScreenProps) => {
         <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000" />
         <div className="relative z-10 max-w-md mx-auto text-center">
           <h1 className="text-4xl font-bold mb-4">
-            {view === 'register' ?  'Melde dich an!' : 'Schönfeld geht in die nächste Runde!'}
+            {view === 'register' ?  "Registriere dich für Schönfeld '25" : 'Schönfeld geht in die nächste Runde!'}
           </h1>
           <p className="text-muted-foreground">
             {view === 'register' 
-              ? "Registriere dich für Schönfeld '25" : 'Hier einloggen'
+              ? "Registrieren heißt noch nicht, dass du kommen oder zahlen musst ;-)" : 'Hier einloggen'
             }
           </p>
         </div>

@@ -46,7 +46,7 @@ const AdminSpotForm = ({
             </div>
 
             <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">Beschreibung</Label>
                 <Textarea
                     id="description"
                     value={formData.description ?? ''}
@@ -56,7 +56,7 @@ const AdminSpotForm = ({
             </div>
 
             <div className="space-y-2">
-                <Label htmlFor="price">Price (€)</Label>
+                <Label htmlFor="price">Preis (€)</Label>
                 <Input
                     id="price"
                     type="number"
@@ -77,7 +77,7 @@ const AdminSpotForm = ({
 
             {!isCreating && (
                 <div className="space-y-2">
-                    <Label htmlFor="currentCount">Current Count</Label>
+                    <Label htmlFor="currentCount">Aktuelle Anzahl</Label>
                     <Input
                         id="currentCount"
                         type="number"

@@ -100,13 +100,13 @@ const SpotCard = ({
       });
       setIsEditing(false);
       toast({
-        title: "Profile updated",
-        description: "Your profile has been successfully updated.",
+        title: "Hat geklappt!",
+        description: "Dein Profil wurde geuptdated!",
       });
     } catch {
       toast({
-        title: "Error",
-        description: "Could not update profile. Please try again.",
+        title: "Fehler",
+        description: "Mist, hat leider nicht geklappt.",
         variant: "destructive",
       });
     }
@@ -118,15 +118,15 @@ const SpotCard = ({
     <div className="container mx-auto max-w-4xl p-8 mt-8">
       <Card className="w-full">
         <CardHeader>
-          <CardTitle className="text-2xl">Profile Settings</CardTitle>
+          <CardTitle className="text-2xl">Dein Profil</CardTitle>
         </CardHeader>
         <CardContent className="space-y-8">
           {/* Basic Information */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Basic Information</h3>
+            <h3 className="text-lg font-semibold">Kontaktinfo</h3>
             <div className="grid gap-4">
               <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
+                <Label htmlFor="username">Email</Label>
                 <Input
                   id="username"
                   value={formData.username}
@@ -136,7 +136,7 @@ const SpotCard = ({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="fullName">Full Name</Label>
+                <Label htmlFor="fullName">Vor- und Nachname</Label>
                 <Input
                   id="fullName"
                   value={formData.fullName}
@@ -146,7 +146,7 @@ const SpotCard = ({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
+                <Label htmlFor="phone">Handynummer</Label>
                 <Input
                   id="phone"
                   value={formData.phone}
@@ -159,7 +159,7 @@ const SpotCard = ({
 
           {/* Spot Selection */}
           <div className="space-y-6">
-            <h3 className="text-lg font-semibold">Spot Selection</h3>
+            <h3 className="text-lg font-semibold">Spot Auswahl</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <SpotCard
                   key={0}
@@ -182,11 +182,11 @@ const SpotCard = ({
             {/* Current Subscription Info */}
             <div className="grid gap-4 mt-6">
               <div className="flex justify-between items-center py-3 px-6 bg-muted rounded-lg">
-                <span>Current Spot</span>
-                <span className="font-medium">{user.spotType?.name || 'No spot assigned'}</span>
+                <span>Dein Spot: </span>
+                <span className="font-medium">{user.spotType?.name || 'Noch kein Spot ausgewählt'}</span>
               </div>
               <div className="flex justify-between items-center py-3 px-6 bg-muted rounded-lg">
-                <span>Payment Status</span>
+                <span>Zahlungsstatus</span>
                 <div className={`px-3 py-1 rounded-full text-sm ${
                   user.amountPaid >= (user.amountToPay || 0)
                     ? 'bg-green-100 text-green-800'
@@ -210,17 +210,17 @@ const SpotCard = ({
             >
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="none" id="none" />
-                <Label htmlFor="none">No Soli</Label>
+                <Label htmlFor="none">Kein Soli</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="give" id="give" />
                 <Label htmlFor="give" className="flex items-center">
-                  I want to give <Gift className="ml-2 h-4 w-4" />
+                  Ich möchte den Soli spendieren ❤️ <Gift className="ml-2 h-4 w-4" />
                 </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="take" id="take" />
-                <Label htmlFor="take">I need support</Label>
+                <Label htmlFor="take">Soli beantragen</Label>
               </div>
             </RadioGroup>
           </div>
@@ -252,16 +252,16 @@ const SpotCard = ({
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Saving...
+                    Speichern...
                   </>
                 ) : (
-                  'Save Changes'
+                  'Speichern'
                 )}
               </Button>
             </>
           ) : (
             <Button onClick={() => setIsEditing(true)}>
-              Edit Profile
+              Änderungen vornehmen
             </Button>
           )}
         </CardFooter>

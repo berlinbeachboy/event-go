@@ -68,7 +68,7 @@ export const Navbar = ({ onLogout }: NavBarProps) => {
                         {/* Desktop Menu */}
                         <div className="hidden md:flex items-center gap-4">
                             {/* Navigation Items */}
-                            {navigationItems.map((item) => (
+                            {/* {navigationItems.map((item) => (
                                 <Link
                                     key={item.name}
                                     to={item.path}
@@ -76,7 +76,7 @@ export const Navbar = ({ onLogout }: NavBarProps) => {
                                 >
                                     {item.name}
                                 </Link>
-                            ))}
+                            ))} */}
 
                             <MusicPlayer />
 
@@ -109,7 +109,7 @@ export const Navbar = ({ onLogout }: NavBarProps) => {
                                         onClick={() => navigate('/user')}
                                         className="text-black hover:bg-custom-pink/40 m-1 rounded-lg cursor-pointer"
                                     >
-                                        Profile
+                                        Mein Profil
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
                                         onClick={handleLogout}
@@ -170,7 +170,7 @@ export const Navbar = ({ onLogout }: NavBarProps) => {
                                                 className="w-full rounded-full border-solid border-2 border-black gap-2 bg-custom-aquamarine"
                                                 onClick={() => navigate('/user')}
                                             >
-                                                Profile
+                                                Mein Spot
                                             </Button>
                                         </SheetClose>
 
