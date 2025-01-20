@@ -65,7 +65,7 @@ func updateUser(ue *models.User, uu UserUpdate) {
 	if uu.TakesSoli != nil {
 		ue.TakesSoli = *uu.TakesSoli
 	}
-	if int(*uu.SpotTypeID) == 0 {
+	if uu.SpotTypeID != nil && int(*uu.SpotTypeID) == 0 {
 		ue.SpotTypeID = nil
 	} else if uu.SpotTypeID != nil {
 		ue.SpotTypeID = uu.SpotTypeID

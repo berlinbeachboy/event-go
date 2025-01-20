@@ -48,7 +48,7 @@ const App = () => {
           <>
             <Navbar onLogout={fetchUser}/>
             <MusicPlayer />
-            <div className="pt-24">
+            <div>
               <Routes>
                 <Route path="/" element={<Navigate to="/home" replace />} />
                 <Route path="/home" element={<HomePage spotTypes={userSpots}/>} />

@@ -66,7 +66,7 @@ const SpotCard = ({
   const SpotPage = ({ userSpots }: UserPageProps) => {
     const { user, updateUser, isLoading } = useAuth();
     const { toast } = useToast();
-    const [isEditing, setIsEditing] = useState(false);
+    const [isEditing, setIsEditing] = useState(true);
     const [formData, setFormData] = useState({
       soliType: user?.givesSoli ? 'give' : user?.takesSoli ? 'take' : 'none',
       spotTypeId: user?.spotTypeId || 0,
@@ -111,7 +111,7 @@ const SpotCard = ({
   if (!user) return null;
 
   return (
-    <div className="container mx-auto max-w-4xl p-8 mt-8">
+    <div className="container mx-auto max-w-4xl md:p-24">
       <Card className="w-full">
         <CardHeader>
           <CardTitle className="text-2xl">Dein Profil</CardTitle>

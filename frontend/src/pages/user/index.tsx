@@ -10,7 +10,7 @@ import { Loader2 } from 'lucide-react';
   const UserPage = () => {
     const { user, updateUser, isLoading } = useAuth();
     const { toast } = useToast();
-    const [isEditing, setIsEditing] = useState(false);
+    const [isEditing, setIsEditing] = useState(true);
     const [formData, setFormData] = useState({
       username: user?.username || '',
       nickname: user?.nickname || '',
@@ -47,7 +47,7 @@ import { Loader2 } from 'lucide-react';
   if (!user) return null;
 
   return (
-    <div className="container mx-auto max-w-4xl p-8 mt-8">
+    <div className="container mx-auto max-w-4xl md:p-24">
       <Card className="w-full">
         <CardHeader>
           <CardTitle className="text-2xl">Dein Profil</CardTitle>

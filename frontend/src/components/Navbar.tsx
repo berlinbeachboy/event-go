@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { User, PartyPopper, Menu} from 'lucide-react';
-import { MarqueeText } from '@/components/MarqueeText';
+// import { MarqueeText } from '@/components/MarqueeText';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -44,13 +44,13 @@ export const Navbar = ({ onLogout }: NavBarProps) => {
 
     return (
         <div className="fixed w-full z-20">
-            <MarqueeText
+            {/* <MarqueeText
                 text="Jetzt Zuschlagen! 0% Rabatt auf alle Tickets - Nur vom 15.01. bis 15.02."
                 speed={5}
                 className="bg-custom-aquamarine py-2 border-b"
                 textClassName="text-black font-medium tracking-wider text-sm"
                 separator="✦"
-            />
+            /> */}
 
             <nav className="w-full h-16 bg-white text-black border-b-2 border-solid border-black">
                 <div className="max-w-7xl h-full mx-auto px-4 sm:px-6 lg:px-8">

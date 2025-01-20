@@ -8,7 +8,6 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-
 var sitePW string
 
 func SitePW() string {
@@ -37,7 +36,7 @@ type Claims struct {
 func MakeJWT(username string) (string, error) {
 	jwtKey := JWTKey()
 
-	expirationTime := time.Now().Add(2 * time.Hour)
+	expirationTime := time.Now().Add(24 * time.Hour)
 	claims := &Claims{
 		Username: username,
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -50,11 +49,10 @@ func MakeJWT(username string) (string, error) {
 	return tokenString, err
 }
 
-
-func CheckUser(c *gin.Context){
+func CheckUser(c *gin.Context) {
 	_, exists := c.Get("username")
-		if !exists {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user."})
-			return
-		}
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user."})
+		return
+	}
 }
