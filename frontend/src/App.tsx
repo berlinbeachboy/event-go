@@ -14,6 +14,7 @@ import AuthScreen from './components/AuthScreen';
 import { Navbar } from '@/components/Navbar';
 import { useSpots } from './api/hooks/use-spots';
 import { MusicPlayer } from './components/MusicPlayer';
+import SpotPage from './pages/spot';
 
 const App = () => {
   const { toast } = useToast();
@@ -51,7 +52,8 @@ const App = () => {
               <Routes>
                 <Route path="/" element={<Navigate to="/home" replace />} />
                 <Route path="/home" element={<HomePage spotTypes={userSpots}/>} />
-                <Route path="/user" element={<UserPage userSpots={userSpots} />} />
+                <Route path="/spot" element={<SpotPage userSpots={userSpots}/>} />
+                <Route path="/user" element={<UserPage/>} />
                 <Route
                   path="/admin"
                   element={

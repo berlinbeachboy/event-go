@@ -65,11 +65,10 @@ func updateUser(ue *models.User, uu UserUpdate) {
 	if uu.TakesSoli != nil {
 		ue.TakesSoli = *uu.TakesSoli
 	}
-	if uu.SpotTypeID != nil && int(*uu.SpotTypeID) != 0 {
-		ue.SpotTypeID = uu.SpotTypeID
-	}
 	if int(*uu.SpotTypeID) == 0 {
 		ue.SpotTypeID = nil
+	} else if uu.SpotTypeID != nil {
+		ue.SpotTypeID = uu.SpotTypeID
 	}
 
 }
@@ -123,7 +122,7 @@ func PutMe(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 		var userExist models.User
-		if err := db.Preload("SpotType").First(&userExist, "username = ?", username).Error; err != nil {
+		if err := db.First(&userExist, "username = ?", username).Error; err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to retrieve user."})
 			return
 		}
@@ -151,7 +150,7 @@ func PutMe(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		updateUser(&userExist, uu)
-		db.Save(&userExist)
+		db.Session(&gorm.Session{FullSaveAssociations: true}).Save(&userExist)
 		if uu.SpotTypeID != nil {
 			if err := db.Model(&userExist).Association("SpotType").Find(&userExist.SpotType); err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": "Konnte den SpotType nach Update nicht laden."})
@@ -236,7 +235,7 @@ func PutUser(db *gorm.DB) gin.HandlerFunc {
 		}
 		uid := c.Param("id")
 		var userExist models.User
-		if err := db.Preload("SpotType").First(&userExist, "ID = ?", uid).Error; err != nil {
+		if err := db.First(&userExist, "ID = ?", uid).Error; err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to retrieve user."})
 			return
 		}
@@ -245,7 +244,6 @@ func PutUser(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 			return
 		}
-
 		// check SpotType
 		if uu.SpotTypeID != nil {
 			if err := checkSpot(db, int(*uu.SpotTypeID)); err != nil {
@@ -258,7 +256,7 @@ func PutUser(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 		updateUser(&userExist, uu)
-		db.Save(&userExist)
+		db.Session(&gorm.Session{FullSaveAssociations: true}).Save(&userExist)
 
 		// Need to reload the Association after changing the Foreign Key
 		if uu.SpotTypeID != nil {
@@ -267,6 +265,7 @@ func PutUser(db *gorm.DB) gin.HandlerFunc {
 				return
 			}
 		}
+		db.Save(&userExist)
 		c.JSON(http.StatusOK, userExist.ToResponse())
 
 	}

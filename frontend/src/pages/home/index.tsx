@@ -72,7 +72,7 @@ export const HomePage = ({spotTypes}: HomePageProps) => {
                     <div className="grid grid-cols-2 gap-4">
                         <div className="flex items-center space-x-2 text-gray-600">
                             <Calendar className="h-5 w-5" />
-                            <span>3. bis 6. Juni 2025</span>
+                            <span>6. bis 9. Juni 2025</span>
                         </div>
                         <div className="flex items-center space-x-2 text-gray-600">
                             <MapPin className="h-5 w-5" />

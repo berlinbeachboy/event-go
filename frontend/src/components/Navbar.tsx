@@ -79,6 +79,15 @@ export const Navbar = ({ onLogout }: NavBarProps) => {
 
                             {/* <MusicPlayer /> */}
 
+                            <Link to="/spot">
+                                <Button
+                                    variant="ghost"
+                                    className="rounded-full border-solid border-2 border-black gap-2 bg-custom-aquamarine transition-all duration-200"
+                                >
+                                    Mein Ticket
+                                </Button>
+                            </Link>
+
                             {user?.type === 'admin' && (
                                 <Link to="/admin">
                                     <Button
@@ -150,6 +159,17 @@ export const Navbar = ({ onLogout }: NavBarProps) => {
 
                                         {/* <MusicPlayer /> */}
 
+                                        <SheetClose asChild>
+                                                <Link to="/spot">
+                                                    <Button
+                                                        variant="ghost"
+                                                        className="w-full rounded-full border-solid border-2 border-black gap-2 bg-custom-aquamarine"
+                                                    >
+                                                        Mein Ticket
+                                                    </Button>
+                                                </Link>
+                                            </SheetClose>
+
                                         {user?.type === 'admin' && (
                                             <SheetClose asChild>
                                                 <Link to="/admin">
@@ -169,7 +189,7 @@ export const Navbar = ({ onLogout }: NavBarProps) => {
                                                 className="w-full rounded-full border-solid border-2 border-black gap-2 bg-custom-aquamarine"
                                                 onClick={() => navigate('/user')}
                                             >
-                                                Mein Spot
+                                                Mein Profil
                                             </Button>
                                         </SheetClose>
 
