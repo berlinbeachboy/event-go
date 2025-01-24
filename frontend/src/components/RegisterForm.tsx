@@ -74,7 +74,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
 
           {/* Password field */}
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">Dein Password</Label>
             <Input
               id="password"
               name="password"

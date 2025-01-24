@@ -52,7 +52,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
             <Input
               id="username"
               name="username"
-              placeholder="Enter your username"
+              placeholder="Deine Emailadresse"
               type="text"
               value={formData.username}
               onChange={handleChange}
@@ -64,7 +64,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
             <Input
               id="password"
               name="password"
-              placeholder="Enter your password"
+              placeholder="Dein Passwort"
               type="password"
               value={formData.password}
               onChange={handleChange}

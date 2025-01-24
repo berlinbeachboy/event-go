@@ -5,6 +5,25 @@ interface HomePageProps {
     spotTypes: SpotType[];
   }
 export const HomePage = ({spotTypes}: HomePageProps) => {
+
+    const spotTypeImageMap: Record<string, string> = {
+        "Zeltplatz": "/images/tent_mn.PNG",
+        "Hausplatz": "/images/bed_mn.PNG"
+      };
+      
+    function resolveSpotTypeImage(spotTypeName: string): string {
+    // Exact match
+    if (spotTypeImageMap[spotTypeName]) {
+        return spotTypeImageMap[spotTypeName];
+    }
+    
+    // Partial match (case-insensitive)
+    const matchedKey = Object.keys(spotTypeImageMap).find(
+        key => spotTypeName.toLowerCase().includes(key.toLowerCase())
+    );
+    
+    return matchedKey ? spotTypeImageMap[matchedKey] : "/images/tnt_mn.jpg";
+    }
     // const programItems = [
     //     {
     //         time: "Donnerstag",
@@ -89,24 +108,35 @@ export const HomePage = ({spotTypes}: HomePageProps) => {
                     </div>
                 </div>
 
-                {/* Accommodation Options */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-                    {spotTypes.map((option) => (
-                        <motion.div
-                            key={option.name}
-                            whileHover={{ y: -5 }}
-                            className="p-6 border border-gray-200 rounded-lg hover:shadow-lg transition-shadow"
-                        >
-                            <h3 className="text-xl font-medium text-black mb-2">{option.name}</h3>
-                            <span className={`inline-block px-2 py-1 rounded text-sm mb-4 ${option.currentCount === option.limit
-                                ? "bg-gray-200 text-gray-700"
-                                : "bg-black text-white"
-                                }`}>
-                                {option.currentCount}/{option.limit}
-                            </span>
-                            <p className="text-gray-600">{option.description}</p>
-                        </motion.div>
-                    ))}
+                {/* Updated component with image support */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+                {spotTypes.map((option) => (
+                    <motion.div
+                    key={option.name}
+                    whileHover={{ y: -5 }}
+                    className="p-6 border border-gray-200 rounded-lg hover:shadow-lg transition-shadow flex"
+                    >
+                    <div className="flex-grow pr-4">
+                        <h3 className="text-xl font-medium text-black mb-2">{option.name}</h3>
+                        <span className={`inline-block px-2 py-1 rounded text-sm mb-4 ${option.currentCount === option.limit
+                        ? "bg-gray-200 text-gray-700"
+                        : "bg-black text-white"
+                        }`}>
+                        {option.currentCount}/{option.limit}
+                        </span>
+                        <p className="text-gray-600">{option.description}</p>
+                    </div>
+                    {resolveSpotTypeImage(option.name) && (
+                        <div className="ml-2 w-32 flex-shrink-0">
+                        <img 
+                            src={resolveSpotTypeImage(option.name)} 
+                            alt={option.name} 
+                            className="rounded-lg object-cover w-full h-32"
+                        />
+                        </div>
+                    )}
+                    </motion.div>
+                ))}
                 </div>
 
                 {/* Shifts Section */}

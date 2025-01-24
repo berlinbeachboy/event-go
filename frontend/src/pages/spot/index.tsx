@@ -32,6 +32,25 @@ const SpotCard = ({
   } else {
     Icon = Frown
   }
+  const spotTypeImageMap: Record<string, string> = {
+    "Zeltplatz": "/images/tent_mn.PNG",
+    "Hausplatz": "/images/bed_mn.PNG",
+    "Leider nicht dabei" : "/images/sad.PNG"
+  };
+  
+  function resolveSpotTypeImage(spotTypeName: string): string {
+  // Exact match
+  if (spotTypeImageMap[spotTypeName]) {
+      return spotTypeImageMap[spotTypeName];
+  }
+
+  // Partial match (case-insensitive)
+  const matchedKey = Object.keys(spotTypeImageMap).find(
+      key => spotTypeName.toLowerCase().includes(key.toLowerCase())
+  );
+
+  return matchedKey ? spotTypeImageMap[matchedKey] : "/images/tnt_mn.jpg";
+  }
 
   return (
     <div
@@ -40,11 +59,31 @@ const SpotCard = ({
         "relative p-4 rounded-lg border-2 cursor-pointer transition-all",
         selected ? "border-black bg-custom-aquamarine/20" : "border-gray-200 hover:border-gray-300",
         disabled && "opacity-50 cursor-not-allowed",
-        "flex flex-col items-center gap-4"
+        "flex items-center gap-4"
       )}
     >
-      <Icon size={32} />
-      <div className="text-center">
+    <div className="flex-grow pr-4">
+      <h3 className="text-xl font-medium text-black mb-2">{spot.name}   </h3>
+      <p className="text-sm text-gray-600">{spot.price}€      <span className={cn(
+            "px-2 py-1 rounded-full",
+            spot.currentCount >= spot.limit 
+              ? "bg-red-100 text-red-800" 
+              : "bg-green-100 text-green-800"
+          )}>
+            {spot.currentCount} / {spot.limit} spots
+          </span></p>
+      <p className="text-gray-600">{spot.description}</p>
+    </div>
+    {resolveSpotTypeImage(spot.name) && (
+        <div className="ml-0 w-28 flex-shrink-0">
+        <img 
+            src={resolveSpotTypeImage(spot.name)} 
+            alt={spot.name} 
+            className="rounded-lg object-cover w-full h-32"
+        />
+        </div>
+    )}
+      {/* <div className="text-center">
         <h4 className="font-medium">{spot.name}</h4>
         <p className="text-sm text-gray-600">{spot.price}€</p>
         <div className="mt-2 text-xs">
@@ -57,7 +96,7 @@ const SpotCard = ({
             {spot.currentCount} / {spot.limit} spots
           </span>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
@@ -73,7 +112,7 @@ const SpotCard = ({
     });
     const noSpot = {
       id: 0,
-      name: "leider nicht dabei",
+      name: "Leider nicht dabei",
       price: 0,
       limit: 0,
       description: ":(",
@@ -111,7 +150,7 @@ const SpotCard = ({
   if (!user) return null;
 
   return (
-    <div className="container mx-auto max-w-4xl md:p-24">
+    <div className="container mx-auto max-w-5xl md:p-24">
       <Card className="w-full">
         <CardHeader>
           <CardTitle className="text-2xl">Dein Profil</CardTitle>
