@@ -12,7 +12,9 @@ export const HomePage = ({spotTypes}: HomePageProps) => {
 
     const spotTypeImageMap: Record<string, string> = {
         "Zeltplatz": "/images/tent_mn.PNG",
-        "Hausplatz": "/images/bed_mn.PNG"
+        "Hausplatz": "/images/bed_mn.PNG",
+        "Tipi": "/images/tent_mn.PNG",
+        "Yoga Raum": "/images/bed_mn.PNG",
       };
       
     function resolveSpotTypeImage(spotTypeName: string): string {

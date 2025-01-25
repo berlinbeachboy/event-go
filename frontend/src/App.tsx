@@ -22,7 +22,7 @@ import PrivacyPage from './pages/privacy';
 const Footer = () => (
   <footer className="w-full text-grey text-center p-4">
     <div className="flex justify-center space-x-4">
-      <a href="*" className="hover:underline">
+      <a href="/" className="hover:underline">
         Home
       </a>
       <a href="/impressum" className="hover:underline">
