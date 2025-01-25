@@ -75,3 +75,7 @@ node_modules
 dist
 dist-ssr
 *.local
+flying_new
+flying_new/*
+galery
+galery/*

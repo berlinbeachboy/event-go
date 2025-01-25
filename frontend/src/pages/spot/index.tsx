@@ -56,14 +56,17 @@ const SpotCard = ({
     >
     <div className="flex-grow pr-4">
       <h3 className="text-xl font-medium text-black mb-2">{spot.name}   </h3>
-      <p className="text-sm text-gray-600">{spot.price}€      <span className={cn(
+      <p className="text-sm text-gray-600">{spot.price}€     
+        <span className={cn(
             "px-2 py-1 rounded-full",
             spot.currentCount >= spot.limit 
               ? "bg-red-100 text-red-800" 
               : "bg-green-100 text-green-800"
           )}>
-            {spot.currentCount} / {spot.limit} spots
-          </span></p>
+            {spot.currentCount} / {spot.limit}
+          </span>
+        </p>
+        <br></br>
       <p className="text-gray-600">{spot.description}</p>
     </div>
     {resolveSpotTypeImage(spot.name) && (

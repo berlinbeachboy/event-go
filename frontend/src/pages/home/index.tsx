@@ -1,10 +1,14 @@
+import BalloonGame from '@/components/BallonGame';
 import { SpotType } from '@/models/models';
 import { motion } from 'framer-motion';
 import { Calendar, MapPin, Users, Clock} from 'lucide-react';
+import { useState } from 'react';
 interface HomePageProps {
     spotTypes: SpotType[];
   }
 export const HomePage = ({spotTypes}: HomePageProps) => {
+
+    const [isBallooning, setIsBallooning] = useState(false);
 
     const spotTypeImageMap: Record<string, string> = {
         "Zeltplatz": "/images/tent_mn.PNG",
@@ -55,6 +59,7 @@ export const HomePage = ({spotTypes}: HomePageProps) => {
 
     return (
         <div className="min-h-screen bg-white relative">
+            {isBallooning && <BalloonGame/>}
             {/* Background Image Container */}
             <div className="absolute top-0 left-0 w-full h-[50vh] z-0">
                 <div 
@@ -202,7 +207,7 @@ export const HomePage = ({spotTypes}: HomePageProps) => {
                             className="aspect-square relative overflow-hidden rounded-lg"
                         >
                             <img
-                                src={`/images/${index}.jpg`}
+                                src={`/images/galery/${index}.jpg`}
                                 alt={`Gallery image ${index}`}
                                 className="object-cover w-full h-full"
                             />
@@ -212,6 +217,15 @@ export const HomePage = ({spotTypes}: HomePageProps) => {
                     ))}
                 </div>
             </motion.div>
+
+            <div className="ml-2 w-64 cursor-pointer" onClick={() => setIsBallooning(!isBallooning)}
+            >
+                <img 
+                    src="/images/balloons/blue.png"
+                    alt="balloon_button"
+                    className="rounded-lg object-cover w-full h-full"
+                />
+                </div>
             </div>
         </div>
     );
