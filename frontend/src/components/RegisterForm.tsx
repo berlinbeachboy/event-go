@@ -141,6 +141,10 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
             />
           </div>
 
+          <div className="space-y-2 text-xs">
+            Mit der Registrierung stimmst du unseren <a className="hover:underline" href='/privacy'>Datenschutzrichtlinien</a> zu.
+          </div>
+
           {/* Submit button */}
           <Button 
             className="w-full" 

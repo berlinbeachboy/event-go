@@ -15,6 +15,25 @@ import { Navbar } from '@/components/Navbar';
 import { useSpots } from './api/hooks/use-spots';
 import { MusicPlayer } from './components/MusicPlayer';
 import SpotPage from './pages/spot';
+import ImprintPage from './pages/imprint';
+import PrivacyPage from './pages/privacy';
+
+// Footer Component
+const Footer = () => (
+  <footer className="w-full text-grey text-center p-4">
+    <div className="flex justify-center space-x-4">
+      <a href="*" className="hover:underline">
+        Home
+      </a>
+      <a href="/impressum" className="hover:underline">
+        Impressum
+      </a>
+      <a href="/privacy" className="hover:underline">
+        Datenschutz
+      </a>
+    </div>
+  </footer>
+);
 
 const App = () => {
   const { toast } = useToast();
@@ -43,7 +62,13 @@ const App = () => {
     <Router>
       <div className="min-h-screen w-screen bg-background">
         {!user ? (
-          <AuthScreen onSuccess={fetchUser} />
+          <>
+          <Routes>
+              <Route path="/impressum" element={<ImprintPage />} />
+              <Route path="/privacy" element={<PrivacyPage />} />
+              <Route path="*" element={<AuthScreen onSuccess={fetchUser} />} />
+            </Routes>
+          </>
         ) : (
           <>
             <Navbar onLogout={fetchUser}/>
@@ -54,6 +79,8 @@ const App = () => {
                 <Route path="/home" element={<HomePage spotTypes={userSpots}/>} />
                 <Route path="/spot" element={<SpotPage userSpots={userSpots}/>} />
                 <Route path="/user" element={<UserPage/>} />
+                <Route path="/impressum" element={<ImprintPage/>} />
+                <Route path="/privacy" element={<PrivacyPage/>} />
                 <Route
                   path="/admin"
                   element={
@@ -62,8 +89,10 @@ const App = () => {
                 />
               </Routes>
             </div>
+            
           </>
         )}
+        <Footer />
       </div>
       <Toaster />
     </Router>

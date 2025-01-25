@@ -109,7 +109,7 @@ export const MusicPlayer = () => {
     });
 
     return (
-        <div className="fixed left-1/2 -translate-x-1/2 bottom-4 z-50">
+        <div className="fixed left-1/2 -translate-x-1/2 bottom-10 z-50">
             <div className="max-w-md mx-auto px-2">
                 <div className="flex items-center border-solid border-2 border-black gap-2 bg-custom-aquamarine backdrop-blur-sm rounded-full px-3 shadow-lg">
                     {/* Controls */}
