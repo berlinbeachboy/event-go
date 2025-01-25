@@ -151,11 +151,11 @@ func PutMe(db *gorm.DB) gin.HandlerFunc {
 
 		updateUser(&userExist, uu)
 		db.Session(&gorm.Session{FullSaveAssociations: true}).Save(&userExist)
-		if uu.SpotTypeID != nil {
-			if err := db.Model(&userExist).Association("SpotType").Find(&userExist.SpotType); err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": "Konnte den SpotType nach Update nicht laden."})
-				return
-			}
+
+		// full reload so that all fields are there for output
+		if err := db.Model(&userExist).Association("SpotType").Find(&userExist.SpotType); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Konnte den SpotType nach Update nicht laden."})
+			return
 		}
 		// Need to reload the Association after changing the Foreign Key
 		c.JSON(http.StatusOK, userExist.ToResponse())

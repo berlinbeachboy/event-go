@@ -166,7 +166,7 @@ const AdminTable = ({
                     <span className={`px-2 py-1 rounded-full text-xs ${
                       user.amountPaid >= user.amountToPay ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
                     }`}>
-                      {user.amountPaid}€ / {user.amountToPay}€
+                      {user.amountPaid}€ / {user.amountToPay + user.amountPaid}€
                     </span>
                   </TableCell>
                   <TableCell>{user.lastLogin !== null ? formatDate(user.lastLogin) : "-"}</TableCell>

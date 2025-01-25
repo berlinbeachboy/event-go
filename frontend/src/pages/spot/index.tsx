@@ -215,7 +215,7 @@ const SpotCard = ({
                     ? 'bg-green-100 text-green-800'
                     : 'bg-yellow-100 text-yellow-800'
                 }`}>
-                  {user.amountPaid}€ / {user.amountToPay}€
+                  {user.amountPaid}€ / {user.amountToPay + user.amountPaid}€
                 </div>
               </div>
               <div className="flex justify-between items-center py-3 px-6 bg-muted rounded-lg">

@@ -93,8 +93,8 @@ const App = () => {
           </>
         )}
         <Footer />
+        <Toaster />
       </div>
-      <Toaster />
     </Router>
   );
 };
