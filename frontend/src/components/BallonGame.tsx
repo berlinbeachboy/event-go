@@ -16,6 +16,7 @@ const BalloonGame: React.FC = () => {
   // Configuration
   const MAX_BALLOONS = 20; // Reduced number of balloons
   const SPAWN_DENSITY = 2000; // Significantly reduced spawn rate
+  const BALLOON_IMAGE_COUNT = 39
   const BALLOON_COLORS = [
     { color: 'green', image: '/images/balloons/green.png' },
     { color: 'blue', image: '/images/balloons/blue.png' },
@@ -53,7 +54,7 @@ const BalloonGame: React.FC = () => {
       if (!balloonToRemove) return prevBalloons;
 
       // Select and display a random image
-      const imageNo = Math.floor(Math.random() * 9) + 1;
+      const imageNo = Math.floor(Math.random() * BALLOON_IMAGE_COUNT) + 1;
       const img = new Image();
       img.src = `/images/flying_new/${imageNo}.jpeg`;
 
