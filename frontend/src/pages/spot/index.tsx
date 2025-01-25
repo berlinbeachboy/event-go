@@ -4,7 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
-import { Loader2, Home, Tent, Frown } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { SpotType } from '@/models/models';
 import { cn } from '@/lib/utils';
@@ -24,14 +24,6 @@ const SpotCard = ({
   onSelect: () => void;
   disabled: boolean;
 }) => {
-  var Icon
-  if (spot.name.toLowerCase().includes('haus')){
-    Icon = Home
-  }else if (spot.name.toLowerCase().includes('zelt')){
-    Icon = Tent
-  } else {
-    Icon = Frown
-  }
   const spotTypeImageMap: Record<string, string> = {
     "Zeltplatz": "/images/tent_mn.PNG",
     "Hausplatz": "/images/bed_mn.PNG",
