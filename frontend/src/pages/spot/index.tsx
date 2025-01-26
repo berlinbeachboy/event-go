@@ -27,8 +27,8 @@ const SpotCard = ({
   const spotTypeImageMap: Record<string, string> = {
     "Zeltplatz": "/images/tent_mn.PNG",
     "Hausplatz": "/images/bed_mn.PNG",
-    "Tipi": "/images/tent_mn.PNG",
-    "Yoga Raum": "/images/bed_mn.PNG",
+    "Glamping-Tipi": "/images/tent_mn.PNG",
+    "Yogaraum": "/images/bed_mn.PNG",
     "Leider nicht dabei" : "/images/sad.PNG"
   };
   
@@ -150,13 +150,13 @@ const SpotCard = ({
     <div className="container mx-auto max-w-5xl md:p-24">
       <Card className="w-full">
         <CardHeader>
-          <CardTitle className="text-2xl">Dein Profil</CardTitle>
+          <CardTitle className="text-2xl">Dein Ticket</CardTitle>
         </CardHeader>
         <CardContent className="space-y-8">
 
           {/* Spot Selection */}
           <div className="space-y-6">
-            <h3 className="text-lg font-semibold">Spot Auswahl</h3>
+            <h3 className="text-lg font-semibold">Wähle hier deinen Spot aus</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <SpotCard
                   key={0}
@@ -178,7 +178,7 @@ const SpotCard = ({
 
             {/* Soli Options */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Sole beantragen oder Spendieren</h3>
+            <h3 className="text-lg font-semibold">Soli von 25€ Beantragen oder Spendieren</h3>
             <RadioGroup 
               value={formData.soliType} 
               onValueChange={(value) => handleChange('soliType', value)}
@@ -197,7 +197,7 @@ const SpotCard = ({
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="take" id="take" />
-                <Label htmlFor="take">Soli beantragen</Label>
+                <Label htmlFor="take">Soli beantragen (Kein Grund zum Schämen!)</Label>
               </div>
             </RadioGroup>
           </div>

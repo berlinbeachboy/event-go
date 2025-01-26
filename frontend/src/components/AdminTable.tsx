@@ -141,6 +141,7 @@ const AdminTable = ({
                 <TableHead>Vor- und Nachname</TableHead>
                 <TableHead className="hidden sm:block">Username</TableHead>
                 <TableHead>Spitzname</TableHead>
+                <TableHead className="hidden md:block">Handy</TableHead>
                 <TableHead>Typ</TableHead>
                 <TableHead>Spot</TableHead>
                 <TableHead>Zahlung</TableHead>
@@ -154,6 +155,7 @@ const AdminTable = ({
                   <TableCell>{user.fullName}</TableCell>
                   <TableCell className="hidden sm:block">{user.username}</TableCell>
                   <TableCell>{user.nickname}</TableCell>
+                  <TableCell className="hidden md:block">{user.phone}</TableCell>
                   <TableCell>
                     <span className={`px-2 py-1 rounded-full text-xs ${
                       user.type === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'

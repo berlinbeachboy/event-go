@@ -13,8 +13,8 @@ export const HomePage = ({spotTypes}: HomePageProps) => {
     const spotTypeImageMap: Record<string, string> = {
         "Zeltplatz": "/images/tent_mn.PNG",
         "Hausplatz": "/images/bed_mn.PNG",
-        "Tipi": "/images/tent_mn.PNG",
-        "Yoga Raum": "/images/bed_mn.PNG",
+        "Glamping Tipi": "/images/tent_mn.PNG",
+        "Yogaraum": "/images/bed_mn.PNG",
       };
       
     function resolveSpotTypeImage(spotTypeName: string): string {
@@ -90,7 +90,8 @@ export const HomePage = ({spotTypes}: HomePageProps) => {
                     <div className="space-y-4">
                         <h2 className="text-2xl font-medium text-black">Executive Summary</h2>
                         <p className="text-gray-700 leading-relaxed">
-                            Drei Tage Spaß in der Uckermark! Pool | Hot Tub | Olympiade | Bingo | Clubkeller | Geiles Essen uvm.
+                            Drei Tage Spaß in der Uckermark! <br></br>
+                            Pool | Hot Tub | Workshops | Olympiade | Bingo | Clubkeller | Geiles Essen uvm.
                             <br></br>
                             Dieses Jahr an Pfingsten!
                         </p>
