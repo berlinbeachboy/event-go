@@ -13,8 +13,8 @@ export const HomePage = ({spotTypes}: HomePageProps) => {
     const spotTypeImageMap: Record<string, string> = {
         "Zeltplatz": "/images/tent_mn.PNG",
         "Hausplatz": "/images/bed_mn.PNG",
-        "Glamping Tipi": "/images/tent_mn.PNG",
-        "Yogaraum": "/images/bed_mn.PNG",
+        "Glamping-Tipi": "/images/tipi_mn.PNG",
+        "Yogaraum": "/images/room_mn.PNG",
       };
       
     function resolveSpotTypeImage(spotTypeName: string): string {
@@ -81,10 +81,14 @@ export const HomePage = ({spotTypes}: HomePageProps) => {
                 animate={{ opacity: 1 }}
                 className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16"
             >
-                <h1 className="text-6xl font-bold text-black mb-6">
-                    schoenfeld.
-                    <span className="text-gray-300">.</span>
-                </h1>
+                <div className="text-6xl font-bold mb-6 flex items-end">
+                <img 
+                            src="/images/schriftzug.png" 
+                            alt="Schönfeld."
+                            className="object-cover w-72"
+                        />
+                    <div className="text-2xl text-gray-700">2025</div>
+                </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
                     <div className="space-y-4">

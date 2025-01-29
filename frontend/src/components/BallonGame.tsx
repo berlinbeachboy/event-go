@@ -18,10 +18,9 @@ const BalloonGame: React.FC = () => {
   const SPAWN_DENSITY = 2000; // Significantly reduced spawn rate
   const BALLOON_IMAGE_COUNT = 39
   const BALLOON_COLORS = [
-    { color: 'green', image: '/images/balloons/green.png' },
-    { color: 'blue', image: '/images/balloons/blue.png' },
-    { color: 'red', image: '/images/balloons/red.png' },
-    { color: 'yellow', image: '/images/balloons/purple.png' }
+    { color: 'green', image: '/images/balloons/one.png' },
+    { color: 'blue', image: '/images/balloons/two.png' },
+    { color: 'red', image: '/images/balloons/three.png' },
   ];
 
   // Generate a random X position within the canvas width

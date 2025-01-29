@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { User, PartyPopper, Menu} from 'lucide-react';
+import { User, HouseIcon, Menu, } from 'lucide-react';
 // import { MarqueeText } from '@/components/MarqueeText';
 import {
     DropdownMenu,
@@ -57,10 +57,12 @@ export const Navbar = ({ onLogout }: NavBarProps) => {
                     <div className="flex h-full justify-between items-center">
                         <div className="flex-shrink-0">
                             <Link to="/home" className="flex items-center group">
-                                <PartyPopper className='mr-4'></PartyPopper>
-                                <span className="text-2xl font-bold hover:transition-colors duration-200">
-                                    schoenfeld.
-                                </span>
+                                <HouseIcon className='mr-4'></HouseIcon>
+                                <img 
+                                    src="/images/schriftzug.png" 
+                                    alt="Schönfeld."
+                                    className="object-cover w-48"
+                                />
                             </Link>
                         </div>
 

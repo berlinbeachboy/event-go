@@ -27,8 +27,8 @@ const SpotCard = ({
   const spotTypeImageMap: Record<string, string> = {
     "Zeltplatz": "/images/tent_mn.PNG",
     "Hausplatz": "/images/bed_mn.PNG",
-    "Glamping-Tipi": "/images/tent_mn.PNG",
-    "Yogaraum": "/images/bed_mn.PNG",
+    "Glamping-Tipi": "/images/tipi_mn.PNG",
+    "Yogaraum": "/images/room_mn.PNG",
     "Leider nicht dabei" : "/images/sad.PNG"
   };
   
