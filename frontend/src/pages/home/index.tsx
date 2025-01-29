@@ -156,11 +156,12 @@ export const HomePage = ({spotTypes}: HomePageProps) => {
                     <h2 className="text-3xl font-medium text-black mb-6">Was gibt's neues?</h2>
                     <div className="prose prose-gray max-w-none">
                         <ul className="space-y-2 text-gray-700">
-                            <li>Es gibt dieses Jahr aus finanziellen und organisatorischen Gründen keine Samstagstickets.</li>
+                            <li>Es gibt dieses Jahr aus finanziellen und organisatorischen Gründen <b>keine Samstagstickets</b>.</li>
                             <li>Dafür gibt es weitere Abstufung der Tickets, z.B. für Tipis.</li>
                             <li>Das Programm wird um Workshops und Kulturelles erweitert. Bitte melden, wer Workshops o.ä. anbieten möchte!</li>
                             <li>Musik tagsüber draußen 👯‍♂️</li>
-                            <li>Das Schichtsystem wird etwas angepasst: Alle müssen nun am Sonntag zwischen 10 und 12 eine Aufräumschicht machen.</li>
+                            <li>Wer jemanden mitbringen möchte, bitte beim Orgateam anfragen, nicht einfach das Passwort weitergeben.</li>
+                            <li>Das Schichtsystem wird etwas angepasst: Alle müssen nun <b>am Sonntag zwischen 10 und 12 eine Aufräumschicht</b> machen.</li>
                         </ul>
                     </div>
                 </div>

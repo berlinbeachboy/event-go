@@ -15,7 +15,7 @@ const BalloonGame: React.FC = () => {
 
   // Configuration
   const MAX_BALLOONS = 20; // Reduced number of balloons
-  const SPAWN_DENSITY = 2000; // Significantly reduced spawn rate
+  const SPAWN_DENSITY = 1000; // Significantly reduced spawn rate
   const BALLOON_IMAGE_COUNT = 39
   const BALLOON_COLORS = [
     { color: 'green', image: '/images/balloons/one.png' },

@@ -178,7 +178,7 @@ const SpotCard = ({
 
             {/* Soli Options */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Soli von 25€ Beantragen oder Spendieren</h3>
+            <h3 className="text-lg font-semibold">Möchtest du den Soli von 25€ beantragen oder spendieren</h3>
             <RadioGroup 
               value={formData.soliType} 
               onValueChange={(value) => handleChange('soliType', value)}
@@ -219,7 +219,7 @@ const SpotCard = ({
                 </div>
               </div>
               <div className="flex justify-between items-center py-3 px-6 bg-muted rounded-lg">
-                <span>Zahlen müsst ihr erst bis Ende April, Zahlungsinfos folgen </span>
+                <span>Zahlen müsst ihr erst bis Ende April, Zahlungsinfos folgen.</span>
               </div>
             </div>
           </div>
