@@ -41,11 +41,16 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
         title: "Top, jetzt nur noch die Mail bestätigen",
         description: "Check deine Mails (auch Spam) und verfiziere dein Mail!",
       });
-    } catch (error) {
-      console.error('Registration error:', error);
+    } catch (error: any) {
+      if (error.response && error.response.data && error.response.data.error) {
+        console.log(error.response.data?.error);
+        var desc: String = error.response.data?.error
+      } else {
+        var desc: String = "Hat leider nicht geklappt :("
+      }
       toast({
-        title: "Registration failed",
-        description: "Please check your details and try again",
+        title: "Registrierung hat nicht geklappt",
+        description: desc,
         variant: "destructive",
       });
     }

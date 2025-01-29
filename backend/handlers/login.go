@@ -63,12 +63,12 @@ func Register(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var ur UserRegister
 		if err := c.ShouldBindJSON(&ur); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Falsches Datenformat bzw. fehlende Infos."})
 			return
 		}
 
 		if ur.SitePassword != util.SitePW() {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Falsches Passwort (frag nochmal einen Admin)"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Falsches Seiten Passwort (frag nochmal einen Admin)"})
 			return
 		}
 		var userExist models.User
@@ -77,7 +77,7 @@ func Register(db *gorm.DB) gin.HandlerFunc {
 			// If the user exists but is not activated, an admin might have created it
 			// it will then be filled by an actual user
 			if userExist.IsActivated {
-				c.JSON(http.StatusBadRequest, gin.H{"error": "User with this email already exists, please login"})
+				c.JSON(http.StatusBadRequest, gin.H{"error": "Es gibt bereits einen User mit dieser Email. Notfalls Passwort zurücksetzen?"})
 				return
 			}
 			userExist.Nickname = ur.Nickname
