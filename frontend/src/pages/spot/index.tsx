@@ -60,7 +60,7 @@ const SpotCard = ({
       <h3 className="text-xl font-medium text-black mb-2">{spot.name}   </h3>
       <p className="text-sm text-gray-600">{spot.price}€     
         <span className={cn(
-            "px-2 py-1 rounded-full",
+            "px-2 py-1 rounded-full ml-5",
             spot.currentCount >= spot.limit 
               ? "bg-red-100 text-red-800" 
               : "bg-green-100 text-green-800"

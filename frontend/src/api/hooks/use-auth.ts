@@ -112,8 +112,8 @@
     updateUser: async (data: Partial<UserResponse>) => {
       try {
         set({ isLoading: true, error: null });
-        const response = await axiosInstance.put<UserResponse>('/user/me', data);
-        set({ user: response.data, isLoading: false });
+        const res_user = await axiosInstance.put<UserResponse>('/user/me', data);
+        set({ user: res_user.data, isLoading: false });
       } catch (error) {
         set({ error: error as Error, isLoading: false });
         throw error;
