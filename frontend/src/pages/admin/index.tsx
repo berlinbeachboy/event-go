@@ -5,6 +5,7 @@ import AdminTable from '@/components/AdminTable';
 import AdminSpotTable from '@/components/SpotTypeTable';
 import { useState, useEffect } from 'react'; // Removed useEffect
 import { Button } from '@/components/ui/button';
+import SpotCalculator from '@/components/SpotCalculator';
 
 type ViewType = 'userTable' | 'spotTable';
 
@@ -70,13 +71,20 @@ const AdminPage = () => {
             )}
 
             {view === 'spotTable' && (
-              <AdminSpotTable
-                spotTypes={spots}
-                isLoading={isLoading}
-                onCreateSpot={createSpot}
-                onUpdateSpot={updateSpot}
-                onDeleteSpot={deleteSpot}
-              />
+              <>
+                <AdminSpotTable
+                  spotTypes={spots}
+                  isLoading={isLoading}
+                  onCreateSpot={createSpot}
+                  onUpdateSpot={updateSpot}
+                  onDeleteSpot={deleteSpot}
+                />
+                <br></br><br></br>
+                <SpotCalculator
+                  spotTypes={spots}
+                  isLoading={isLoading}
+                />
+              </>
             )}
           </div>
         )}

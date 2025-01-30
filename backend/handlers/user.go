@@ -10,6 +10,7 @@ import (
 	"gorm.io/gorm"
 
 	"sfpr/models"
+	"sfpr/util"
 )
 
 type UserUpdate struct {
@@ -304,13 +305,17 @@ func DeleteUser(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		_, exists := c.Get("username")
 		if !exists {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user."})
+			c.JSON(http.StatusNotFound, gin.H{"error": "Failed to retrieve user."})
 			return
 		}
 		uid := c.Param("id")
 		var userExist models.User
 		if err := db.First(&userExist, "ID = ?", uid).Error; err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to retrieve user."})
+			return
+		}
+		if userExist.Username == util.StrPtr("p@p.com") {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Cannot delete Super Admin User."})
 			return
 		}
 		db.Delete(&userExist)

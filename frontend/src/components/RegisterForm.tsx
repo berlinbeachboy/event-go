@@ -138,7 +138,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
             <Input
               id="sitePassword"
               name="sitePassword"
-              type="password"
+              type="text"
               placeholder="Frag hierfür ein Orgamitglied"
               value={formData.sitePassword}
               onChange={handleChange}
