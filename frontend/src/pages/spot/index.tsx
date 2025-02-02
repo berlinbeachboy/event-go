@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 
-const paymentDetails = import.meta.env.PAYMENT_DETAILS || 'wird demnächst freigegeben';
+const paymentDetails = import.meta.env.VITE_PAYMENT_DETAILS || 'wird demnächst freigegeben';
 
 
 interface UserPageProps {
