@@ -124,6 +124,9 @@ const SpotCard = ({
     }
 
   const handleChange = (field: keyof typeof formData, value: any) => {
+    if (field === 'soliAmount' && (Number.isNaN(value) || value === "NaN")){
+      value = 0
+    }
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -212,7 +215,7 @@ const SpotCard = ({
 
             <div className="items-center space-x-2">
               <div className="space-y-2 w-56">
-                <Label htmlFor="soliAmount">Möchtest du einen Soli spenden?</Label>
+                <Label htmlFor="soliAmount">Möchtest du einen Soli spenden (Empfehlung 25€)? </Label>
                 <Input
                   id="soliAmount"
                   placeholder="Empfehlung: 25€"
@@ -228,7 +231,7 @@ const SpotCard = ({
                   htmlFor="terms"
                   className="text-sm font-medium pl-2 space-y-1 leading-none leading-none"
                 >
-                  Soli von 25€ beantragen (Kein Grund zum Schämen!)
+                  25€-Nachlass Soli beantragen (Kein Grund zum Schämen!)
                 </label>
               </div>
             </div>
@@ -251,7 +254,7 @@ const SpotCard = ({
                 </div>
               </div>
               <div className="flex justify-between items-center py-3 px-6 bg-muted rounded-lg">
-                <span>Zahlung bis Anfang April an: {paymentDetails}.</span>
+                <span>Zahlung bis zum 1. April an: {paymentDetails}</span>
               </div>
             </div>
           </div>
