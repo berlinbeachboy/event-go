@@ -130,12 +130,12 @@ export const HomePage = ({spotTypes}: HomePageProps) => {
                     >
                     <div className="flex-grow pr-4">
                         <h3 className="text-xl font-medium text-black mb-2">{option.name}</h3>
-                        <span className={`inline-block px-2 py-1 rounded text-sm mb-4 ${option.currentCount === option.limit
+                        {/* <span className={`inline-block px-2 py-1 rounded text-sm mb-4 ${option.currentCount === option.limit
                         ? "bg-gray-200 text-gray-700"
                         : "bg-black text-white"
-                        }`}>
-                        {option.currentCount}/{option.limit}
-                        </span>
+                        }`}> */}
+                        {/* {option.currentCount}/{option.limit} */}
+                        {/* </span> */}
                         <p className="text-gray-600">{option.description}</p>
                     </div>
                     {resolveSpotTypeImage(option.name) && (

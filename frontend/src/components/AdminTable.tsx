@@ -144,6 +144,7 @@ const AdminTable = ({
                 <TableHead className="hidden md:block">Handy</TableHead>
                 <TableHead>Typ</TableHead>
                 <TableHead>Spot</TableHead>
+                <TableHead>Soli</TableHead>
                 <TableHead>Zahlung</TableHead>
                 <TableHead>Letzter Login</TableHead>
                 <TableHead></TableHead>
@@ -164,6 +165,16 @@ const AdminTable = ({
                     </span>
                   </TableCell>
                   <TableCell>{user.spotType?.name || 'No spot'}</TableCell>
+                  <TableCell>
+                    {user.takesSoli ? (
+                    <span className="text-xs">
+                      -25€
+                    </span>): (
+                      <span className="text-xs">
+                      {user.soliAmount}€
+                    </span>
+                    )}
+                  </TableCell>
                   <TableCell>
                     <span className={`px-2 py-1 rounded-full text-xs ${
                       user.amountPaid >= user.amountToPay ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'

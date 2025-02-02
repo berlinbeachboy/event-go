@@ -5,9 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { SpotType } from '@/models/models';
 import { cn } from '@/lib/utils';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+
+const paymentDetails = import.meta.env.PAYMENT_DETAILS || 'wird demnächst freigegeben';
+
 
 interface UserPageProps {
   userSpots: SpotType[];
@@ -59,14 +63,14 @@ const SpotCard = ({
     <div className="flex-grow pr-4">
       <h3 className="text-xl font-medium text-black mb-2">{spot.name}   </h3>
       <p className="text-sm text-gray-600">{spot.price}€     
-        <span className={cn(
+        {/* <span className={cn(
             "px-2 py-1 rounded-full ml-5",
             spot.currentCount >= spot.limit 
               ? "bg-red-100 text-red-800" 
               : "bg-green-100 text-green-800"
           )}>
             {spot.currentCount} / {spot.limit}
-          </span>
+          </span> */}
         </p>
         <br></br>
       <p className="text-gray-600">{spot.description}</p>
@@ -103,10 +107,13 @@ const SpotCard = ({
     const { user, updateUser, isLoading } = useAuth();
     const { toast } = useToast();
     const [isEditing, setIsEditing] = useState(true);
+    
     const [formData, setFormData] = useState({
-      soliType: user?.givesSoli ? 'give' : user?.takesSoli ? 'take' : 'none',
+      takesSoli: user?.takesSoli || false,
+      soliAmount: user?.soliAmount || 0,
       spotTypeId: user?.spotTypeId || 0,
     });
+    const [hasSpotSelected, sethasSpotSelected] = useState(formData.spotTypeId !== 0);
     const noSpot = {
       id: 0,
       name: "Leider nicht dabei",
@@ -121,14 +128,37 @@ const SpotCard = ({
       ...prev,
       [field]: value
     }));
+    if (field === 'spotTypeId' && value === 0){
+      setFormData(prev => ({
+        ...prev,
+        soliAmount: 0,
+        takesSoli: false
+      }))
+      sethasSpotSelected(false)
+    }
+    if (field === 'spotTypeId' && value !== 0){
+      sethasSpotSelected(true)
+    }
+    if (field === 'takesSoli' && value === true){
+      setFormData(prev => ({
+        ...prev,
+        soliAmount: 0
+      }))
+    }
+    if (field === 'soliAmount' && value > 0){
+      setFormData(prev => ({
+        ...prev,
+        takesSoli: false
+      }))
+    }
   };
 
   const handleSubmit = async () => {
     try {
       await updateUser({
         ...formData,
-        givesSoli: formData.soliType === 'give',
-        takesSoli: formData.soliType === 'take',
+        soliAmount: formData.soliAmount,
+        takesSoli: formData.takesSoli,
       });
       setIsEditing(false);
       toast({
@@ -158,13 +188,6 @@ const SpotCard = ({
           <div className="space-y-6">
             <h3 className="text-lg font-semibold">Wähle hier deinen Spot aus</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <SpotCard
-                  key={0}
-                  spot={noSpot}
-                  selected={formData.spotTypeId === 0 || !formData.spotTypeId || formData.spotTypeId == null}
-                  onSelect={() => handleChange('spotTypeId', 0)}
-                  disabled={!isEditing}
-                />
               {userSpots.map(spot => (
                 <SpotCard
                   key={spot.id}
@@ -174,32 +197,41 @@ const SpotCard = ({
                   disabled={!isEditing || (spot.currentCount >= spot.limit && formData.spotTypeId !== spot.id)}
                 />
               ))}
+              <SpotCard
+                  key={0}
+                  spot={noSpot}
+                  selected={formData.spotTypeId === 0 || !formData.spotTypeId || formData.spotTypeId == null}
+                  onSelect={() => handleChange('spotTypeId', 0)}
+                  disabled={!isEditing}
+                />
             </div>
 
             {/* Soli Options */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Möchtest du den Soli von 25€ beantragen oder spendieren</h3>
-            <RadioGroup 
-              value={formData.soliType} 
-              onValueChange={(value) => handleChange('soliType', value)}
-              disabled={!isEditing}
-              className="gap-4"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="none" id="none" />
-                <Label htmlFor="none">Kein Soli</Label>
+          <div className="space-y-6">
+            <h3 className="text-lg font-semibold">Soli beantragen oder spendieren</h3>
+
+            <div className="items-center space-x-2">
+              <div className="space-y-2 w-56">
+                <Label htmlFor="soliAmount">Möchtest du einen Soli spenden?</Label>
+                <Input
+                  id="soliAmount"
+                  placeholder="Empfehlung: 25€"
+                  value={formData.soliAmount}
+                  onChange={(e) => handleChange('soliAmount', parseFloat(e.target.value))}
+                  disabled={!isEditing || !hasSpotSelected}
+                />
               </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="give" id="give" />
-                <Label htmlFor="give" className="flex items-center">
-                  Ich möchte den Soli spendieren ❤️
-                </Label>
+              <br></br>
+              <div className="space-y-2">
+                <Checkbox id="take" disabled={!isEditing || !hasSpotSelected} checked={formData.takesSoli} onCheckedChange={() => handleChange('takesSoli', !formData.takesSoli)}/>
+                <label
+                  htmlFor="terms"
+                  className="text-sm font-medium pl-2 space-y-1 leading-none leading-none"
+                >
+                  Soli von 25€ beantragen (Kein Grund zum Schämen!)
+                </label>
               </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="take" id="take" />
-                <Label htmlFor="take">Soli beantragen (Kein Grund zum Schämen!)</Label>
-              </div>
-            </RadioGroup>
+            </div>
           </div>
 
             {/* Current Subscription Info */}
@@ -219,7 +251,7 @@ const SpotCard = ({
                 </div>
               </div>
               <div className="flex justify-between items-center py-3 px-6 bg-muted rounded-lg">
-                <span>Zahlen müsst ihr erst bis Ende April, Zahlungsinfos folgen.</span>
+                <span>Zahlung bis Anfang April an: {paymentDetails}.</span>
               </div>
             </div>
           </div>
@@ -233,8 +265,9 @@ const SpotCard = ({
                 onClick={() => {
                   setIsEditing(false);
                   setFormData({
-                    soliType: user.givesSoli ? 'give' : user.takesSoli ? 'take' : 'none',
-                    spotTypeId: user.spotTypeId || 0,
+                    takesSoli: user?.takesSoli || false,
+                    soliAmount: user?.soliAmount || 0,
+                    spotTypeId: user?.spotTypeId || 0,
                   });
                 }}
                 disabled={isLoading}

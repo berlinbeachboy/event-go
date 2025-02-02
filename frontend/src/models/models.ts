@@ -6,8 +6,8 @@ export interface User {
     nickname: string;
     fullName: string | null;
     phone: string | null;
-    givesSoli: boolean;
     takesSoli: boolean;
+    soliAmount: number;
     lastLogin: Date;
     amountPaid: number;
     amountToPay: number;

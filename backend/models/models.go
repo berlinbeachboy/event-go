@@ -23,7 +23,8 @@ type User struct {
 	Nickname   string     `gorm:"unique;not null" json:"nickname"`
 	FullName   *string    `gorm:"null" json:"fullName"`
 	Phone      *string    `gorm:"null" json:"phone"`
-	GivesSoli  bool       `gorm:"not null;default:false" json:"givesSoli"`
+	SoliAmount  float32  `gorm:"not null;default:0" json:"soliAmount"`
+	// GivesSoli  bool       `gorm:"not null;default:false" json:"givesSoli"`
 	TakesSoli  bool       `gorm:"not null;default:false" json:"takesSoli"`
 	LastLogin  *time.Time `gorm:"null;default:null" json:"lastLogin"`
 	AmountPaid float32    `gorm:"not null;default:0" json:"amountPaid"`
@@ -46,15 +47,15 @@ func (u User) AmountToPay() float32 {
 	if u.LastLogin == nil {
 
 	}
-	givesSoli := 0
-	if u.GivesSoli {
-		givesSoli = SoliAmount()
-	}
+	// givesSoli := 0
+	// if u.GivesSoli {
+	// 	givesSoli = SoliAmount()
+	// }
 	takesSoli := 0
 	if u.TakesSoli {
 		takesSoli = SoliAmount()
 	}
-	return float32(u.SpotType.Price) + float32(givesSoli) - float32(takesSoli) - u.AmountPaid
+	return float32(u.SpotType.Price) + u.SoliAmount - float32(takesSoli) - u.AmountPaid
 }
 
 type UserResponse struct {
@@ -64,7 +65,7 @@ type UserResponse struct {
 	Nickname    string     `json:"nickname"`
 	FullName    *string    `json:"fullName"`
 	Phone       *string    `json:"phone"`
-	GivesSoli   bool       `json:"givesSoli"`
+	SoliAmount  float32   `json:"soliAmount"`
 	TakesSoli   bool       `json:"takesSoli"`
 	LastLogin   *time.Time `json:"lastLogin"`
 	AmountToPay float32    `json:"amountToPay"`
@@ -84,7 +85,7 @@ func (u User) ToResponse() UserResponse {
 		Nickname:    u.Nickname,
 		FullName:    u.FullName,
 		Phone:       u.Phone,
-		GivesSoli:   u.GivesSoli,
+		SoliAmount:  u.SoliAmount,
 		TakesSoli:   u.TakesSoli,
 		LastLogin:   u.LastLogin,
 		AmountToPay: u.AmountToPay(),

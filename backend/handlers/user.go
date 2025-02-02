@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -18,9 +19,9 @@ type UserUpdate struct {
 	Nickname   *string  `json:"nickname"`
 	FullName   *string  `json:"fullName"`
 	Phone      *string  `json:"phone"`
-	Type       *string  `json:"type"` // can only be
+	Type       *string  `json:"type"`
 	AmountPaid *float32 `json:"amountPaid"`
-	GivesSoli  *bool    `json:"givesSoli"`
+	SoliAmount *float32 `json:"soliAmount"`
 	TakesSoli  *bool    `json:"takesSoli"`
 	SpotTypeID *uint    `json:"spotTypeId"`
 }
@@ -60,8 +61,8 @@ func updateUser(ue *models.User, uu UserUpdate) {
 	if uu.AmountPaid != nil {
 		ue.AmountPaid = *uu.AmountPaid
 	}
-	if uu.GivesSoli != nil {
-		ue.GivesSoli = *uu.GivesSoli
+	if uu.SoliAmount != nil {
+		ue.SoliAmount = *uu.SoliAmount
 	}
 	if uu.TakesSoli != nil {
 		ue.TakesSoli = *uu.TakesSoli
@@ -129,6 +130,7 @@ func PutMe(db *gorm.DB) gin.HandlerFunc {
 		}
 		var uu UserUpdate
 		if err := c.ShouldBindJSON(&uu); err != nil {
+			fmt.Println(err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 			return
 		}
@@ -145,7 +147,7 @@ func PutMe(db *gorm.DB) gin.HandlerFunc {
 		uu.Type = nil
 		uu.Username = nil
 		uu.AmountPaid = nil
-		if uu.GivesSoli != nil && uu.TakesSoli != nil && *uu.GivesSoli && *uu.TakesSoli {
+		if uu.SoliAmount != nil && uu.TakesSoli != nil && *uu.SoliAmount >= 0 && *uu.TakesSoli {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Du kannst den Soli nicht gleichzeitig geben und nehmen."})
 			return
 		}
@@ -252,7 +254,7 @@ func PutUser(db *gorm.DB) gin.HandlerFunc {
 				return
 			}
 		}
-		if uu.GivesSoli != nil && uu.TakesSoli != nil && *uu.GivesSoli && *uu.TakesSoli {
+		if uu.SoliAmount != nil && uu.TakesSoli != nil && *uu.SoliAmount >= 0 && *uu.TakesSoli {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Du kannst nicht Soli geben und nehmen gleichzeitig."})
 			return
 		}
