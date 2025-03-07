@@ -64,9 +64,10 @@ const App = () => {
         {!user ? (
           <>
           <Routes>
+              <Route path="/register" element={<AuthScreen onSuccess={fetchUser} startView='register'/>} />
               <Route path="/impressum" element={<ImprintPage />} />
               <Route path="/privacy" element={<PrivacyPage />} />
-              <Route path="*" element={<AuthScreen onSuccess={fetchUser} />} />
+              <Route path="*" element={<AuthScreen onSuccess={fetchUser} startView='login' />} />
             </Routes>
           </>
         ) : (

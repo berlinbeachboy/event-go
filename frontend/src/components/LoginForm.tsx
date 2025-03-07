@@ -14,10 +14,12 @@ import { useToast } from '@/hooks/use-toast';
 
 interface LoginFormProps {
   onLogin: () => Promise<void>;
+  isVerified: boolean;
 }
 
-export default function LoginForm({ onLogin }: LoginFormProps) {
+export default function LoginForm({ onLogin, isVerified}: LoginFormProps) {
   const [formData, setFormData] = useState({ username: '', password: '' });
+  const [isEmailVerified, _] = useState(isVerified);
   const { login, isLoading } = useAuth();
   const { toast } = useToast();
 
@@ -48,6 +50,12 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
+          {isEmailVerified && (
+              <p>
+                  ✅ Du hast dich erfolgreich verifiziert.
+                  Bitte jetzt noch einmal anmelden.
+              </p>
+            )}
             <Label htmlFor="username">Username</Label>
             <Input
               id="username"

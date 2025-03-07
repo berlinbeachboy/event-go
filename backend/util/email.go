@@ -47,7 +47,7 @@ func SetEmailConfig() {
 }
 
 // sendVerificationEmail sends an email with verification link
-func SendVerificationEmail(email, verificationLink string, nickname string) error {
+func SendVerificationEmail(email string, verificationLink string, nickname string) error {
 	message := []byte(fmt.Sprintf(
 		"From: Peter Schoenfelder <%s>\r\n"+
 			"To: %s\r\n"+

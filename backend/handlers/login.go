@@ -156,7 +156,7 @@ func Register(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		if err := util.SendVerificationEmail(*user.Username, verificationLink, userExist.Nickname); err != nil {
+		if err := util.SendVerificationEmail(*user.Username, verificationLink, user.Nickname); err != nil {
 			fmt.Println("Failed to send Verification Email to ", *user.Username)
 			fmt.Println("Error was ", err.Error())
 			fmt.Println("Their verification Link is: ", verificationLink)

@@ -6,34 +6,25 @@ import { Button } from "@/components/ui/button";
 import RequestPasswordForm from './RequestPassword';
 import PasswordResetForm from './ResetPasswordForm';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
 
 interface AuthScreenProps {
   onSuccess: () => Promise<void>;
+  startView: 'login' | 'register' | 'requestPw' | 'updatePw';
 }
 
-const AuthScreen = ({ onSuccess }: AuthScreenProps) => {
-  const [view, setView] = useState<'login' | 'register' | 'requestPw' | 'updatePw'>('login');
+const AuthScreen = ({ onSuccess, startView}: AuthScreenProps) => {
+  const [view, setView] = useState<'login' | 'register' | 'requestPw' | 'updatePw'>(startView);
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [searchParams, _] = useSearchParams();
   const resetToken = searchParams.get("resetToken")
-  const emailVerify = searchParams.get("verify")
   const resetTokenPass = resetToken as string
+  
 
   useEffect(() => {
+    
     if (resetToken !== null){
       setView('updatePw')
     }
-    if (emailVerify === "success"){
-      const timeout = setTimeout(() => {
-        toast({
-          title: "Dein Account wurde verfiziert!",
-          description: "Ab geht die Post!",
-        });
-        return (() => clearTimeout(timeout))
-      }, 10)
-    }    
   })
   
 
@@ -60,7 +51,7 @@ const AuthScreen = ({ onSuccess }: AuthScreenProps) => {
       <div className="flex flex-col items-center justify-center p-4 lg:p-8">
         <div className="w-full max-w-sm mx-auto space-y-6">
           {view === 'login' ? (
-            <LoginForm onLogin={onSuccess} />
+            <LoginForm onLogin={onSuccess} isVerified={searchParams.get("verify") === 'success'} />
           ) : view === 'register' ? (
             <RegisterForm onSuccess={() => setView('login')} />
           ) : view === 'requestPw' ? (
