@@ -77,6 +77,7 @@ const App = () => {
             <div>
               <Routes>
                 <Route path="/" element={<Navigate to="/home" replace />} />
+                <Route path="/register" element={<Navigate to="/home" replace />} />
                 <Route path="/home" element={<HomePage spotTypes={userSpots}/>} />
                 <Route path="/spot" element={<SpotPage userSpots={userSpots}/>} />
                 <Route path="/user" element={<UserPage/>} />

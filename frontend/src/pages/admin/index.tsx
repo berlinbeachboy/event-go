@@ -44,6 +44,7 @@ const AdminPage = () => {
           </div>
         ) : (
           <div className="w-full">
+            <div className="md:hidden"><br/><br></br><br/></div>
             <div className="mb-4 space-x-2">
               <Button
                 variant={view === 'userTable' ? 'default' : 'secondary'}

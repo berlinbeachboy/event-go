@@ -91,7 +91,7 @@ func Register(db *gorm.DB) gin.HandlerFunc {
 				c.JSON(500, gin.H{"error": "Failed to generate verification token"})
 				return
 			}
-			expiryTime := time.Now().Add(24 * time.Hour)
+			expiryTime := time.Now().Add(96 * time.Hour)
 			// Set token and expiry time
 			userExist.VerificationToken = &token
 			userExist.TokenExpiryTime = &expiryTime
@@ -137,7 +137,7 @@ func Register(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(500, gin.H{"error": "Failed to generate verification token"})
 			return
 		}
-		expiryTime := time.Now().Add(24 * time.Hour)
+		expiryTime := time.Now().Add(96 * time.Hour)
 		// Set token and expiry time
 		user.VerificationToken = &token
 		user.TokenExpiryTime = &expiryTime
@@ -179,22 +179,22 @@ func Login(db *gorm.DB) gin.HandlerFunc {
 		var user models.User
 		usernameLower := strings.ToLower(creds.Username)
 		if err := db.Where("username = ?", &usernameLower).First(&user).Error; err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Email not found"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Falsche Email"})
 			return
 		}
 
 		if err := bcrypt.CompareHashAndPassword([]byte(*user.Password), []byte(creds.Password)); err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Falsches Passwort"})
 			return
 		}
 		if !user.IsActivated {
-			c.JSON(http.StatusForbidden, gin.H{"error": "User not nicht verifiziert. Bitte den Email Link benutzen."})
+			c.JSON(http.StatusForbidden, gin.H{"error": "Du bist noch nicht verifiziert. Bitte den Email Link benutzen oder neu registrieren."})
 			return
 		}
 
 		tokenString, err := util.MakeJWT(usernameLower)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Etwas ist schief gegangen, bitte neu laden und nochmal probieren :/"})
 			return
 		}
 		now := time.Now()
@@ -210,7 +210,7 @@ func Login(db *gorm.DB) gin.HandlerFunc {
 			site = "localhost"
 			secureCookie = false
 		}
-		c.SetCookie("jwt", tokenString, 3600, "/api", site, secureCookie, true)
+		c.SetCookie("jwt", tokenString, 86400, "/api", site, secureCookie, true)
 		c.JSON(http.StatusOK, gin.H{"status": "success"})
 	}
 }
@@ -219,7 +219,7 @@ func Verify(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.Query("token")
 		if token == "" {
-			c.JSON(400, gin.H{"error": "Invalid verification token"})
+			c.JSON(400, gin.H{"error": "Irgendwas ist mit dem Link schiefgelaufen :/"})
 			return
 		}
 
@@ -227,19 +227,19 @@ func Verify(db *gorm.DB) gin.HandlerFunc {
 		var user models.User
 		result := db.Where("verification_token = ?", token).First(&user)
 		if result.Error != nil {
-			c.JSON(404, gin.H{"error": "Invalid verification token"})
+			c.JSON(404, gin.H{"error": "Irgendwas ist mit dem Link schiefgelaufen :/"})
 			return
 		}
 
 		// Check token expiry
 		if time.Now().After(*user.TokenExpiryTime) {
-			c.JSON(400, gin.H{"error": "Verification token has expired"})
+			c.JSON(400, gin.H{"error": "Der Link ist leider abgelaufen, bitte nochmal neu registrieren :/"})
 			return
 		}
 
 		// Activate user
 		user.IsActivated = true
-		user.VerificationToken = util.StrPtr("")
+		// user.VerificationToken = util.StrPtr("")
 		db.Save(&user)
 
 		// c.JSON(200, gin.H{"message": "Email verified successfully"})
@@ -287,7 +287,7 @@ func RequestPWReset(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(500, gin.H{"error": "Failed to generate verification token"})
 			return
 		}
-		expiryTime := time.Now().Add(24 * time.Hour)
+		expiryTime := time.Now().Add(3 * time.Hour)
 		// Set token and expiry time
 		userExist.VerificationToken = &token
 		userExist.TokenExpiryTime = &expiryTime

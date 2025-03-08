@@ -198,7 +198,7 @@ const AdminTable = ({
                               Update User
                             </DropdownMenuItem>
                           </SheetTrigger>
-                          <SheetContent>
+                          <SheetContent className='w-64'>
                             <SheetHeader>
                               <SheetTitle>Update User: {user.fullName}</SheetTitle>
                             </SheetHeader>
