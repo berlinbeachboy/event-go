@@ -190,7 +190,7 @@ const AdminTable = ({
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
+                      <DropdownMenuContent align="start">
                         <Sheet open={isEditing} onOpenChange={setIsEditing}>
                           <SheetTrigger asChild>
                             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
