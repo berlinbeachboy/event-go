@@ -7,10 +7,11 @@ import { SpotType } from '@/models/models';
 
 interface SpotCalculatorProps {
     spotTypes: SpotType[];
+    soliAmount: number
     isLoading?: boolean;
   }
 
-const SpotCalculator = ({spotTypes, isLoading}: SpotCalculatorProps) => {
+const SpotCalculator = ({spotTypes, soliAmount, isLoading}: SpotCalculatorProps) => {
   const [spotCounts, setSpotCounts] = useState<Record<number, number>>(
     () => {
         const initialCounts: Record<number, number> = {};
@@ -20,9 +21,14 @@ const SpotCalculator = ({spotTypes, isLoading}: SpotCalculatorProps) => {
         return initialCounts;
     }
   );
-    
-  const [solidarityGivers, setSolidarityGivers] = useState(0);
-  const [solidarityTakers, setSolidarityTakers] = useState(0);
+  const [solidarityAmount, setsolidarityAmount] = useState(soliAmount);
+
+  const [hausCost, setHausCost] = useState(9800);
+  const [foodCost, setFoodCost] = useState(1200);
+  const [techCost, setTechCost] = useState(270);
+  const [mobCost, setMobCost] = useState(370);
+  const [funCost, setFunCost] = useState(300);
+  const [puffer, setPuffer] = useState(250);
 
   const handleSpotCountChange = (spotId: number, value: string) => {
     const numValue = Math.max(0, parseInt(value) || 0);
@@ -39,15 +45,19 @@ const SpotCalculator = ({spotTypes, isLoading}: SpotCalculatorProps) => {
       return total + (spot?.price || 0) * count;
     }, 0);
 
-    const solidarityBalance = (solidarityGivers * 25) - (solidarityTakers * 25);
-    const total = spotSubtotal + solidarityBalance;
+    const allCosts = hausCost + foodCost + funCost + techCost + mobCost + puffer
+    // const solidarityBalance = (solidarityGivers * 25) - (solidarityTakers * 25);
+    const total = spotSubtotal + solidarityAmount;
     const totalGuests = Object.values(spotCounts).reduce((sum, count) => sum + count, 0);
+    const final = total - allCosts
 
     return {
+      allCosts,
       spotSubtotal,
-      solidarityBalance,
+      solidarityAmount,
       total,
-      totalGuests
+      totalGuests,
+      final
     };
   };
 
@@ -88,27 +98,69 @@ const SpotCalculator = ({spotTypes, isLoading}: SpotCalculatorProps) => {
           {/* Solidarity System */}
           <div className="space-y-4">
             <div className="flex items-center gap-4">
-              <Label className="w-32">Solispendierende</Label>
+              <Label className="w-32">Soli</Label>
               <Input
                 type="number"
-                min="0"
-                value={solidarityGivers}
-                onChange={(e) => setSolidarityGivers(Math.max(0, parseInt(e.target.value) || 0))}
-                className="w-24"
-              />
-            </div>
-            <div className="flex items-center gap-4">
-              <Label className="w-32">Solibeaspruchende</Label>
-              <Input
-                type="number"
-                min="0"
-                value={solidarityTakers}
-                onChange={(e) => setSolidarityTakers(Math.max(0, parseInt(e.target.value) || 0))}
+                value={solidarityAmount}
+                onChange={(e) => setsolidarityAmount(parseInt(e.target.value))}
                 className="w-24"
               />
             </div>
           </div>
   
+          <Separator />
+
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              <Label className="w-32">Haus</Label>
+              <Input
+                type="number"
+                value={hausCost}
+                onChange={(e) => setHausCost(parseInt(e.target.value))}
+                className="w-24"
+              />
+              <Label className="w-32">Essen</Label>
+              <Input
+                type="number"
+                value={foodCost}
+                onChange={(e) => setFoodCost(parseInt(e.target.value))}
+                className="w-24"
+              />
+            </div>
+            <div className="flex items-center gap-4">
+              <Label className="w-32">Technik</Label>
+              <Input
+                type="number"
+                value={techCost}
+                onChange={(e) => setTechCost(parseInt(e.target.value))}
+                className="w-24"
+              />
+              <Label className="w-32">Mobilität</Label>
+              <Input
+                type="number"
+                value={mobCost}
+                onChange={(e) => setMobCost(parseInt(e.target.value))}
+                className="w-24"
+              />
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <Label className="w-32">Fun</Label>
+              <Input
+                type="number"
+                value={funCost}
+                onChange={(e) => setFunCost(parseInt(e.target.value))}
+                className="w-24"
+              />
+              <Label className="w-32">Puffer</Label>
+              <Input
+                type="number"
+                value={puffer}
+                onChange={(e) => setPuffer(parseInt(e.target.value))}
+                className="w-24"
+              />
+            </div>
+          </div>
           <Separator />
   
           {/* Summary */}
@@ -118,16 +170,22 @@ const SpotCalculator = ({spotTypes, isLoading}: SpotCalculatorProps) => {
               <span>Anzahl Gäste:</span>
               <span>{totals.totalGuests}</span>
               
-              <span>Spots:</span>
+              <span>Tickets:</span>
               <span>€{totals.spotSubtotal.toFixed(2)}</span>
               
               <span>Soli:</span>
-              <span className={totals.solidarityBalance >= 0 ? 'text-green-600' : 'text-red-600'}>
-                €{totals.solidarityBalance.toFixed(2)}
+              <span>
+                €{totals.solidarityAmount.toFixed(2)}
               </span>
+
+              <span>Kosten:</span>
+              <span>€{totals.allCosts}</span>
               
               <span className="font-medium">Gesamtbudget:</span>
               <span className="font-medium">€{totals.total.toFixed(2)}</span>
+
+              <span className="font-medium">Ergebnis:</span>
+              <span className={totals.final >= 0 ? 'text-green-600' : 'text-red-600'}>€{totals.final.toFixed(2)}</span>
             </div>
           </div>
         

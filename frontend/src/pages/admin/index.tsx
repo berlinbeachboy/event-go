@@ -33,6 +33,13 @@ const AdminPage = () => {
 
     fetchData();
   }, [view, fetchUsers, fetchSpots]);
+  const soliAmount = users.reduce((sum, user) => {
+    if (user.takesSoli) {
+      return sum + (user.soliAmount - 25);
+    } else {
+      return sum + user.soliAmount;
+    }
+  }, 0);
 
 
   return (
@@ -83,6 +90,7 @@ const AdminPage = () => {
                 <br></br><br></br>
                 <SpotCalculator
                   spotTypes={spots}
+                  soliAmount={soliAmount}
                   isLoading={isLoading}
                 />
               </>

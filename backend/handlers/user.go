@@ -130,7 +130,7 @@ func PutMe(db *gorm.DB) gin.HandlerFunc {
 		}
 		var uu UserUpdate
 		if err := c.ShouldBindJSON(&uu); err != nil {
-			fmt.Println(err)
+			fmt.Println(err.Error())
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 			return
 		}
@@ -147,7 +147,8 @@ func PutMe(db *gorm.DB) gin.HandlerFunc {
 		uu.Type = nil
 		uu.Username = nil
 		uu.AmountPaid = nil
-		if uu.SoliAmount != nil && uu.TakesSoli != nil && *uu.SoliAmount >= 0 && *uu.TakesSoli {
+		if uu.SoliAmount != nil && uu.TakesSoli != nil && *uu.SoliAmount > 0 && *uu.TakesSoli {
+			fmt.Println("Du kannst den Soli nicht gleichzeitig geben und nehmen")
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Du kannst den Soli nicht gleichzeitig geben und nehmen."})
 			return
 		}
@@ -157,6 +158,7 @@ func PutMe(db *gorm.DB) gin.HandlerFunc {
 
 		// full reload so that all fields are there for output
 		if err := db.Model(&userExist).Association("SpotType").Find(&userExist.SpotType); err != nil {
+			fmt.Println(err.Error())
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Konnte den SpotType nach Update nicht laden."})
 			return
 		}
@@ -193,8 +195,8 @@ func PutMePW(db *gorm.DB) gin.HandlerFunc {
 func GetUsers(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var users []models.User
-		if err := db.Preload("SpotType").Find(&users).Error; err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+		if err := db.Preload("SpotType").Order("last_login desc").Find(&users).Error; err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Bad DB query"})
 			return
 		}
 		c.IndentedJSON(http.StatusOK, models.ToUsersResponseList(users))

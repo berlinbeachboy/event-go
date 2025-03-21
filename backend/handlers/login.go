@@ -143,6 +143,7 @@ func Register(db *gorm.DB) gin.HandlerFunc {
 		user.TokenExpiryTime = &expiryTime
 
 		if err := db.Create(&user).Error; err != nil {
+			fmt.Println("Error was ", err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to register user"})
 			return
 		}
