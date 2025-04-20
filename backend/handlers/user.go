@@ -138,7 +138,7 @@ func PutMe(db *gorm.DB) gin.HandlerFunc {
 		}
 		zero := uint(0)
 		// check SpotType
-		if uu.SpotTypeID != nil && uu.SpotTypeID != &zero && uu.SpotTypeID != userExist.SpotTypeID {
+		if uu.SpotTypeID != nil && uu.SpotTypeID != &zero && &uu.SpotTypeID != &userExist.SpotTypeID {
 			if err := checkSpot(db, int(*uu.SpotTypeID)); err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": "Bad Spottype."})
 				return
@@ -252,7 +252,7 @@ func PutUser(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 		// check SpotType
-		if uu.SpotTypeID != nil && uu.SpotTypeID != userExist.SpotTypeID {
+		if uu.SpotTypeID != nil && &uu.SpotTypeID != &userExist.SpotTypeID {
 			if err := checkSpot(db, int(*uu.SpotTypeID)); err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": "Bad Spottype."})
 				return

@@ -397,3 +397,55 @@ func TestSpotTypes(t *testing.T) {
 	}
 	assert.Equal(t, uint16(76), usersList[0].SpotType.Price)
 }
+
+
+
+// func TestShifts(t *testing.T) {
+// 	tx := testDB.Begin()
+// 	defer tx.Rollback()
+// 	router := SetupRouter(tx)
+
+// 	token := getToken(AdminEmail)
+
+// 	// test create user as admin
+// 	b := `{"name": "Kochen", "price": 76, "limit":20}`
+// 	code, body := sendReq(router, "POST", "/api/admin/spots/", &b, &token)
+// 	bodyMap := umGeneric(body)
+// 	checkRes(t, 201, code, bodyMap)
+// 	//fmt.Println(body)
+// 	stid := strconv.FormatFloat(bodyMap["id"].(float64), 'f', -1, 64)
+
+// 	b = `{"spotTypeId": 67}`
+// 	code, body = sendReq(router, "PUT", "/api/user/me", &b, &token)
+// 	bodyMap = umGeneric(body)
+// 	checkRes(t, 400, code, bodyMap)
+
+// 	b = fmt.Sprintf(`{"spotTypeId": %s}`, stid)
+// 	code, body = sendReq(router, "PUT", "/api/user/me", &b, &token)
+// 	bodyMap = umGeneric(body)
+// 	checkRes(t, 200, code, bodyMap)
+// 	assert.Equal(t, float64(76), bodyMap["amountToPay"])
+// 	userId := strconv.FormatFloat(bodyMap["id"].(float64), 'f', -1, 64)
+
+// 	b = `{"amountPaid": 50}`
+// 	code, body = sendReq(router, "PUT", "/api/admin/users/"+userId, &b, &token)
+// 	bodyMap = umGeneric(body)
+// 	checkRes(t, 200, code, bodyMap)
+// 	assert.Equal(t, float64(26), bodyMap["amountToPay"])
+
+// 	code, body = sendReq(router, "GET", "/api/admin/spots/", nil, &token)
+// 	assert.Equal(t, 200, code)
+// 	var spotList []models.SpotType
+// 	if err := json.Unmarshal(body, &spotList); err != nil {
+// 		t.Errorf("Bad SpotType (list) Response")
+// 	}
+// 	assert.Equal(t, uint16(1), spotList[0].CurrentCount)
+
+// 	code, body = sendReq(router, "GET", "/api/admin/users/", nil, &token)
+// 	assert.Equal(t, 200, code)
+// 	var usersList []models.UserResponse
+// 	if err := json.Unmarshal(body, &usersList); err != nil {
+// 		t.Errorf("Bad Users (list) Response")
+// 	}
+// 	assert.Equal(t, uint16(76), usersList[0].SpotType.Price)
+// }
