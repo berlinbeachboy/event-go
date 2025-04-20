@@ -400,21 +400,21 @@ func TestSpotTypes(t *testing.T) {
 
 
 
-// func TestShifts(t *testing.T) {
-// 	tx := testDB.Begin()
-// 	defer tx.Rollback()
-// 	router := SetupRouter(tx)
+func TestShifts(t *testing.T) {
+	tx := testDB.Begin()
+	defer tx.Rollback()
+	router := SetupRouter(tx)
 
-// 	token := getToken(AdminEmail)
+	token := getToken(AdminEmail)
 
-// 	// test create user as admin
-// 	b := `{"name": "Kochen", "price": 76, "limit":20}`
-// 	code, body := sendReq(router, "POST", "/api/admin/spots/", &b, &token)
-// 	bodyMap := umGeneric(body)
-// 	checkRes(t, 201, code, bodyMap)
-// 	//fmt.Println(body)
-// 	stid := strconv.FormatFloat(bodyMap["id"].(float64), 'f', -1, 64)
-
+	b := `{"name": "Kochen", "headCount": 4, "time": "2025-05-01 17:00:00", "day": "Freitag"}`
+	code, body := sendReq(router, "POST", "/api/admin/shifts/", &b, &token)
+	bodyMap := umGeneric(body)
+	checkRes(t, 201, code, bodyMap)
+	//fmt.Println(body)
+	stid := strconv.FormatFloat(bodyMap["id"].(float64), 'f', -1, 64)
+	fmt.Println(stid)
+}
 // 	b = `{"spotTypeId": 67}`
 // 	code, body = sendReq(router, "PUT", "/api/user/me", &b, &token)
 // 	bodyMap = umGeneric(body)
