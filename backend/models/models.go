@@ -119,16 +119,16 @@ type SpotType struct {
 	UpdatedAt time.Time `json:"updatedAt"` // Automatically managed by GORM for update time
 }
 
-// type Shift struct {
-// 	ID           uint    `gorm:"primarykey" json:"id"`
-// 	Name         string  `gorm:"not null" json:"name"`
-// 	HeadCount    uint8   `gorm:"not null" json:"headCount"`
-// 	Points       uint8   `gorm:"not null" json:"points"`
-// 	Description  *string `gorm:"null" json:"description"`
-// 	Time  		*time.Time `gorm:"null" json:"time"`
-// 	// UserNames []*string  `gorm:"->" json:"userNames"`
-// 	Users []*User `gorm:"many2many:shift_users;"`
+type Shift struct {
+	ID           uint    `gorm:"primarykey" json:"id"`
+	Name         string  `gorm:"not null" json:"name"`
+	HeadCount    uint8   `gorm:"not null" json:"headCount"`
+	Points       uint8   `gorm:"not null" json:"points"`
+	Description  *string `gorm:"null" json:"description"`
+	Time  		*time.Time `gorm:"null" json:"time"`
+	// UserNames []*string  `gorm:"->" json:"userNames"`
+	Users []*User `gorm:"many2many:shift_users;"`
 
-// 	CreatedAt time.Time `json:"createdAt"` // Automatically managed by GORM for creation time
-// 	UpdatedAt time.Time `json:"updatedAt"` // Automatically managed by GORM for update time
-// }
+	CreatedAt time.Time `json:"createdAt"` // Automatically managed by GORM for creation time
+	UpdatedAt time.Time `json:"updatedAt"` // Automatically managed by GORM for update time
+}
