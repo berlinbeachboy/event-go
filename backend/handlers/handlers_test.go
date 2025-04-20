@@ -85,7 +85,7 @@ func TestMain(m *testing.M) {
 
 	// Create tables, seed data, etc.
 	// Migrate the schema
-	err := testDB.AutoMigrate(&models.User{}, &models.SpotType{})
+	err := testDB.AutoMigrate(&models.User{}, &models.SpotType{}, &models.Shift{})
 	if err != nil {
 		log.Fatal("Failed to migrate database:", err)
 	}
@@ -398,16 +398,14 @@ func TestSpotTypes(t *testing.T) {
 	assert.Equal(t, uint16(76), usersList[0].SpotType.Price)
 }
 
-
-
 func TestShifts(t *testing.T) {
 	tx := testDB.Begin()
 	defer tx.Rollback()
 	router := SetupRouter(tx)
 
 	token := getToken(AdminEmail)
-
-	b := `{"name": "Kochen", "headCount": 4, "time": "2025-05-01 17:00:00", "day": "Freitag"}`
+	// ,
+	b := `{"name": "Kochen", "headCount": 4, "day": "Freitag", "time": "2025-05-01T17:00:00Z"}`
 	code, body := sendReq(router, "POST", "/api/admin/shifts/", &b, &token)
 	bodyMap := umGeneric(body)
 	checkRes(t, 201, code, bodyMap)
@@ -415,6 +413,7 @@ func TestShifts(t *testing.T) {
 	stid := strconv.FormatFloat(bodyMap["id"].(float64), 'f', -1, 64)
 	fmt.Println(stid)
 }
+
 // 	b = `{"spotTypeId": 67}`
 // 	code, body = sendReq(router, "PUT", "/api/user/me", &b, &token)
 // 	bodyMap = umGeneric(body)

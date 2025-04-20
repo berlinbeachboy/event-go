@@ -75,7 +75,7 @@ func updateUser(ue *models.User, uu UserUpdate) {
 
 }
 
-func checkSpot(db *gorm.DB, spotTypeId int) error {
+func checkSpot(db *gorm.DB, spotTypeId int, checkLimit bool) error {
 	if spotTypeId == 0 {
 		return nil
 	}
@@ -84,7 +84,7 @@ func checkSpot(db *gorm.DB, spotTypeId int) error {
 		fmt.Println("Got Spottype Id ", strconv.Itoa(spotTypeId), "which could not be found")
 		return errors.New("bad Spottype")
 	}
-	if spot.CurrentCount == spot.Limit {
+	if checkLimit && spot.CurrentCount >= spot.Limit {
 		fmt.Println("Got Spottype Id ", strconv.Itoa(spotTypeId), "which is full")
 		return errors.New("leider schon voll")
 	}
@@ -138,8 +138,11 @@ func PutMe(db *gorm.DB) gin.HandlerFunc {
 		}
 		zero := uint(0)
 		// check SpotType
-		if uu.SpotTypeID != nil && uu.SpotTypeID != &zero && *uu.SpotTypeID != *userExist.SpotTypeID {
-			if err := checkSpot(db, int(*uu.SpotTypeID)); err != nil {
+		if uu.SpotTypeID != nil && uu.SpotTypeID != &zero {
+
+			// only check the limit if the spot Type is different or new
+			checkLimit := userExist.SpotTypeID == nil || *uu.SpotTypeID != *userExist.SpotTypeID
+			if err := checkSpot(db, int(*uu.SpotTypeID), checkLimit); err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": "Bad Spottype."})
 				return
 			}
@@ -242,7 +245,7 @@ func PutUser(db *gorm.DB) gin.HandlerFunc {
 		}
 		uid := c.Param("id")
 		var userExist models.User
-		if err := db.First(&userExist, "ID = ?", uid).Error; err != nil {
+		if err := db.Preload("SpotType").First(&userExist, "ID = ?", uid).Error; err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to retrieve user."})
 			return
 		}
@@ -253,7 +256,9 @@ func PutUser(db *gorm.DB) gin.HandlerFunc {
 		}
 		// check SpotType
 		if uu.SpotTypeID != nil && *uu.SpotTypeID != *userExist.SpotTypeID {
-			if err := checkSpot(db, int(*uu.SpotTypeID)); err != nil {
+			// only check the limit if the spot Type is different or new
+			checkLimit := userExist.SpotTypeID == nil || *uu.SpotTypeID != *userExist.SpotTypeID
+			if err := checkSpot(db, int(*uu.SpotTypeID), checkLimit); err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": "Bad Spottype."})
 				return
 			}
@@ -287,7 +292,7 @@ func PutUserPW(db *gorm.DB) gin.HandlerFunc {
 		}
 		uid := c.Param("id")
 		var userExist models.User
-		if err := db.First(&userExist, "ID = ?", uid).Error; err != nil {
+		if err := db.Preload("SpotType").First(&userExist, "ID = ?", uid).Error; err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to retrieve user."})
 			return
 		}
@@ -316,7 +321,7 @@ func DeleteUser(db *gorm.DB) gin.HandlerFunc {
 		}
 		uid := c.Param("id")
 		var userExist models.User
-		if err := db.First(&userExist, "ID = ?", uid).Error; err != nil {
+		if err := db.Preload("SpotType").First(&userExist, "ID = ?", uid).Error; err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to retrieve user."})
 			return
 		}

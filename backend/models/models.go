@@ -47,15 +47,11 @@ func (u User) AmountToPay() float32 {
 	if u.LastLogin == nil {
 
 	}
-	// givesSoli := 0
-	// if u.GivesSoli {
-	// 	givesSoli = SoliAmount()
-	// }
 	takesSoli := 0
 	if u.TakesSoli {
 		takesSoli = SoliAmount()
 	}
-	return float32(u.SpotType.Price) + u.SoliAmount - float32(takesSoli) - u.AmountPaid
+	return u.SoliAmount - float32(takesSoli) - u.AmountPaid + float32(u.SpotType.Price) //
 }
 
 type UserResponse struct {
@@ -123,10 +119,10 @@ type Shift struct {
 	ID          uint       `gorm:"primarykey" json:"id"`
 	Name        string     `gorm:"not null" json:"name"`
 	HeadCount   uint8      `gorm:"not null" json:"headCount"`
-	Points      uint8      `gorm:"not null" json:"points"`
+	Points      uint8      `gorm:"not null;default:1" json:"points"`
 	Description *string    `gorm:"null" json:"description"`
 	Day         *string    `gorm:"null" json:"day"`
-	Time        *time.Time `gorm:"null" json:"time"`
+	StartTime        *time.Time `gorm:"null;default:null" json:"time"`
 	// UserNames []*string  `gorm:"->" json:"userNames"`
 	Users []*User `gorm:"many2many:shift_users;"`
 

@@ -14,85 +14,88 @@ import (
 )
 
 type ShiftUpdate struct {
-	Name        *string `json:"name"`
-	HeadCount   *uint8 `json:"headCount"`
-	Points      *uint8 `json:"points"`
-	Description *string `json:"description"`
-	Time        *time.Time  `json:"time"`
+	Name        *string    `json:"name"`
+	HeadCount   *uint8     `json:"headCount"`
+	Points      *uint8     `json:"points"`
+	Description *string    `json:"description"`
+	Day         *string    `json:"day"`
+	StartTime   *time.Time `json:"time" time_format:"2006-01-02T15:00:00"`
 }
 
 type ShiftCreate struct {
-	Name        string  `json:"name"`
-	HeadCount   uint8  `json:"headCount"`
-	Points      uint8  `json:"points"`
-	Description *string `json:"description"`
-	Time        *time.Time  `json:"time"`
+	Name        string     `json:"name" binding:"required"`
+	HeadCount   uint8      `json:"headCount" binding:"required"`
+	Points      *uint8     `json:"points"`
+	Description *string    `json:"description"`
+	Day         *string    `json:"day"`
+	StartTime   *time.Time `json:"time" time_format:"2006-01-02T15:00:00"`
 }
 
 type ShiftOut struct {
-	ID           uint    `json:"id"`
-	Name         string  `json:"name"`
-	HeadCount    uint8   `json:"headCount"`
-	Points       uint8   `json:"points"`
-	Description  *string `json:"description"`
-	Time  		*time.Time `json:"time"`
-	CurrentCount uint8  `json:"currentCount"`
-	UserNames *[]string  `json:"userNames"`
+	ID           uint       `json:"id"`
+	Name         string     `json:"name"`
+	HeadCount    uint8      `json:"headCount"`
+	Points       uint8      `json:"points"`
+	Day          *string    `json:"day"`
+	Description  *string    `json:"description"`
+	StartTime    *time.Time `json:"time"`
+	CurrentCount uint8      `json:"currentCount"`
+	UserNames    *[]string  `json:"userNames"`
 }
 
 // CRUD
 
 func GetShiftById(db *gorm.DB, id string) (models.Shift, error) {
 	var shiftExist models.Shift
-    if err := db.Preload("Users").First(&shiftExist, "id = ?", id).Error; err != nil {
-        return shiftExist, err
-    }
+	if err := db.Preload("Users").First(&shiftExist, "id = ?", id).Error; err != nil {
+		return shiftExist, err
+	}
 	return shiftExist, nil
 }
 
-
 func GetShiftsWithUserNames(db *gorm.DB) ([]ShiftOut, error) {
-    var shifts []models.Shift
-    var shiftsWithUserNames []ShiftOut
+	var shifts []models.Shift
+	var shiftsWithUserNames []ShiftOut
 
-    // First, load shifts with their users
-    if err := db.Preload("Users").Find(&shifts).Error; err != nil {
-        return nil, err
-    }
+	// First, load shifts with their users
+	if err := db.Preload("Users").Find(&shifts).Error; err != nil {
+		return nil, err
+	}
 
-    // Transform the shifts to include only user names
-    for _, shift := range shifts {
-        var userNames []string
-        for _, user := range shift.Users {
-            userNames = append(userNames, *user.FullName)
-        }
+	// Transform the shifts to include only user names
+	for _, shift := range shifts {
+		var userNames []string
+		for _, user := range shift.Users {
+			userNames = append(userNames, *user.FullName)
+		}
 
-        shiftsWithUserNames = append(shiftsWithUserNames, ShiftOut{
-            ID:     shift.ID,
-            Name:     shift.Name,
-            Time: shift.Time,
-            HeadCount:   shift.HeadCount,
+		shiftsWithUserNames = append(shiftsWithUserNames, ShiftOut{
+			ID:           shift.ID,
+			Name:         shift.Name,
+			StartTime:    shift.StartTime,
+			Day:          shift.Day,
+			HeadCount:    shift.HeadCount,
 			CurrentCount: uint8(len(userNames)),
-            UserNames: &userNames,
-        })
-    }
+			UserNames:    &userNames,
+		})
+	}
 
-    return shiftsWithUserNames, nil
+	return shiftsWithUserNames, nil
 }
 
 // AddUserToShift adds a user to a shift
 func AddUserToShift(db *gorm.DB, shiftID, userID uint) error {
-    var shift models.Shift
-    if err := db.First(&shift, shiftID).Error; err != nil {
-        return err
-    }
+	var shift models.Shift
+	if err := db.First(&shift, shiftID).Error; err != nil {
+		return err
+	}
 	if len(shift.Users) >= int(shift.HeadCount) {
 		return errors.New("this shift is already full :/")
 	}
-    var user models.User
-    if err := db.First(&user, userID).Error; err != nil {
-        return err
-    }
+	var user models.User
+	if err := db.First(&user, userID).Error; err != nil {
+		return err
+	}
 
 	for _, s := range shift.Users {
 		if s.Username == user.Username {
@@ -100,20 +103,20 @@ func AddUserToShift(db *gorm.DB, shiftID, userID uint) error {
 		}
 	}
 
-    // Add the user to the shift
-    return db.Model(&shift).Association("Users").Append(&user)
+	// Add the user to the shift
+	return db.Model(&shift).Association("Users").Append(&user)
 }
 
 // RemoveUserFromShift removes a user from a shift
 func RemoveUserFromShift(db *gorm.DB, shiftID, userID uint) error {
-    var shift models.Shift
-    if err := db.First(&shift, shiftID).Error; err != nil {
-        return err
-    }
-    var user models.User
-    if err := db.First(&user, userID).Error; err != nil {
-        return err
-    }
+	var shift models.Shift
+	if err := db.First(&shift, shiftID).Error; err != nil {
+		return err
+	}
+	var user models.User
+	if err := db.First(&user, userID).Error; err != nil {
+		return err
+	}
 	found := false
 	for _, s := range shift.Users {
 		if s.Username == user.Username {
@@ -124,14 +127,13 @@ func RemoveUserFromShift(db *gorm.DB, shiftID, userID uint) error {
 		return errors.New("user is not part of this shift (yet)")
 	}
 
-    // Remove the user from the shift
-    return db.Model(&shift).Association("Users").Delete(&user)
+	// Remove the user from the shift
+	return db.Model(&shift).Association("Users").Delete(&user)
 }
 
 // ##########
 // Handlers
 // ##########
-
 
 func HandleCreateShift(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -146,7 +148,11 @@ func HandleCreateShift(db *gorm.DB) gin.HandlerFunc {
 			Name:        sc.Name,
 			HeadCount:   sc.HeadCount,
 			Description: sc.Description,
-			Time: sc.Time,
+			Day:         sc.Day,
+			StartTime:   sc.StartTime,
+		}
+		if sc.Points != nil {
+			stc.Points = *sc.Points
 		}
 		if err := db.Create(&stc).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create Shift"})
@@ -191,8 +197,14 @@ func HandlePutShift(db *gorm.DB) gin.HandlerFunc {
 		if su.Description != nil {
 			shiftExist.Description = su.Description
 		}
-		if su.Time != nil {
-			shiftExist.Time = su.Time
+		if su.Day != nil {
+			shiftExist.Day = su.Day
+		}
+		if su.Points != nil {
+			shiftExist.Points = *su.Points
+		}
+		if su.StartTime != nil {
+			shiftExist.StartTime = su.StartTime
 		}
 
 		db.Save(&shiftExist)
@@ -206,13 +218,13 @@ func HandleAddUserToShift(db *gorm.DB) gin.HandlerFunc {
 		uid := c.Param("user_id")
 		sid := c.Param("shift_id")
 		shiftIDUint, _ := strconv.ParseUint(sid, 10, 32)
-    	userIDUint, _ := strconv.ParseUint(uid, 10, 32)
-    
+		userIDUint, _ := strconv.ParseUint(uid, 10, 32)
+
 		if err := AddUserToShift(db, uint(shiftIDUint), uint(userIDUint)); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-		
+
 		c.JSON(http.StatusOK, gin.H{"message": "User added to shift successfully"})
 	}
 }
@@ -232,30 +244,28 @@ func HandleAddMeToShift(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "User is not in DB."})
 			return
 		}
-    
+
 		if err := AddUserToShift(db, uint(shiftIDUint), uint(userExist.ID)); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-		
+
 		c.JSON(http.StatusOK, gin.H{"message": "User added to shift successfully"})
 	}
 }
-
-
 
 func HandleRemoveUserFromShift(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		uid := c.Param("user_id")
 		sid := c.Param("shift_id")
 		shiftIDUint, _ := strconv.ParseUint(sid, 10, 32)
-    	userIDUint, _ := strconv.ParseUint(uid, 10, 32)
-    
+		userIDUint, _ := strconv.ParseUint(uid, 10, 32)
+
 		if err := RemoveUserFromShift(db, uint(shiftIDUint), uint(userIDUint)); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-		
+
 		c.JSON(http.StatusOK, gin.H{"message": "User added to shift successfully"})
 	}
 }
@@ -275,19 +285,19 @@ func HandleRemoveMeToShift(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "User is not in DB."})
 			return
 		}
-    
+
 		if err := RemoveUserFromShift(db, uint(shiftIDUint), uint(userExist.ID)); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-		
+
 		c.JSON(http.StatusOK, gin.H{"message": "User added to shift successfully"})
 	}
 }
 
 func HandleDeleteshift(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		uid := c.Param("id")
+		uid := c.Param("shift_id")
 		shiftExist, err := GetShiftById(db, uid)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to retrieve shift type."})
