@@ -81,9 +81,11 @@ func checkSpot(db *gorm.DB, spotTypeId int) error {
 	}
 	spot, err := GetSpotById(db, strconv.Itoa(spotTypeId))
 	if err != nil {
+		fmt.Println("Got Spottype Id ", strconv.Itoa(spotTypeId), "which could not be found")
 		return errors.New("bad Spottype")
 	}
 	if spot.CurrentCount == spot.Limit {
+		fmt.Println("Got Spottype Id ", strconv.Itoa(spotTypeId), "which is full")
 		return errors.New("leider schon voll")
 	}
 	return nil
@@ -136,7 +138,7 @@ func PutMe(db *gorm.DB) gin.HandlerFunc {
 		}
 		zero := uint(0)
 		// check SpotType
-		if uu.SpotTypeID != nil && uu.SpotTypeID != &zero {
+		if uu.SpotTypeID != nil && uu.SpotTypeID != &zero && uu.SpotTypeID != userExist.SpotTypeID {
 			if err := checkSpot(db, int(*uu.SpotTypeID)); err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": "Bad Spottype."})
 				return
@@ -250,7 +252,7 @@ func PutUser(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 		// check SpotType
-		if uu.SpotTypeID != nil {
+		if uu.SpotTypeID != nil && uu.SpotTypeID != userExist.SpotTypeID {
 			if err := checkSpot(db, int(*uu.SpotTypeID)); err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": "Bad Spottype."})
 				return
