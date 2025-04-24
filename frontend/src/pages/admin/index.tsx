@@ -6,13 +6,15 @@ import AdminSpotTable from '@/components/SpotTypeTable';
 import { useState, useEffect } from 'react'; // Removed useEffect
 import { Button } from '@/components/ui/button';
 import SpotCalculator from '@/components/SpotCalculator';
+import ShiftsTable from '@/components/Shiftstable';
 
-type ViewType = 'userTable' | 'spotTable';
+type ViewType = 'userTable' | 'spotTable' | 'shiftTable';
 
 const AdminPage = () => {
   const {
     spots,
     users,
+    shifts,
     isLoading,
     createUser,
     updateUser,
@@ -21,7 +23,14 @@ const AdminPage = () => {
     fetchUsers,
     createSpot,
     updateSpot,
-    deleteSpot
+    deleteSpot,
+    fetchShifts,
+    createShift,
+    updateShift,
+    deleteShift,
+  
+    addUserToShift,
+    removeUserFromShift,
   } = useAdmin();
 
   const [view, setView] = useState<ViewType>('userTable');
@@ -30,6 +39,7 @@ const AdminPage = () => {
         await fetchUsers();
         await fetchSpots();
     };
+    
 
     fetchData();
   }, [view, fetchUsers, fetchSpots]);
@@ -65,6 +75,12 @@ const AdminPage = () => {
               >
                 Spots
               </Button>
+              <Button
+                variant={view === 'spotTable' ? 'default' : 'secondary'}
+                onClick={() => setView('shiftTable')}
+              >
+                Shifts
+              </Button>
             </div>
 
             {view === 'userTable' && (
@@ -93,6 +109,22 @@ const AdminPage = () => {
                   soliAmount={soliAmount}
                   isLoading={isLoading}
                 />
+              </>
+            )}
+
+            {view === 'shiftTable' && (
+              <>
+                <ShiftsTable
+                  users={users}
+                  shifts={shifts}
+                  onFetchShifts={fetchShifts}
+                  onCreateShift={createShift}
+                  onUpdateShift={updateShift}
+                  onDeleteShift={deleteShift}
+                  onAddUserToShift={addUserToShift}
+                  onRemoveUserFromShift={removeUserFromShift}
+              />
+                
               </>
             )}
           </div>

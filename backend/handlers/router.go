@@ -48,6 +48,10 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	protected.PUT("/me/pw", PutMePW(db))
 	protected.GET("/spots", GetSpots(db))
 	protected.GET("/spots/", GetSpots(db))
+	protected.GET("/shifts", HandleGetShifts(db))
+	protected.GET("/shifts/", HandleGetShifts(db))
+	protected.POST("/shifts/:shift_id/me", HandleAddMeToShift(db))
+	protected.DELETE("/shifts/:shift_id/me", HandleRemoveMeFromShift(db))
 
 	admin := api.Group("/admin")
 	admin.Use(middleware.AdminMiddleware(db))
@@ -75,6 +79,6 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	admin.DELETE("/shifts/:shift_id", HandleDeleteshift(db))
 	admin.DELETE("/shifts/:shift_id/user/:user_id", HandleRemoveUserFromShift(db))
 	admin.PUT("/shifts/:id", HandlePutShift(db))
-	
+
 	return r
 }

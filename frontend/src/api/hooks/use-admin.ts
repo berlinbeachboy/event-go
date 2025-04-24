@@ -1,11 +1,13 @@
 import { create } from 'zustand';
 import { axiosInstance } from '../axios-instance';
-import { User, SpotType } from '@/models/models';
+import { User, Shift, SpotType } from '@/models/models';
+// import { Factory } from 'lucide-react';
 
 interface AdminState {
   // Users state and actions
   users: User[];
   spots: SpotType[];
+  shifts: Shift[];
   isLoading: boolean;
   error: Error | null;
 
@@ -21,19 +23,20 @@ interface AdminState {
   updateSpot: (spotId: number, spotData: Partial<SpotType>) => Promise<void>;
   deleteSpot: (spotId: number) => Promise<void>;
 
-  // Batch operations
-  bulkUpdateSpots: (spots: Partial<SpotType>[]) => Promise<void>;
-  bulkDeleteSpots: (spotIds: number[]) => Promise<void>;
+  // Shift management
+  fetchShifts: () => Promise<void>;
+  createShift: (shiftData: Partial<Shift>) => Promise<void>;
+  updateShift: (shiftId: number, spotData: Partial<SpotType>) => Promise<void>;
+  deleteShift: (shiftId: number) => Promise<void>;
 
-  // Additional admin actions
-  toggleSpotStatus: (spotId: number) => Promise<void>;
-  assignUserToSpot: (userId: number, spotId: number) => Promise<void>;
-  removeUserFromSpot: (userId: number, spotId: number) => Promise<void>;
+  addUserToShift: (shiftId: number, userId: number) => Promise<boolean>;
+  removeUserFromShift: (shiftId: number, userId: number) => Promise<boolean>;
 }
 
 export const useAdmin = create<AdminState>((set) => ({
   users: [],
   spots: [],
+  shifts: [],
   isLoading: false,
   error: null,
 
@@ -145,16 +148,48 @@ export const useAdmin = create<AdminState>((set) => ({
     }
   },
 
-  // Batch operations
-  bulkUpdateSpots: async (spots: Partial<SpotType>[]) => {
+  // Mock API functions - replace these with your actual API calls
+  fetchShifts: async () => {
+    try {
+      const { data } = await axiosInstance.get<Shift[]>('/admin/shifts/');
+      console.error('Got shifts:', data);
+      if (!data){
+        set({ shifts: [], isLoading: false }) 
+      } else {
+        set({ shifts: data, isLoading: false })
+      }
+      
+    } catch (error) {
+      set({ error: error as Error, isLoading: false });
+      console.error('Error fetching shifts:', error);
+      throw error;
+    }
+  },
+  
+  createShift: async (shiftData: Partial<Shift>) => {
+    
     try {
       set({ isLoading: true, error: null });
-      const { data } = await axiosInstance.put<SpotType[]>('/admin/spots/bulk', { spots });
+      console.log(shiftData)
+      const { data } = await axiosInstance.post<Shift>('/admin/shifts/', shiftData);
       set(state => ({
-        spots: state.spots.map(spot => {
-          const updatedSpot = data.find(s => s.id === spot.id);
-          return updatedSpot || spot;
-        }),
+        shifts: [...state.shifts, data],
+        isLoading: false
+      }));
+    } catch (error) {
+      set({ error: error as Error, isLoading: false });
+      throw error;
+    }
+    
+  },
+  
+  updateShift: async (shiftId: number, shiftData: Partial<Shift>) => {
+
+    try {
+      set({ isLoading: true, error: null });
+      const { data } = await axiosInstance.put<Shift>(`/admin/shifts/${shiftId}`, shiftData);
+      set(state => ({
+        shifts: state.shifts.map(shift => shift.id === shiftId ? data : shift),
         isLoading: false
       }));
     } catch (error) {
@@ -162,55 +197,55 @@ export const useAdmin = create<AdminState>((set) => ({
       throw error;
     }
   },
+  
+  deleteShift: async (shiftId: number) => {
 
-  bulkDeleteSpots: async (spotIds: number[]) => {
     try {
       set({ isLoading: true, error: null });
-      await axiosInstance.delete('/admin/spots/bulk', { data: { spotIds } });
+      await axiosInstance.delete(`/admin/shifts/${shiftId}`);
       set(state => ({
-        spots: state.spots.filter(spot => !spotIds.includes(spot.id)),
+        users: state.users.filter(shift => shift.id !== shiftId),
         isLoading: false
       }));
     } catch (error) {
       set({ error: error as Error, isLoading: false });
       throw error;
     }
-  },
 
-  // Additional admin actions
-  toggleSpotStatus: async (spotId: number) => {
+  },
+  
+  addUserToShift: async (shiftId: number, userId: number): Promise<boolean> => {
+    
     try {
       set({ isLoading: true, error: null });
-      const { data } = await axiosInstance.patch<SpotType>(`/admin/spots/${spotId}/toggle`);
+      const { data } = await axiosInstance.post<Shift>(`/admin/shifts/${shiftId}/user/${userId}`);
       set(state => ({
-        spots: state.spots.map(spot => spot.id === spotId ? data : spot),
+        shifts: state.shifts.map(shift => shift.id === shiftId ? data : shift),
         isLoading: false
       }));
+      return true
     } catch (error) {
       set({ error: error as Error, isLoading: false });
-      throw error;
+      console.log(error)
+      return false
     }
+    
   },
-
-  assignUserToSpot: async (userId: number, spotId: number) => {
+  
+  removeUserFromShift: async (shiftId: number, userId: number): Promise<boolean> => {
     try {
       set({ isLoading: true, error: null });
-      await axiosInstance.post(`/admin/spots/${spotId}/users/${userId}`);
-      set({ isLoading: false });
+      const { data } = await axiosInstance.delete<Shift>(`/admin/shifts/${shiftId}/user/${userId}`);
+      set(state => ({
+        shifts: state.shifts.map(shift => shift.id === shiftId ? data : shift),
+        isLoading: false
+      }));
+      return true
     } catch (error) {
       set({ error: error as Error, isLoading: false });
-      throw error;
+      console.log(error)
+      // throw error;
+      return false
     }
-  },
-
-  removeUserFromSpot: async (userId: number, spotId: number) => {
-    try {
-      set({ isLoading: true, error: null });
-      await axiosInstance.delete(`/admin/spots/${spotId}/users/${userId}`);
-      set({ isLoading: false });
-    } catch (error) {
-      set({ error: error as Error, isLoading: false });
-      throw error;
-    }
-  },
+  }
 }));

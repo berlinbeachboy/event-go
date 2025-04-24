@@ -15,15 +15,17 @@ import (
 )
 
 type UserUpdate struct {
-	Username   *string  `json:"username"`
-	Nickname   *string  `json:"nickname"`
-	FullName   *string  `json:"fullName"`
-	Phone      *string  `json:"phone"`
-	Type       *string  `json:"type"`
-	AmountPaid *float32 `json:"amountPaid"`
-	SoliAmount *float32 `json:"soliAmount"`
-	TakesSoli  *bool    `json:"takesSoli"`
-	SpotTypeID *uint    `json:"spotTypeId"`
+	Username    *string  `json:"username"`
+	Nickname    *string  `json:"nickname"`
+	FullName    *string  `json:"fullName"`
+	Phone       *string  `json:"phone"`
+	Type        *string  `json:"type"`
+	AmountPaid  *float32 `json:"amountPaid"`
+	SoliAmount  *float32 `json:"soliAmount"`
+	TakesSoli   *bool    `json:"takesSoli"`
+	DonatesSoli *bool    `json:"donatesSoli"`
+	SundayShift *string  `json:"sundayShift"`
+	SpotTypeID  *uint    `json:"spotTypeId"`
 }
 
 type UserCreate struct {
@@ -66,6 +68,12 @@ func updateUser(ue *models.User, uu UserUpdate) {
 	}
 	if uu.TakesSoli != nil {
 		ue.TakesSoli = *uu.TakesSoli
+	}
+	if uu.DonatesSoli != nil {
+		ue.DonatesSoli = *uu.DonatesSoli
+	}
+	if uu.SundayShift != nil {
+		ue.SundayShift = uu.SundayShift
 	}
 	if uu.SpotTypeID != nil && int(*uu.SpotTypeID) == 0 {
 		ue.SpotTypeID = nil
@@ -167,7 +175,6 @@ func PutMe(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Konnte den SpotType nach Update nicht laden."})
 			return
 		}
-		// Need to reload the Association after changing the Foreign Key
 		c.JSON(http.StatusOK, userExist.ToResponse())
 	}
 }

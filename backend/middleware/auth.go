@@ -59,6 +59,7 @@ func AuthMiddleware(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 		c.Set("username", username)
+		c.Set("user_id", userExist.ID)
 		c.Next()
 	}
 }
@@ -86,6 +87,7 @@ func AdminMiddleware(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 		c.Set("username", username)
+		c.Set("user_name", userExist.ID)
 		c.Set("admin", 1)
 		c.Next()
 	}

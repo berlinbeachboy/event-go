@@ -25,6 +25,8 @@ var testDB *gorm.DB // Global variable to hold the test database connection
 
 var AdminEmail string = "p@p.com"
 
+var AdminID uint
+
 func getToken(email string) string {
 	token, _ := util.MakeJWT(email)
 	return token
@@ -103,6 +105,7 @@ func TestMain(m *testing.M) {
 		IsActivated: true,
 	}
 	testDB.Save(&user)
+	AdminID = user.ID
 
 	// Run the tests
 	exitCode := m.Run()
@@ -115,7 +118,10 @@ func TestMain(m *testing.M) {
 	// os.Unsetenv("SMTP_SERVER")
 	// os.Unsetenv("SMTP_PASSWORD")
 	// os.Unsetenv("SMTP_EMAIL")
-	testDB.Exec("DELETE FROM users")
+	testDB.Exec("DELETE FROM users;")
+	// testDB.Exec("DELETE FROM shifts;")
+	// testDB.Exec("DELETE FROM spot_types;")
+	// testDB.Exec("DELETE FROM shift_users;")
 	os.Exit(exitCode)
 }
 
@@ -174,7 +180,7 @@ func TestRegister(t *testing.T) {
 	// verification successful
 	verifyPath = fmt.Sprintf("/api/verify?token=%s", *userExist.VerificationToken)
 	code, _ = sendReq(router, "GET", verifyPath, &userJsonString, nil)
-	assert.Equal(t, 200, code)
+	assert.Equal(t, 307, code)
 }
 
 func TestResetPW(t *testing.T) {
@@ -233,28 +239,36 @@ func TestLoginAndGetMe(t *testing.T) {
 	if w.Code != 200 {
 		t.Errorf("Bad Code returned")
 	}
-	var response map[string]string
-	body, _ := io.ReadAll(w.Body)
-	err := json.Unmarshal(body, &response)
+	// var response map[string]string
+	// body, _ := io.ReadAll(w.Body)
+	// err := json.Unmarshal(body, &response)
+	// fmt.Println("###############")
+	// fmt.Println(response)
 	// Compare the response body with the json data of exampleUser
-	assert.Nil(t, err)
-	token := response["token"]
+	// assert.Nil(t, err)
+	var token string
+	cookies := w.Result().Cookies()
+	for _, c := range cookies {
+		if c.Name == "jwt" {
+			token = c.Value
+		}
+	}
 	assert.NotEmpty(t, token)
 
 	req, _ = http.NewRequest("GET", "/api/user/me", nil)
 	authValue := "Bearer " + string(token)
 	req.Header.Set("Authorization", authValue)
+
+	w = httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
 	if w.Code != 200 {
 		t.Errorf("Bad Code returned")
 	}
-	body, _ = io.ReadAll(w.Body)
-	var response2 map[string]interface{}
-	err = json.Unmarshal(body, &response2)
-	assert.Nil(t, err)
-	assert.Equal(t, "Pete", response2["nickname"])
-	assert.NotEmpty(t, response2["lastLogin"])
+	body, _ := io.ReadAll(w.Body)
+	response := umGeneric(body)
+	assert.Equal(t, "Pete", response["nickname"])
+	assert.NotEmpty(t, response["lastLogin"])
 }
 
 func TestPutMe(t *testing.T) {
@@ -405,46 +419,76 @@ func TestShifts(t *testing.T) {
 
 	token := getToken(AdminEmail)
 	// ,
-	b := `{"name": "Kochen", "headCount": 4, "day": "Freitag", "time": "2025-05-01T17:00:00Z"}`
+	b := `{"name": "Kochen", "headCount": 1, "day": "Freitag", "time": "2025-05-01T17:00:00Z"}`
 	code, body := sendReq(router, "POST", "/api/admin/shifts/", &b, &token)
 	bodyMap := umGeneric(body)
 	checkRes(t, 201, code, bodyMap)
 	//fmt.Println(body)
 	stid := strconv.FormatFloat(bodyMap["id"].(float64), 'f', -1, 64)
-	fmt.Println(stid)
+
+	// create user as admin
+	code, body = sendReq(router, "POST", "/api/admin/users/", util.StrPtr(`{"nickname": "blpb", "fullName":"Hans"}`), &token)
+	assert.Equal(t, 201, code)
+	bodyMap = umGeneric(body)
+	userId := strconv.FormatFloat(bodyMap["id"].(float64), 'f', -1, 64)
+
+	// add user to shift
+	code, body = sendReq(router, "POST", "/api/admin/shifts/"+stid+"/user/"+userId, nil, &token)
+	bodyMap = umGeneric(body)
+	checkRes(t, 200, code, bodyMap)
+
+	// error since user cannot be added another time
+	code, body = sendReq(router, "POST", "/api/admin/shifts/"+stid+"/user/"+userId, nil, &token)
+	bodyMap = umGeneric(body)
+	checkRes(t, 400, code, bodyMap)
+
+	// check shifts, which should include user
+	code, body = sendReq(router, "GET", "/api/admin/shifts/", nil, &token)
+	assert.Equal(t, 200, code)
+	var shiftList []ShiftOut
+	if err := json.Unmarshal(body, &shiftList); err != nil {
+		t.Errorf("Bad Users (list) Response")
+	}
+	un := *shiftList[0].UserNames
+	assert.Equal(t, uint8(1), shiftList[0].CurrentCount)
+	assert.Equal(t, "Hans", un[0])
+	adminIdStr := strconv.FormatUint(uint64(AdminID), 10)
+
+	// try adding another user to shift but fail since shift is full
+	code, body = sendReq(router, "POST", "/api/admin/shifts/"+stid+"/user/"+adminIdStr, nil, &token)
+	bodyMap = umGeneric(body)
+	checkRes(t, 400, code, bodyMap)
+
+	// delete User from Shift
+	code, body = sendReq(router, "DELETE", "/api/admin/shifts/"+stid+"/user/"+userId, nil, &token)
+	bodyMap = umGeneric(body)
+	checkRes(t, 200, code, bodyMap)
+
+	// check shifts, which should include user
+	code, body = sendReq(router, "GET", "/api/admin/shifts/", nil, &token)
+	assert.Equal(t, 200, code)
+	if err := json.Unmarshal(body, &shiftList); err != nil {
+		t.Errorf("Bad Users (list) Response")
+	}
+	assert.Equal(t, uint8(0), shiftList[0].CurrentCount)
+
+	// add me (admin) to shift
+	code, body = sendReq(router, "POST", "/api/user/shifts/"+stid+"/me", nil, &token)
+	bodyMap = umGeneric(body)
+	checkRes(t, 200, code, bodyMap)
+
+	// check shifts, which should include admin
+	code, body = sendReq(router, "GET", "/api/user/shifts/", nil, &token)
+	assert.Equal(t, 200, code)
+	if err := json.Unmarshal(body, &shiftList); err != nil {
+		t.Errorf("Bad Users (list) Response")
+	}
+	un = *shiftList[0].UserNames
+	assert.Equal(t, uint8(1), shiftList[0].CurrentCount)
+	assert.Equal(t, "P R", un[0])
+
+	// delete User from Shift
+	code, body = sendReq(router, "DELETE", "/api/user/shifts/"+stid+"/me", nil, &token)
+	bodyMap = umGeneric(body)
+	checkRes(t, 200, code, bodyMap)
 }
-
-// 	b = `{"spotTypeId": 67}`
-// 	code, body = sendReq(router, "PUT", "/api/user/me", &b, &token)
-// 	bodyMap = umGeneric(body)
-// 	checkRes(t, 400, code, bodyMap)
-
-// 	b = fmt.Sprintf(`{"spotTypeId": %s}`, stid)
-// 	code, body = sendReq(router, "PUT", "/api/user/me", &b, &token)
-// 	bodyMap = umGeneric(body)
-// 	checkRes(t, 200, code, bodyMap)
-// 	assert.Equal(t, float64(76), bodyMap["amountToPay"])
-// 	userId := strconv.FormatFloat(bodyMap["id"].(float64), 'f', -1, 64)
-
-// 	b = `{"amountPaid": 50}`
-// 	code, body = sendReq(router, "PUT", "/api/admin/users/"+userId, &b, &token)
-// 	bodyMap = umGeneric(body)
-// 	checkRes(t, 200, code, bodyMap)
-// 	assert.Equal(t, float64(26), bodyMap["amountToPay"])
-
-// 	code, body = sendReq(router, "GET", "/api/admin/spots/", nil, &token)
-// 	assert.Equal(t, 200, code)
-// 	var spotList []models.SpotType
-// 	if err := json.Unmarshal(body, &spotList); err != nil {
-// 		t.Errorf("Bad SpotType (list) Response")
-// 	}
-// 	assert.Equal(t, uint16(1), spotList[0].CurrentCount)
-
-// 	code, body = sendReq(router, "GET", "/api/admin/users/", nil, &token)
-// 	assert.Equal(t, 200, code)
-// 	var usersList []models.UserResponse
-// 	if err := json.Unmarshal(body, &usersList); err != nil {
-// 		t.Errorf("Bad Users (list) Response")
-// 	}
-// 	assert.Equal(t, uint16(76), usersList[0].SpotType.Price)
-// }

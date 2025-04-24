@@ -26,9 +26,12 @@ type User struct {
 	SoliAmount float32 `gorm:"not null;default:0" json:"soliAmount"`
 	// GivesSoli  bool       `gorm:"not null;default:false" json:"givesSoli"`
 	TakesSoli   bool       `gorm:"not null;default:false" json:"takesSoli"`
+	DonatesSoli bool       `gorm:"not null;default:false" json:"donatesSoli"`
 	LastLogin   *time.Time `gorm:"null;default:null" json:"lastLogin"`
 	AmountPaid  float32    `gorm:"not null;default:0" json:"amountPaid"`
 	IsActivated bool       `gorm:"not null;default:false" json:"-"`
+
+	SundayShift *string `gorm:"null" json:"sundayShift"`
 
 	VerificationToken *string    `gorm:"null" json:"-"`
 	TokenExpiryTime   *time.Time `gorm:"null" json:"-"`
@@ -63,9 +66,12 @@ type UserResponse struct {
 	Phone       *string    `json:"phone"`
 	SoliAmount  float32    `json:"soliAmount"`
 	TakesSoli   bool       `json:"takesSoli"`
+	DonatesSoli bool       `json:"donatesSoli"`
 	LastLogin   *time.Time `json:"lastLogin"`
 	AmountToPay float32    `json:"amountToPay"`
 	AmountPaid  float32    `json:"amountPaid"`
+
+	SundayShift *string `json:"sundayShift"`
 
 	CreatedAt time.Time `json:"createdAt"`
 
@@ -83,9 +89,12 @@ func (u User) ToResponse() UserResponse {
 		Phone:       u.Phone,
 		SoliAmount:  u.SoliAmount,
 		TakesSoli:   u.TakesSoli,
+		DonatesSoli: u.DonatesSoli,
 		LastLogin:   u.LastLogin,
 		AmountToPay: u.AmountToPay(),
 		AmountPaid:  u.AmountPaid,
+
+		SundayShift: u.SundayShift,
 
 		SpotTypeID: u.SpotTypeID,
 		SpotType:   u.SpotType,
@@ -122,7 +131,7 @@ type Shift struct {
 	Points      uint8      `gorm:"not null;default:1" json:"points"`
 	Description *string    `gorm:"null" json:"description"`
 	Day         *string    `gorm:"null" json:"day"`
-	StartTime        *time.Time `gorm:"null;default:null" json:"time"`
+	StartTime   *time.Time `gorm:"null;default:null" json:"time"`
 	// UserNames []*string  `gorm:"->" json:"userNames"`
 	Users []*User `gorm:"many2many:shift_users;"`
 

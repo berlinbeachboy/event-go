@@ -4,7 +4,7 @@ export interface User {
     username: string | null;
     type: string;
     nickname: string;
-    fullName: string | null;
+    fullName: string;
     phone: string | null;
     takesSoli: boolean;
     soliAmount: number;
@@ -32,4 +32,16 @@ export interface User {
     updatedAt?: string;
   }
   
+  // Define the Shift type to match your API structure
+  export interface Shift {
+    id: number;
+    name: string;
+    headCount: number;
+    points: number;
+    day: string;
+    description: string | null;
+    startTime: string | null; // We'll parse this later
+    currentCount: number;
+    userNames: string[] | null;
+  }
   

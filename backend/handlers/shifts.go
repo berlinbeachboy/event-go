@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -86,21 +87,22 @@ func GetShiftsWithUserNames(db *gorm.DB) ([]ShiftOut, error) {
 // AddUserToShift adds a user to a shift
 func AddUserToShift(db *gorm.DB, shiftID, userID uint) error {
 	var shift models.Shift
-	if err := db.First(&shift, shiftID).Error; err != nil {
+	if err := db.Preload("Users").First(&shift, shiftID).Error; err != nil {
 		return err
 	}
 	if len(shift.Users) >= int(shift.HeadCount) {
 		return errors.New("this shift is already full :/")
 	}
+
+	for _, s := range shift.Users {
+		if s.ID == userID {
+			return errors.New("user is already in this shift")
+		}
+	}
+
 	var user models.User
 	if err := db.First(&user, userID).Error; err != nil {
 		return err
-	}
-
-	for _, s := range shift.Users {
-		if s.Username == user.Username {
-			return errors.New("user is already in this shift")
-		}
 	}
 
 	// Add the user to the shift
@@ -110,21 +112,22 @@ func AddUserToShift(db *gorm.DB, shiftID, userID uint) error {
 // RemoveUserFromShift removes a user from a shift
 func RemoveUserFromShift(db *gorm.DB, shiftID, userID uint) error {
 	var shift models.Shift
-	if err := db.First(&shift, shiftID).Error; err != nil {
-		return err
-	}
-	var user models.User
-	if err := db.First(&user, userID).Error; err != nil {
+	if err := db.Preload("Users").First(&shift, shiftID).Error; err != nil {
 		return err
 	}
 	found := false
 	for _, s := range shift.Users {
-		if s.Username == user.Username {
+		if s.ID == userID {
 			found = true
 		}
 	}
 	if !found {
 		return errors.New("user is not part of this shift (yet)")
+	}
+
+	var user models.User
+	if err := db.First(&user, userID).Error; err != nil {
+		return err
 	}
 
 	// Remove the user from the shift
@@ -221,7 +224,7 @@ func HandleAddUserToShift(db *gorm.DB) gin.HandlerFunc {
 		userIDUint, _ := strconv.ParseUint(uid, 10, 32)
 
 		if err := AddUserToShift(db, uint(shiftIDUint), uint(userIDUint)); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
@@ -234,18 +237,14 @@ func HandleAddMeToShift(db *gorm.DB) gin.HandlerFunc {
 		sid := c.Param("shift_id")
 		shiftIDUint, _ := strconv.ParseUint(sid, 10, 32)
 
-		username, exists := c.Get("username")
+		userId, exists := c.Get("user_id")
+		userId2 := userId.(uint)
 		if !exists {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user"})
 			return
 		}
-		var userExist models.User
-		if err := db.First(&userExist, "username = ?", username).Error; err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "User is not in DB."})
-			return
-		}
 
-		if err := AddUserToShift(db, uint(shiftIDUint), uint(userExist.ID)); err != nil {
+		if err := AddUserToShift(db, uint(shiftIDUint), userId2); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
@@ -262,32 +261,29 @@ func HandleRemoveUserFromShift(db *gorm.DB) gin.HandlerFunc {
 		userIDUint, _ := strconv.ParseUint(uid, 10, 32)
 
 		if err := RemoveUserFromShift(db, uint(shiftIDUint), uint(userIDUint)); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{"message": "User added to shift successfully"})
+		c.JSON(http.StatusOK, gin.H{"message": "User removed from shift successfully"})
 	}
 }
 
-func HandleRemoveMeToShift(db *gorm.DB) gin.HandlerFunc {
+func HandleRemoveMeFromShift(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		sid := c.Param("shift_id")
 		shiftIDUint, _ := strconv.ParseUint(sid, 10, 32)
 
-		username, exists := c.Get("username")
+		userId, exists := c.Get("user_id")
+		userId2 := userId.(uint)
+		fmt.Println("User ID: " + strconv.FormatUint(uint64(userId2), 10))
 		if !exists {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user"})
 			return
 		}
-		var userExist models.User
-		if err := db.First(&userExist, "username = ?", username).Error; err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "User is not in DB."})
-			return
-		}
 
-		if err := RemoveUserFromShift(db, uint(shiftIDUint), uint(userExist.ID)); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		if err := RemoveUserFromShift(db, uint(shiftIDUint), userId2); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
