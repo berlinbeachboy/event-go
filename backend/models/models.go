@@ -131,8 +131,7 @@ type Shift struct {
 	Points      uint8      `gorm:"not null;default:1" json:"points"`
 	Description *string    `gorm:"null" json:"description"`
 	Day         *string    `gorm:"null" json:"day"`
-	StartTime   *time.Time `gorm:"null;default:null" json:"time"`
-	// UserNames []*string  `gorm:"->" json:"userNames"`
+	StartTime   *time.Time `gorm:"null;default:null" json:"startTime"`
 	Users []*User `gorm:"many2many:shift_users;"`
 
 	CreatedAt time.Time `json:"createdAt"` // Automatically managed by GORM for creation time

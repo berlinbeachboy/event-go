@@ -63,14 +63,6 @@ const SpotCard = ({
     <div className="flex-grow pr-4">
       <h3 className="text-xl font-medium text-black mb-2">{spot.name}   </h3>
       <p className="text-sm text-gray-600">{spot.price}€     
-        {/* <span className={cn(
-            "px-2 py-1 rounded-full ml-5",
-            spot.currentCount >= spot.limit 
-              ? "bg-red-100 text-red-800" 
-              : "bg-green-100 text-green-800"
-          )}>
-            {spot.currentCount} / {spot.limit}
-          </span> */}
         </p>
         <br></br>
       <p className="text-gray-600">{spot.description}</p>
@@ -84,20 +76,6 @@ const SpotCard = ({
         />
         </div>
     )}
-      {/* <div className="text-center">
-        <h4 className="font-medium">{spot.name}</h4>
-        <p className="text-sm text-gray-600">{spot.price}€</p>
-        <div className="mt-2 text-xs">
-          <span className={cn(
-            "px-2 py-1 rounded-full",
-            spot.currentCount >= spot.limit 
-              ? "bg-red-100 text-red-800" 
-              : "bg-green-100 text-green-800"
-          )}>
-            {spot.currentCount} / {spot.limit} spots
-          </span>
-        </div>
-      </div> */}
     </div>
   );
 };
@@ -112,6 +90,7 @@ const SpotCard = ({
       takesSoli: user?.takesSoli || false,
       soliAmount: user?.soliAmount || 0,
       spotTypeId: user?.spotTypeId || 0,
+      donatesSoli: user?.donatesSoli || false,
     });
     const [hasSpotSelected, sethasSpotSelected] = useState(formData.spotTypeId !== 0);
     const noSpot = {
@@ -154,6 +133,12 @@ const SpotCard = ({
         takesSoli: false
       }))
     }
+    if (field === 'donatesSoli'){
+      setFormData(prev => ({
+        ...prev,
+        donatesSoli: value
+      }))
+    }
   };
 
   const handleSubmit = async () => {
@@ -162,6 +147,7 @@ const SpotCard = ({
         ...formData,
         soliAmount: formData.soliAmount,
         takesSoli: formData.takesSoli,
+        donatesSoli: formData.donatesSoli
       });
       setIsEditing(false);
       toast({
@@ -213,16 +199,28 @@ const SpotCard = ({
           <div className="space-y-6">
             <h3 className="text-lg font-semibold">Soli beantragen oder spendieren</h3>
 
-            <div className="items-center space-x-2">
-              <div className="space-y-2 w-56">
+            <div className=" space-x-2">
+              <div className="items-center space-y-2 w-90">
                 <Label htmlFor="soliAmount">Möchtest du einen Soli spenden (Empfehlung 25€)? </Label>
-                <Input
-                  id="soliAmount"
-                  placeholder="Empfehlung: 25€"
-                  value={formData.soliAmount}
-                  onChange={(e) => handleChange('soliAmount', parseFloat(e.target.value))}
-                  disabled={!isEditing || !hasSpotSelected}
-                />
+                <div className='flex items-center'>
+                  <Input
+                    className='w-40'
+                    id="soliAmount"
+                    placeholder="Empfehlung: 25€"
+                    value={formData.soliAmount}
+                    onChange={(e) => handleChange('soliAmount', parseFloat(e.target.value))}
+                    disabled={!isEditing || !hasSpotSelected}
+                  /> <br></br>
+                  <div className={formData.soliAmount > 0 ? "pl-5" : "hidden"}>
+                    <Checkbox id="donate" disabled={!isEditing || !hasSpotSelected} checked={formData.donatesSoli} onCheckedChange={() => handleChange('donatesSoli', !formData.donatesSoli)}/>
+                    <label
+                      htmlFor="donate"
+                      className="text-sm font-medium pl-2 space-y-1 leading-none leading-none"
+                    >
+                      Soli auch für Allgemeinheit spenden
+                    </label>
+                  </div>
+                </div>
               </div>
               <br></br>
               <div className="space-y-2">
@@ -271,6 +269,7 @@ const SpotCard = ({
                     takesSoli: user?.takesSoli || false,
                     soliAmount: user?.soliAmount || 0,
                     spotTypeId: user?.spotTypeId || 0,
+                    donatesSoli: user?.donatesSoli || false,
                   });
                 }}
                 disabled={isLoading}

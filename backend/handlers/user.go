@@ -261,8 +261,10 @@ func PutUser(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 			return
 		}
+		zero := uint(0)
 		// check SpotType
-		if uu.SpotTypeID != nil && *uu.SpotTypeID != *userExist.SpotTypeID {
+		if uu.SpotTypeID != nil && uu.SpotTypeID != &zero {
+
 			// only check the limit if the spot Type is different or new
 			checkLimit := userExist.SpotTypeID == nil || *uu.SpotTypeID != *userExist.SpotTypeID
 			if err := checkSpot(db, int(*uu.SpotTypeID), checkLimit); err != nil {

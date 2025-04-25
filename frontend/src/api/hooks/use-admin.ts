@@ -170,7 +170,6 @@ export const useAdmin = create<AdminState>((set) => ({
     
     try {
       set({ isLoading: true, error: null });
-      console.log(shiftData)
       const { data } = await axiosInstance.post<Shift>('/admin/shifts/', shiftData);
       set(state => ({
         shifts: [...state.shifts, data],

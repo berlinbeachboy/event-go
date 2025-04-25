@@ -16,12 +16,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -46,6 +40,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Info, Pencil, Trash, Plus, Calendar, Clock, X, Check, ChevronsUpDown } from "lucide-react";
 import { Shift, User } from "@/models/models";
+import CsvUpload from "./ShiftCsvUpload";
 
 // Props for the ShiftsTable component
 interface ShiftsTableProps {
@@ -65,13 +60,14 @@ export default function ShiftsTable({ shifts, users, onFetchShifts, onCreateShif
   const [openDialog, setOpenDialog] = useState(false);
   const [currentShift, setCurrentShift] = useState<Shift | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showUpload, setShowUpload] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [userDialogOpen, setUserDialogOpen] = useState(false);
   const [currentShiftForUsers, setCurrentShiftForUsers] = useState<Shift | null>(null);
   const [userOperationInProgress, setUserOperationInProgress] = useState(false);
 
   // Filter states
-  const [dayFilter, setDayFilter] = useState<string | null>("-");
+  const [dayFilter, setDayFilter] = useState<string>("-");
   
   useEffect(() => {
     loadShifts();
@@ -90,19 +86,38 @@ export default function ShiftsTable({ shifts, users, onFetchShifts, onCreateShif
 
   const handleEditShift = (shift: Shift) => {
     setCurrentShift(shift);
+    setFormData(() => (
+      {
+        name: shift.name,
+        headCount: shift.headCount,
+        points: shift.points,
+        day: shift.day,
+        description: shift.description,
+        startTime: formatTime(shift.startTime)
+    }
+    ));
     setOpenDialog(true);
   };
 
-  const handleDeleteShift = async (id: number) => {
-    if (confirm("Are you sure you want to delete this shift?")) {
-      setIsDeleting(true);
-      await onDeleteShift(id);
-      setIsDeleting(false);
+  const handleDeleteShift = async (shift: Shift) => {
+    if (shift.currentCount > 0){
+      alert("Du kannst die Schicht erst löschen, wenn du alle Teilnehmer entfert hast.")
+    }
+    else{
+      if (confirm("Bist du sicher, dass du die Schicht löschen willst?")) {
+        setIsDeleting(true);
+        await onDeleteShift(shift.id);
+        setIsDeleting(false);
+      }
     }
   };
 
-  const handleSubmitShift = async (data: any) => {
+  const handleSubmitShift = async (data: Partial<Shift>) => {
+    if (data.startTime){
+      data.startTime = "2025-05-01T"+data.startTime+":00+02:00"
+    }
     setIsSubmitting(true);
+    console.log(data)
     try {
       if (currentShift) {
         // Update existing shift
@@ -180,7 +195,7 @@ export default function ShiftsTable({ shifts, users, onFetchShifts, onCreateShif
   });
 
 //   Sort shifts by day and time
-  const sortedShifts = [...shifts].sort((a, b) => {
+  const sortedShifts = [...filteredShifts].sort((a, b) => {
     // First compare days
     const dayOrder: {[key: string]: number} = {
       "Freitag": 1,
@@ -215,26 +230,55 @@ export default function ShiftsTable({ shifts, users, onFetchShifts, onCreateShif
     }
   };
 
+  const formatFullName = (name: string): string => {
+    if (!name) return '';
+    
+    const parts = name.trim().split(/\s+/);
+    
+    if (parts.length === 1) {
+      return parts[0];
+    }
+    
+    const firstName = parts[0];
+    const lastNameInitial = parts[1][0];
+    
+    return `${firstName} ${lastNameInitial}.`;
+  };
+
+  const [formData, setFormData] = useState<Partial<Shift>>(
+          currentShift ?? {
+              name: 'putzeputze',
+              headCount: 2,
+              points: 1,
+              day: 'Freitag',
+              description: '',
+              startTime: '12:30'
+          }
+      );
+  const handleFormDataCh = (field: keyof Shift, value: string | number) => {
+          setFormData(prev => ({...prev, [field]: value}));
+      };
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Event Shifts</h2>
+        <h2 className="text-2xl font-bold">Schichten</h2>
         <Button onClick={handleAddShift} className="flex items-center gap-1">
-          <Plus size={16} /> Add Shift
+          <Plus size={18} /> Schicht hinzufügen
         </Button>
       </div>
       
       <div className="flex flex-wrap gap-2 mb-4">
-        <Select value={dayFilter || ''} onValueChange={(value) => setDayFilter(value || null)}>
+        <Select value={dayFilter || ''} onValueChange={(value) => setDayFilter(value)}>
           <SelectTrigger className="w-32">
-            <SelectValue placeholder="All Days" />
+            <SelectValue placeholder="Alle Tage" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="-">All Days</SelectItem>
-            <SelectItem value="Friday">Freitag</SelectItem>
-            <SelectItem value="Saturday">Samstag</SelectItem>
-            <SelectItem value="Sunday">Sonntag</SelectItem>
-            <SelectItem value="Sunday">Montag</SelectItem>
+            <SelectItem value="-">Allen Tage</SelectItem>
+            <SelectItem value="Freitag">Freitag</SelectItem>
+            <SelectItem value="Samstag">Samstag</SelectItem>
+            <SelectItem value="Sonntag">Sonntag</SelectItem>
+            <SelectItem value="Montag">Montag</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -249,19 +293,21 @@ export default function ShiftsTable({ shifts, users, onFetchShifts, onCreateShif
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
+                <TableHead></TableHead>
                 <TableHead className="hidden md:table-cell">Tag</TableHead>
                 <TableHead className="hidden md:table-cell">Zeit</TableHead>
-                <TableHead className="text-center">Punkte</TableHead>
-                <TableHead className="text-center">Anzahl</TableHead>
+                <TableHead className="hidden text-center md:table-cell">Punkte</TableHead>
+                <TableHead className="text-center md:hidden">Pkte</TableHead>
+                <TableHead className="text-center">X/Y</TableHead>
                 <TableHead className="hidden md:table-cell">Menschen</TableHead>
-                <TableHead className="text-right"> - </TableHead>
+                <TableHead className="text-right"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {sortedShifts.map((shift) => (
                 <TableRow key={shift.id}>
-                  <TableCell className="font-medium">
-                    <div>
+                  <TableCell>
+                    <div className="font-medium">
                       {shift.name}
                       
                       {/* Mobile-only day and time indicators */}
@@ -273,15 +319,52 @@ export default function ShiftsTable({ shifts, users, onFetchShifts, onCreateShif
                           <Clock size={12} /> {formatTime(shift.startTime)}
                         </span>
                       </div>
-                    </div>
+                      </div>
                   </TableCell>
+                  <TableCell>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-6 px-2"
+                        >
+                          <Info size={14} />
+                        </Button>
+                      </PopoverTrigger>
+                        <PopoverContent className="w-120">
+                          <div className="max-w-xs font-medium p-2">
+                            <p className="font-semibold">Mehr Infos:</p>
+                            <p>{shift.description || 'Keine Beschreibung verfügbar'}</p>
+                            
+                            {shift.userNames && shift.userNames.length > 0 && (
+                              <div className="md:hidden">
+                                <p className="font-semibold mt-2">Menschen:</p>
+                                <ul className="list-disc pl-5">
+                                  {shift.userNames.map((name, index) => (
+                                    <li key={index}>{name}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                  </TableCell>
+                  
                   <TableCell className="hidden md:table-cell">{shift.day || '—'}</TableCell>
                   <TableCell className="hidden md:table-cell">{formatTime(shift.startTime)}</TableCell>
-                  <TableCell className="text-center">
+                  <TableCell className="hidden md:table-cell text-center ">
                     <Badge variant={shift.points > 1 ? "destructive" : "default"}>
-                      {shift.points} {shift.points === 1 ? 'point' : 'points'}
+                      {shift.points} {shift.points === 1 ? 'Punkt' : 'Punkte'}
                     </Badge>
                   </TableCell>
+                  <TableCell className="text-center md:hidden">
+                    <Badge variant={shift.points > 1 ? "destructive" : "default"}>
+                      {shift.points}
+                    </Badge>
+                  </TableCell>
+
                   <TableCell className="text-center">
                     <span className={`${shift.currentCount >= shift.headCount ? 'text-red-500' : 'text-green-500'}`}>
                       {shift.currentCount}/{shift.headCount}
@@ -292,7 +375,21 @@ export default function ShiftsTable({ shifts, users, onFetchShifts, onCreateShif
                       {shift.userNames && shift.userNames.length > 0 ? (
                         shift.userNames.slice(0, 6).map((name, index) => (
                           <Badge key={index} variant="outline" className="flex items-center gap-1">
-                            {name}
+                            {formatFullName(name)}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                const userId = findUserIdByName(name)
+                                if (userId !== null) {
+                                  handleRemoveUser(shift.id, userId, name);
+                                }
+                              }}
+                              disabled={userOperationInProgress}
+                              className="h-6 px-2"
+                            >
+                              <X size={10} />
+                            </Button>
                           </Badge>
                         ))
                       ) : (
@@ -305,44 +402,58 @@ export default function ShiftsTable({ shifts, users, onFetchShifts, onCreateShif
                         </Badge>
                       )}
                       
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-6 px-2"
-                        onClick={() => openUserManagement(shift)}
-                      >
-                        <Plus size={12} />
-                      </Button>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-6 px-2"
+                            onClick={() => setCurrentShiftForUsers(shift)}
+                          >
+                            <Plus size={12} />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-120">
+                          <div className="grid gap-4">
+                            <div className="space-y-2">
+                              <h4 className="font-medium leading-none">Menschen</h4>
+                              <Command>
+                                <CommandInput placeholder="Search users..." />
+                                <CommandEmpty>Niemand da.</CommandEmpty>
+                                <CommandGroup>
+                                  {users
+                                    .filter(user => {
+                                      // Filter out users already assigned to this shift
+                                      return !currentShiftForUsers?.userNames?.includes(user.fullName);
+                                    })
+                                    .map((user) => (
+                                      <CommandItem
+                                        key={user.id}
+                                        value={user.fullName}
+                                        onSelect={() => {
+                                          if (currentShiftForUsers) {
+                                            handleAddUser(currentShiftForUsers.id, user.id);
+                                          }
+                                        }}
+                                      >
+                                        <Check className="mr-2 h-4 w-4 opacity-0" />
+                                        <span>{user.fullName}</span>
+                                        {user.nickname && (
+                                          <span className="ml-2 text-gray-500">({user.nickname})</span>
+                                        )}
+                                      </CommandItem>
+                                    ))}
+                                </CommandGroup>
+                              </Command>
+                            </div>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                      
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <Info size={16} />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <div className="max-w-xs p-2">
-                              <p className="font-semibold">Beschreibung:</p>
-                              <p>{shift.description || 'No description available'}</p>
-                              
-                              {shift.userNames && shift.userNames.length > 0 && (
-                                <>
-                                  <p className="font-semibold mt-2">Menschen:</p>
-                                  <ul className="list-disc pl-5">
-                                    {shift.userNames.map((name, index) => (
-                                      <li key={index}>{name}</li>
-                                    ))}
-                                  </ul>
-                                </>
-                              )}
-                            </div>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
                       
                       {/* Mobile-only user management button */}
                       <Button 
@@ -364,7 +475,7 @@ export default function ShiftsTable({ shifts, users, onFetchShifts, onCreateShif
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => handleDeleteShift(shift.id)}
+                        onClick={() => handleDeleteShift(shift)}
                         disabled={isDeleting}
                       >
                         <Trash size={16} />
@@ -375,8 +486,14 @@ export default function ShiftsTable({ shifts, users, onFetchShifts, onCreateShif
               ))}
             </TableBody>
           </Table>
+          
         </div>
+        
       )}
+      <Button onClick={() => setShowUpload(!showUpload)}>{showUpload ? "Upload ausblenden" : "CSV Import"}</Button>
+      <div className={showUpload ? "" : "hidden"}>
+      <CsvUpload/>
+      </div>
 
       {/* Shift edit/create dialog */}
       <Dialog open={openDialog} onOpenChange={setOpenDialog}>
@@ -394,14 +511,15 @@ export default function ShiftsTable({ shifts, users, onFetchShifts, onCreateShif
               <Input 
                 id="name" 
                 defaultValue={currentShift?.name || ''} 
-                placeholder="Shift name" 
+                placeholder="Schichtname" 
+                onChange={(e) => handleFormDataCh('name', e.target.value)}
               />
             </div>
             
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <label htmlFor="day" className="text-sm font-medium">Tage</label>
-                <Select defaultValue={currentShift?.day || undefined}>
+                <Select value={formData?.day || undefined} onValueChange={(value) => handleFormDataCh('day', value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Welcher Tag" />
                   </SelectTrigger>
@@ -418,12 +536,10 @@ export default function ShiftsTable({ shifts, users, onFetchShifts, onCreateShif
                 <label htmlFor="startTime" className="text-sm font-medium">Beginn</label>
                 <Input 
                   id="startTime" 
-                  type="startTime"
-                  defaultValue={currentShift?.startTime ? 
-                    new Date(currentShift.startTime).toLocaleTimeString([], {
-                        hour: '2-digit', minute: '2-digit', hour12: false
-                      }) : 
-                    ''}
+                  type="time"
+                  onChange={(e) => handleFormDataCh('startTime', e.target.value)}
+                  value={formData.startTime ? formData.startTime : "12:30"}
+                  required
                 />
               </div>
             </div>
@@ -435,13 +551,14 @@ export default function ShiftsTable({ shifts, users, onFetchShifts, onCreateShif
                   id="headCount" 
                   type="number" 
                   min="1"
-                  defaultValue={currentShift?.headCount || 1} 
+                  defaultValue={formData?.headCount || 1} 
+                  onChange={(e) => handleFormDataCh('headCount', parseInt(e.target.value))}
                 />
               </div>
               
               <div className="grid gap-2">
                 <label htmlFor="points" className="text-sm font-medium">Punkte</label>
-                <Select defaultValue={String(currentShift?.points || 1)}>
+                <Select value={String(formData?.points || 1)} onValueChange={(value) => handleFormDataCh('points', parseInt(value))}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select points" />
                   </SelectTrigger>
@@ -457,8 +574,9 @@ export default function ShiftsTable({ shifts, users, onFetchShifts, onCreateShif
               <label htmlFor="description" className="text-sm font-medium">Beschreibung</label>
               <Textarea 
                 id="description" 
-                defaultValue={currentShift?.description || ''} 
+                value={formData?.description || ''} 
                 placeholder="Add details about this shift"
+                onChange={(e) => handleFormDataCh('description', e.target.value)}
                 rows={3}
               />
             </div>
@@ -466,20 +584,20 @@ export default function ShiftsTable({ shifts, users, onFetchShifts, onCreateShif
           
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpenDialog(false)}>Abbrechen</Button>
-            <Button type="submit" disabled={isSubmitting} onClick={() => handleSubmitShift({})}>
+            <Button type="submit" disabled={isSubmitting} onClick={() => handleSubmitShift(formData)}>
               {isSubmitting ? 'Saving...' : currentShift ? 'Update' : 'Create'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* User management dialog */}
+      {/* User management dialog, only for mobile*/}
       <Dialog open={userDialogOpen} onOpenChange={setUserDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Manage Users for {currentShiftForUsers?.name}</DialogTitle>
+            <DialogTitle>Menschen für {currentShiftForUsers?.name} am {currentShiftForUsers?.day}</DialogTitle>
             <DialogDescription>
-              Add or remove users from this shift.
+              Hier Menschen hinzufügen oder rausnehmen.
             </DialogDescription>
           </DialogHeader>
           
@@ -498,11 +616,11 @@ export default function ShiftsTable({ shifts, users, onFetchShifts, onCreateShif
                       (currentShiftForUsers.currentCount >= currentShiftForUsers.headCount)
                     }
                   >
-                    Select a user...
+                    Füge jemanden hinzu
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-full p-0">
+                <PopoverContent className="w-full p-2 ">
                   <Command>
                     <CommandInput placeholder="Search users..." />
                     <CommandEmpty>No users found.</CommandEmpty>

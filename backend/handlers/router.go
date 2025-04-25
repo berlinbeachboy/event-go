@@ -75,6 +75,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	admin.GET("/shifts/", HandleGetShifts(db))
 	admin.POST("/shifts", HandleCreateShift(db))
 	admin.POST("/shifts/", HandleCreateShift(db))
+	admin.POST("/shifts/import", ImportShiftsFromCSV(db))
 	admin.POST("/shifts/:shift_id/user/:user_id", HandleAddUserToShift(db))
 	admin.DELETE("/shifts/:shift_id", HandleDeleteshift(db))
 	admin.DELETE("/shifts/:shift_id/user/:user_id", HandleRemoveUserFromShift(db))

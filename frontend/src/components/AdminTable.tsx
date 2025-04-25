@@ -139,9 +139,9 @@ const AdminTable = ({
             <TableHeader>
               <TableRow>
                 <TableHead>Vor- und Nachname</TableHead>
-                <TableHead className="hidden sm:block">Username</TableHead>
+                <TableHead className="hidden sm:table-cell">Username</TableHead>
                 <TableHead>Spitzname</TableHead>
-                <TableHead className="hidden md:block">Handy</TableHead>
+                <TableHead className="hidden md:table-cell">Handy</TableHead>
                 <TableHead>Typ</TableHead>
                 <TableHead>Spot</TableHead>
                 <TableHead>Soli</TableHead>
@@ -154,9 +154,9 @@ const AdminTable = ({
               {filteredUsers.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell>{user.fullName}</TableCell>
-                  <TableCell className="hidden sm:block">{user.username}</TableCell>
+                  <TableCell className="hidden sm:table-cell">{user.username}</TableCell>
                   <TableCell>{user.nickname}</TableCell>
-                  <TableCell className="hidden md:block">{user.phone}</TableCell>
+                  <TableCell className="hidden md:table-cell">{user.phone}</TableCell>
                   <TableCell>
                     <span className={`px-2 py-1 rounded-full text-xs ${
                       user.type === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
@@ -171,7 +171,7 @@ const AdminTable = ({
                       -25€
                     </span>): (
                       <span className="text-xs">
-                      {user.soliAmount}€
+                      {user.soliAmount}€ {user.donatesSoli ? "(Y)" : "(N)"}
                     </span>
                     )}
                   </TableCell>

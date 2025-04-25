@@ -6,7 +6,7 @@ import AdminSpotTable from '@/components/SpotTypeTable';
 import { useState, useEffect } from 'react'; // Removed useEffect
 import { Button } from '@/components/ui/button';
 import SpotCalculator from '@/components/SpotCalculator';
-import ShiftsTable from '@/components/Shiftstable';
+import ShiftsTable from '@/components/ShiftsTable';
 
 type ViewType = 'userTable' | 'spotTable' | 'shiftTable';
 
@@ -67,19 +67,19 @@ const AdminPage = () => {
                 variant={view === 'userTable' ? 'default' : 'secondary'}
                 onClick={() => setView('userTable')}
               >
-                Users
+                Menschen
               </Button>
               <Button
                 variant={view === 'spotTable' ? 'default' : 'secondary'}
                 onClick={() => setView('spotTable')}
               >
-                Spots
+                Plätze
               </Button>
               <Button
-                variant={view === 'spotTable' ? 'default' : 'secondary'}
+                variant={view === 'shiftTable' ? 'default' : 'secondary'}
                 onClick={() => setView('shiftTable')}
               >
-                Shifts
+                Schichten
               </Button>
             </div>
 

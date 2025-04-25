@@ -8,6 +8,7 @@ export interface User {
     phone: string | null;
     takesSoli: boolean;
     soliAmount: number;
+    donatesSoli: boolean;
     lastLogin: Date;
     amountPaid: number;
     amountToPay: number;
