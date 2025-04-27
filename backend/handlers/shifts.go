@@ -56,6 +56,27 @@ func GetShiftById(db *gorm.DB, id string) (models.Shift, error) {
 	return shiftExist, nil
 }
 
+func ShiftToOut(shift models.Shift) ShiftOut {
+	var userNames []string
+	var shiftWithUserNames ShiftOut
+	for _, user := range shift.Users {
+		userNames = append(userNames, *user.FullName)
+	}
+
+	shiftWithUserNames = ShiftOut{
+		ID:           shift.ID,
+		Name:         shift.Name,
+		StartTime:    shift.StartTime,
+		Points:       shift.Points,
+		Description:  shift.Description,
+		Day:          shift.Day,
+		HeadCount:    shift.HeadCount,
+		CurrentCount: uint8(len(userNames)),
+		UserNames:    &userNames,
+	}
+	return shiftWithUserNames
+}
+
 func GetShiftsWithUserNames(db *gorm.DB) ([]ShiftOut, error) {
 	var shifts []models.Shift
 	var shiftsWithUserNames []ShiftOut
@@ -232,8 +253,9 @@ func HandleAddUserToShift(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
+		shiftExist, _ := GetShiftById(db, sid)
 
-		c.JSON(http.StatusOK, gin.H{"message": "User added to shift successfully"})
+		c.JSON(http.StatusOK, ShiftToOut(shiftExist))
 	}
 }
 
@@ -254,7 +276,8 @@ func HandleAddMeToShift(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{"message": "User added to shift successfully"})
+		shiftExist, _ := GetShiftById(db, sid)
+		c.JSON(http.StatusOK, ShiftToOut(shiftExist))
 	}
 }
 
@@ -269,8 +292,9 @@ func HandleRemoveUserFromShift(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
+		shiftExist, _ := GetShiftById(db, sid)
 
-		c.JSON(http.StatusOK, gin.H{"message": "User removed from shift successfully"})
+		c.JSON(http.StatusOK, ShiftToOut(shiftExist))
 	}
 }
 
@@ -292,14 +316,16 @@ func HandleRemoveMeFromShift(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{"message": "User added to shift successfully"})
+		shiftExist, _ := GetShiftById(db, sid)
+
+		c.JSON(http.StatusOK, ShiftToOut(shiftExist))
 	}
 }
 
 func HandleDeleteshift(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		uid := c.Param("shift_id")
-		shiftExist, err := GetShiftById(db, uid)
+		sid := c.Param("shift_id")
+		shiftExist, err := GetShiftById(db, sid)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to retrieve shift type."})
 			return

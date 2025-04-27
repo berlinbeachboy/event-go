@@ -29,6 +29,7 @@ import {
 import { SpotType, User } from '@/models/models';
 import { getInitials } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import UserPopover from './UserPopover';
 
 interface AdminTableProps {
   spotTypes: SpotType[];
@@ -152,12 +153,25 @@ const AdminTable = ({
                 <TableRow key={user.id}>
                   {/* <img src="https://eu.ui-avatars.com/api/?name=John+Doe&size=250"> */}
                   <TableCell className='p-1'>
-                    <Avatar className="h-12 w-12 border-2 border-gray-200">
+                  <UserPopover
+                    fullname={user.fullName} 
+                    nickname={user.nickname} 
+                    avatarUrlLg={user.avatarUrlLg}
+                    triggerElement={
+                      <Avatar className="h-12 w-12 border-2 border-gray-200 cursor-pointer">
+                        <AvatarImage src={user.avatarUrlSm} />
+                        <AvatarFallback className="bg-primary text-primary-foreground text-xl">
+                          {getInitials(user.fullName)}
+                        </AvatarFallback>
+                      </Avatar>
+                    }
+                  />
+                    {/* <Avatar className="h-12 w-12 border-2 border-gray-200">
                       <AvatarImage src={user.avatarUrlSm} />
                       <AvatarFallback className="bg-primary text-primary-foreground text-xl">
                         {getInitials(user?.fullName)}
                       </AvatarFallback>
-                    </Avatar>
+                    </Avatar> */}
                   </TableCell>
                   <TableCell>{user.fullName}</TableCell>
                   <TableCell className="hidden sm:table-cell">{user.username}</TableCell>
