@@ -1,7 +1,7 @@
 // api/axios-instance.ts
 import axios from "axios";
 
-const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api'; // 'https://localhost/api'
 
 console.log('API Base URL:', baseURL); // Debug log
 

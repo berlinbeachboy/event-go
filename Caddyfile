@@ -4,6 +4,13 @@ localhost {
         reverse_proxy backend:8080
     }
 
+    # # Serve Avatars
+    # handle /avs/* {
+    #     root * /srv/frontend/avatars
+    #     file_server
+    #     encode gzip
+    # }
+
     # Handle all other paths - serve static frontend files
     handle {
         root * /srv/frontend/dist
@@ -13,7 +20,7 @@ localhost {
     }
 }
 
-# Main Domain (PROD)
+# # Main Domain (PROD)
 schoenfeld.fun {
     handle /api/* {
 

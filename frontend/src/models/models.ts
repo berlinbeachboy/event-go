@@ -12,8 +12,13 @@ export interface User {
     lastLogin: Date;
     amountPaid: number;
     amountToPay: number;
+
+    avatarUrlLg: string;
+    avatarUrlSm: string;
+
     createdAt?: string;
     updatedAt?: string;
+
     spotTypeId: number | null;
     spotType: SpotType | null;
   }

@@ -1,11 +1,5 @@
 import { useState } from 'react';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   Table,
   TableBody,
   TableCell,
@@ -24,7 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import AdminUserForm from './AdminUserForm';
-
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   MoreVertical,
   Trash2,
@@ -33,6 +27,8 @@ import {
   UserPlus,
 } from "lucide-react";
 import { SpotType, User } from '@/models/models';
+import { getInitials } from '@/lib/utils';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
 interface AdminTableProps {
   spotTypes: SpotType[];
@@ -138,26 +134,36 @@ const AdminTable = ({
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead></TableHead>
                 <TableHead>Vor- und Nachname</TableHead>
                 <TableHead className="hidden sm:table-cell">Username</TableHead>
                 <TableHead>Spitzname</TableHead>
                 <TableHead className="hidden md:table-cell">Handy</TableHead>
-                <TableHead>Typ</TableHead>
+                <TableHead className="hidden md:table-cell">Typ </TableHead>
                 <TableHead>Spot</TableHead>
                 <TableHead>Soli</TableHead>
                 <TableHead>Zahlung</TableHead>
-                <TableHead>Letzter Login</TableHead>
+                <TableHead className="hidden md:table-cell">Letzter Login</TableHead>
                 <TableHead></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredUsers.map((user) => (
                 <TableRow key={user.id}>
+                  {/* <img src="https://eu.ui-avatars.com/api/?name=John+Doe&size=250"> */}
+                  <TableCell className='p-1'>
+                    <Avatar className="h-12 w-12 border-2 border-gray-200">
+                      <AvatarImage src={user.avatarUrlSm} />
+                      <AvatarFallback className="bg-primary text-primary-foreground text-xl">
+                        {getInitials(user?.fullName)}
+                      </AvatarFallback>
+                    </Avatar>
+                  </TableCell>
                   <TableCell>{user.fullName}</TableCell>
                   <TableCell className="hidden sm:table-cell">{user.username}</TableCell>
                   <TableCell>{user.nickname}</TableCell>
                   <TableCell className="hidden md:table-cell">{user.phone}</TableCell>
-                  <TableCell>
+                  <TableCell className="hidden md:table-cell">
                     <span className={`px-2 py-1 rounded-full text-xs ${
                       user.type === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
                     }`}>
@@ -171,7 +177,7 @@ const AdminTable = ({
                       -25€
                     </span>): (
                       <span className="text-xs">
-                      {user.soliAmount}€ {user.donatesSoli ? "(Y)" : "(N)"}
+                      {user.soliAmount}€ {user.soliAmount > 0 && user.donatesSoli ? "(Y)" : ""}
                     </span>
                     )}
                   </TableCell>
@@ -182,9 +188,43 @@ const AdminTable = ({
                       {user.amountPaid}€ / {user.amountToPay + user.amountPaid}€
                     </span>
                   </TableCell>
-                  <TableCell>{user.lastLogin !== null ? formatDate(user.lastLogin) : "-"}</TableCell>
+                  <TableCell className="hidden md:table-cell">{user.lastLogin !== null ? formatDate(user.lastLogin) : "-"}</TableCell>
                   <TableCell>
-                    <DropdownMenu>
+                  <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </PopoverTrigger>
+                        <PopoverContent className="w-40" side="left">
+                          <Sheet open={isEditing} onOpenChange={setIsEditing}>
+                          <SheetTrigger asChild>
+                            <Button className="w-full" variant="ghost">
+                              <Edit className="mr-2 h-4 w-4" />
+                              Update User
+                            </Button>
+                          </SheetTrigger>
+                          <SheetContent className='w-64'>
+                            <SheetHeader>
+                              <SheetTitle>Update User: {user.fullName}</SheetTitle>
+                            </SheetHeader>
+                            <AdminUserForm
+                              user={user}
+                              spotTypes={spotTypes}
+                              onSubmit={(updatedData) => handleUpdateUser(user.id, updatedData)}
+                            />
+                          </SheetContent>
+                        </Sheet>
+                        <Button
+                          className="text-red-600 w-full" variant="ghost"
+                          onClick={() => handleDeleteUser(user.id)}
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          User löschen
+                        </Button>
+                        </PopoverContent>
+                      </Popover>
+                    {/* <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="h-8 w-8 p-0">
                           <MoreVertical className="h-4 w-4" />
@@ -217,7 +257,7 @@ const AdminTable = ({
                           User löschen
                         </DropdownMenuItem>
                       </DropdownMenuContent>
-                    </DropdownMenu>
+                    </DropdownMenu> */}
                   </TableCell>
                 </TableRow>
               ))}

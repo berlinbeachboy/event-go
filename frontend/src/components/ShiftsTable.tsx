@@ -41,6 +41,9 @@ import { Badge } from "@/components/ui/badge";
 import { Info, Pencil, Trash, Plus, Calendar, Clock, X, Check, ChevronsUpDown } from "lucide-react";
 import { Shift, User } from "@/models/models";
 import CsvUpload from "./ShiftCsvUpload";
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { formatFullName, getInitials } from '@/lib/utils';
+import UserPopover from "./UserPopover";
 
 // Props for the ShiftsTable component
 interface ShiftsTableProps {
@@ -188,6 +191,19 @@ export default function ShiftsTable({ shifts, users, onFetchShifts, onCreateShif
     const user = users.find(u => u.fullName === fullName);
     return user ? user.id : null;
   };
+  // Find user Small Avatar by name
+  const findUserAvtByName = (fullName: string, lg: boolean = false): string => {
+    const user = users.find(u => u.fullName === fullName);
+    if (lg){
+      return user ? user.avatarUrlLg : "";
+    }
+    return user ? user.avatarUrlSm : "";
+  };
+  // Find user nickname by name
+  const findUserNickByName = (fullName: string): string => {
+    const user = users.find(u => u.fullName === fullName);
+    return user ? user.nickname : "";
+  };
 
   const filteredShifts = shifts.filter(shift => {
     if (shift && dayFilter !== "-" && shift.day !== dayFilter) return false;
@@ -228,21 +244,6 @@ export default function ShiftsTable({ shifts, users, onFetchShifts, onCreateShif
     } catch (e) {
       return '—';
     }
-  };
-
-  const formatFullName = (name: string): string => {
-    if (!name) return '';
-    
-    const parts = name.trim().split(/\s+/);
-    
-    if (parts.length === 1) {
-      return parts[0];
-    }
-    
-    const firstName = parts[0];
-    const lastNameInitial = parts[1][0];
-    
-    return `${firstName} ${lastNameInitial}.`;
   };
 
   const [formData, setFormData] = useState<Partial<Shift>>(
@@ -354,6 +355,8 @@ export default function ShiftsTable({ shifts, users, onFetchShifts, onCreateShif
                   
                   <TableCell className="hidden md:table-cell">{shift.day || '—'}</TableCell>
                   <TableCell className="hidden md:table-cell">{formatTime(shift.startTime)}</TableCell>
+
+                  {/* Column more narrow in mobile */}
                   <TableCell className="hidden md:table-cell text-center ">
                     <Badge variant={shift.points > 1 ? "destructive" : "default"}>
                       {shift.points} {shift.points === 1 ? 'Punkt' : 'Punkte'}
@@ -370,15 +373,30 @@ export default function ShiftsTable({ shifts, users, onFetchShifts, onCreateShif
                       {shift.currentCount}/{shift.headCount}
                     </span>
                   </TableCell>
+                  {/* Cell with People in them */}
                   <TableCell className="hidden md:table-cell">
-                    <div className="flex flex-wrap gap-1 max-w-xs">
+                    <div className="flex flex-wrap gap-1 w-full">
                       {shift.userNames && shift.userNames.length > 0 ? (
                         shift.userNames.slice(0, 6).map((name, index) => (
-                          <Badge key={index} variant="outline" className="flex items-center gap-1">
+                          <Badge key={index} variant="outline" className="flex items-center p-0 gap-1 h-11">
+                            {/* Small Avatar Img as Popover that loads and displays larger Image */}
+                            <UserPopover
+                              fullname={name} 
+                              nickname={findUserNickByName(name)} 
+                              avatarUrlLg={findUserAvtByName(name, true)}
+                              triggerElement={
+                                <Avatar className="h-10 w-10 border-2 border-gray-200 cursor-pointer">
+                                  <AvatarImage id={"av-hid-"+index} src={findUserAvtByName(name)} />
+                                  <AvatarFallback className="bg-primary text-primary-foreground text-xl">
+                                    {getInitials(name)}
+                                  </AvatarFallback>
+                                </Avatar>
+                              }
+                            />
+                            
                             {formatFullName(name)}
                             <Button
                               variant="ghost"
-                              size="sm"
                               onClick={() => {
                                 const userId = findUserIdByName(name)
                                 if (userId !== null) {
@@ -386,7 +404,7 @@ export default function ShiftsTable({ shifts, users, onFetchShifts, onCreateShif
                                 }
                               }}
                               disabled={userOperationInProgress}
-                              className="h-6 px-2"
+                              className="h-6 w-6 px-2"
                             >
                               <X size={10} />
                             </Button>
@@ -401,65 +419,65 @@ export default function ShiftsTable({ shifts, users, onFetchShifts, onCreateShif
                           +{shift.userNames.length - 6} mehr
                         </Badge>
                       )}
-                      
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="h-6 px-2"
-                            onClick={() => setCurrentShiftForUsers(shift)}
-                          >
-                            <Plus size={12} />
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-120">
-                          <div className="grid gap-4">
-                            <div className="space-y-2">
-                              <h4 className="font-medium leading-none">Menschen</h4>
-                              <Command>
-                                <CommandInput placeholder="Search users..." />
-                                <CommandEmpty>Niemand da.</CommandEmpty>
-                                <CommandGroup>
-                                  {users
-                                    .filter(user => {
-                                      // Filter out users already assigned to this shift
-                                      return !currentShiftForUsers?.userNames?.includes(user.fullName);
-                                    })
-                                    .map((user) => (
-                                      <CommandItem
-                                        key={user.id}
-                                        value={user.fullName}
-                                        onSelect={() => {
-                                          if (currentShiftForUsers) {
-                                            handleAddUser(currentShiftForUsers.id, user.id);
-                                          }
-                                        }}
-                                      >
-                                        <Check className="mr-2 h-4 w-4 opacity-0" />
-                                        <span>{user.fullName}</span>
-                                        {user.nickname && (
-                                          <span className="ml-2 text-gray-500">({user.nickname})</span>
-                                        )}
-                                      </CommandItem>
-                                    ))}
-                                </CommandGroup>
-                              </Command>
+                      <div className={shift.currentCount >= shift.headCount ? "hidden" : ""}>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-6 px-2"
+                              onClick={() => setCurrentShiftForUsers(shift)}
+                            >
+                              <Plus size={12} />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-120">
+                            <div className="grid gap-4">
+                              <div className="space-y-2">
+                                <h4 className="font-medium leading-none">Menschen</h4>
+                                <Command>
+                                  <CommandInput placeholder="Search users..." />
+                                  <CommandEmpty>Niemand da.</CommandEmpty>
+                                  <CommandGroup>
+                                    {users
+                                      .filter(user => {
+                                        // Filter out users already assigned to this shift
+                                        return !currentShiftForUsers?.userNames?.includes(user.fullName);
+                                      })
+                                      .map((user) => (
+                                        <CommandItem
+                                          key={user.id}
+                                          value={user.fullName}
+                                          onSelect={() => {
+                                            if (currentShiftForUsers) {
+                                              handleAddUser(currentShiftForUsers.id, user.id);
+                                            }
+                                          }}
+                                        >
+                                          <Check className="mr-2 h-4 w-4 opacity-0" />
+                                          <span>{user.fullName}</span>
+                                          {user.nickname && (
+                                            <span className="ml-2 text-gray-500">({user.nickname})</span>
+                                          )}
+                                        </CommandItem>
+                                      ))}
+                                  </CommandGroup>
+                                </Command>
+                              </div>
                             </div>
-                          </div>
-                        </PopoverContent>
-                      </Popover>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
                       
                     </div>
                   </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
+                  <TableCell className="text-right p-1">
+                    <div className="flex justify-end gap-1">
                       
                       {/* Mobile-only user management button */}
                       <Button 
                         variant="ghost" 
-                        size="icon"
-                        className="md:hidden"
+                        className="md:hidden h-7 w-7"
                         onClick={() => openUserManagement(shift)}
                       >
                         <Plus size={16} />
@@ -467,14 +485,14 @@ export default function ShiftsTable({ shifts, users, onFetchShifts, onCreateShif
                       
                       <Button
                         variant="ghost"
-                        size="icon"
+                        className="h-7 w-7"
                         onClick={() => handleEditShift(shift)}
                       >
                         <Pencil size={16} />
                       </Button>
                       <Button
                         variant="ghost"
-                        size="icon"
+                        className="h-7 w-7"
                         onClick={() => handleDeleteShift(shift)}
                         disabled={isDeleting}
                       >
@@ -641,6 +659,12 @@ export default function ShiftsTable({ shifts, users, onFetchShifts, onCreateShif
                             }}
                           >
                             <Check className="mr-2 h-4 w-4 opacity-0" />
+                              <Avatar className="h-10 w-10 border-2 border-gray-200">
+                                <AvatarImage src={findUserAvtByName(user.fullName)} />
+                                <AvatarFallback className="bg-primary text-primary-foreground text-xl">
+                                  {getInitials(user.fullName)}
+                                </AvatarFallback>
+                              </Avatar>
                             <span>{user.fullName}</span>
                             {user.nickname && (
                               <span className="ml-2 text-gray-500">({user.nickname})</span>
@@ -662,6 +686,19 @@ export default function ShiftsTable({ shifts, users, onFetchShifts, onCreateShif
                     const userId = findUserIdByName(name);
                     return (
                       <div key={index} className="flex justify-between items-center border-b pb-2 last:border-0 last:pb-0">
+                        <UserPopover
+                              fullname={name} 
+                              nickname={findUserNickByName(name)} 
+                              avatarUrlLg={findUserAvtByName(name, true)}
+                              triggerElement={
+                                <Avatar className="h-10 w-10 border-2 border-gray-200 cursor-pointer">
+                                  <AvatarImage id={"av-hid-"+index} src={findUserAvtByName(name)} />
+                                  <AvatarFallback className="bg-primary text-primary-foreground text-xl">
+                                    {getInitials(name)}
+                                  </AvatarFallback>
+                                </Avatar>
+                              }
+                            />
                         <span>{name}</span>
                         <Button
                           variant="ghost"

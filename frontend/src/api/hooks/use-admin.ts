@@ -152,7 +152,7 @@ export const useAdmin = create<AdminState>((set) => ({
   fetchShifts: async () => {
     try {
       const { data } = await axiosInstance.get<Shift[]>('/admin/shifts/');
-      console.error('Got shifts:', data);
+      // console.error('Got shifts:', data);
       if (!data){
         set({ shifts: [], isLoading: false }) 
       } else {

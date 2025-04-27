@@ -18,6 +18,7 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_logs:/var/log/caddy
       - caddy_data:/data
+      #- avatars:/srv/frontend/avatars
 
   backend:
     container_name: backend
@@ -29,6 +30,8 @@ services:
       - ./.env
     depends_on:
       - db
+    volumes:
+      - avatars:/var/images/avatars
 
   db:
     image: postgres:17-alpine
@@ -41,5 +44,6 @@ services:
 
 volumes:
   db_data:
+  avatars:
   caddy_data:
   caddy_logs:

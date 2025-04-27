@@ -6,9 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
+import AvatarUpload from '@/components/AvatarUpload';
 
   const UserPage = () => {
-    const { user, updateUser, isLoading } = useAuth();
+    const { user, updateUser, isLoading, fetchUser} = useAuth();
     const { toast } = useToast();
     const [isEditing, setIsEditing] = useState(true);
     const [formData, setFormData] = useState({
@@ -51,6 +52,7 @@ import { Loader2 } from 'lucide-react';
       <Card className="w-full">
         <CardHeader>
           <CardTitle className="text-2xl">Dein Profil</CardTitle>
+          <AvatarUpload currentUser={user} onAvatarUpdate={fetchUser}/>
         </CardHeader>
         <CardContent className="space-y-8">
           {/* Basic Information */}

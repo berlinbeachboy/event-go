@@ -32,6 +32,8 @@ type User struct {
 	IsActivated bool       `gorm:"not null;default:false" json:"-"`
 
 	SundayShift *string `gorm:"null" json:"sundayShift"`
+	AvatarUrlSm *string `gorm:"null" json:"avatarUrlSm"`
+	AvatarUrlLg *string `gorm:"null" json:"avatarUrlLg"`
 
 	VerificationToken *string    `gorm:"null" json:"-"`
 	TokenExpiryTime   *time.Time `gorm:"null" json:"-"`
@@ -73,6 +75,9 @@ type UserResponse struct {
 
 	SundayShift *string `json:"sundayShift"`
 
+	AvatarUrlSm *string `json:"avatarUrlSm"`
+	AvatarUrlLg *string `json:"avatarUrlLg"`
+
 	CreatedAt time.Time `json:"createdAt"`
 
 	SpotTypeID *uint     `json:"spotTypeId"`
@@ -95,6 +100,8 @@ func (u User) ToResponse() UserResponse {
 		AmountPaid:  u.AmountPaid,
 
 		SundayShift: u.SundayShift,
+		AvatarUrlSm: u.AvatarUrlSm,
+		AvatarUrlLg: u.AvatarUrlLg,
 
 		SpotTypeID: u.SpotTypeID,
 		SpotType:   u.SpotType,
@@ -132,7 +139,7 @@ type Shift struct {
 	Description *string    `gorm:"null" json:"description"`
 	Day         *string    `gorm:"null" json:"day"`
 	StartTime   *time.Time `gorm:"null;default:null" json:"startTime"`
-	Users []*User `gorm:"many2many:shift_users;"`
+	Users       []*User    `gorm:"many2many:shift_users;"`
 
 	CreatedAt time.Time `json:"createdAt"` // Automatically managed by GORM for creation time
 	UpdatedAt time.Time `json:"updatedAt"` // Automatically managed by GORM for update time

@@ -39,6 +39,12 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	api.POST("/requestPasswordReset", RequestPWReset(db))
 	api.POST("/resetPassword", ResetPW(db))
 
+	// in DEV/TEST the backend hosts the avatars
+	// in PROD Caddy handles this
+	// if !util.EnvIsProd() {
+	api.Static("/avs", AvatarStoragePath)
+	// }
+
 	protected := api.Group("/user")
 	protected.Use(middleware.AuthMiddleware(db))
 
@@ -46,6 +52,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	protected.GET("/me", GetMe(db))
 	protected.PUT("/me", PutMe(db))
 	protected.PUT("/me/pw", PutMePW(db))
+	protected.PUT("/me/avatar", UploadAvatar(db))
 	protected.GET("/spots", GetSpots(db))
 	protected.GET("/spots/", GetSpots(db))
 	protected.GET("/shifts", HandleGetShifts(db))
@@ -80,6 +87,5 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	admin.DELETE("/shifts/:shift_id", HandleDeleteshift(db))
 	admin.DELETE("/shifts/:shift_id/user/:user_id", HandleRemoveUserFromShift(db))
 	admin.PUT("/shifts/:id", HandlePutShift(db))
-
 	return r
 }
