@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { axiosInstance } from '../axios-instance';
 import { User, Shift, SpotType } from '@/models/models';
+import { toast } from '@/hooks/use-toast';
 // import { Factory } from 'lucide-react';
 
 interface AdminState {
@@ -177,7 +178,12 @@ export const useAdmin = create<AdminState>((set) => ({
       }));
     } catch (error) {
       set({ error: error as Error, isLoading: false });
-      throw error;
+      console.log(error)
+      toast({
+        title: "Hat leider nicht geklappt :/",
+        description: "Vielleicht nochmal refreshen?",
+        variant: "destructive",
+      });
     }
     
   },
@@ -193,7 +199,12 @@ export const useAdmin = create<AdminState>((set) => ({
       }));
     } catch (error) {
       set({ error: error as Error, isLoading: false });
-      throw error;
+      console.log(error)
+      toast({
+        title: "Hat leider nicht geklappt :/",
+        description: "Vielleicht nochmal refreshen?",
+        variant: "destructive",
+      });
     }
   },
   
@@ -208,7 +219,12 @@ export const useAdmin = create<AdminState>((set) => ({
       }));
     } catch (error) {
       set({ error: error as Error, isLoading: false });
-      throw error;
+      console.log(error)
+      toast({
+        title: "Hat leider nicht geklappt :/",
+        description: "Vielleicht nochmal refreshen?",
+        variant: "destructive",
+      });
     }
 
   },
@@ -226,6 +242,11 @@ export const useAdmin = create<AdminState>((set) => ({
     } catch (error) {
       set({ error: error as Error, isLoading: false });
       console.log(error)
+      toast({
+        title: "Hat leider nicht geklappt :/",
+        description: "Vielleicht nochmal refreshen?",
+        variant: "destructive",
+      });
       return false
     }
     
@@ -243,6 +264,11 @@ export const useAdmin = create<AdminState>((set) => ({
     } catch (error) {
       set({ error: error as Error, isLoading: false });
       console.log(error)
+      toast({
+        title: "Hat leider nicht geklappt :/",
+        description: "Vielleicht nochmal refreshen?",
+        variant: "destructive",
+      });
       // throw error;
       return false
     }

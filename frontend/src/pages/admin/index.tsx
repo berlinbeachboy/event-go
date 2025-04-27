@@ -3,7 +3,7 @@ import { useAdmin } from '@/api/hooks/use-admin';
 import { Loader2 } from 'lucide-react';
 import AdminTable from '@/components/AdminTable';
 import AdminSpotTable from '@/components/SpotTypeTable';
-import { useState, useEffect } from 'react'; // Removed useEffect
+import { useState, useEffect, useRef } from 'react'; // Removed useEffect
 import { Button } from '@/components/ui/button';
 import SpotCalculator from '@/components/SpotCalculator';
 import ShiftsTable from '@/components/ShiftsTable';
@@ -34,10 +34,14 @@ const AdminPage = () => {
   } = useAdmin();
 
   const [view, setView] = useState<ViewType>('userTable');
+  const hasMounted = useRef(false);
   useEffect(() => {
     const fetchData = async () => {
+      if (hasMounted.current) { return; }
         await fetchUsers();
         await fetchSpots();
+        await fetchShifts();
+        hasMounted.current = true;
     };
     
 
@@ -117,7 +121,7 @@ const AdminPage = () => {
                 <ShiftsTable
                   users={users}
                   shifts={shifts}
-                  onFetchShifts={fetchShifts}
+                  isLoading={isLoading}
                   onCreateShift={createShift}
                   onUpdateShift={updateShift}
                   onDeleteShift={deleteShift}

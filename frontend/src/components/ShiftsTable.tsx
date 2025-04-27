@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Table,
   TableBody,
@@ -49,7 +49,7 @@ import UserPopover from "./UserPopover";
 interface ShiftsTableProps {
   shifts: Shift[];
   users: User[];
-  onFetchShifts: () => Promise<void>;
+  isLoading: boolean;
   onCreateShift: (shiftData: Partial<Shift>) => Promise<void>;
   onUpdateShift: (shiftId: number, shiftData: Partial<Shift>) => Promise<void>;
   onDeleteShift: (shiftId: number) => Promise<void>;
@@ -57,9 +57,9 @@ interface ShiftsTableProps {
   onRemoveUserFromShift: (shiftId: number, userId: number) => Promise<boolean>;
 }
 
-export default function ShiftsTable({ shifts, users, onFetchShifts, onCreateShift, onUpdateShift, onDeleteShift, onAddUserToShift, onRemoveUserFromShift}: ShiftsTableProps) {
+export default function ShiftsTable({ shifts, users, isLoading, onCreateShift, onUpdateShift, onDeleteShift, onAddUserToShift, onRemoveUserFromShift}: ShiftsTableProps) {
 //   const [shifts, setShifts] = useState<Shift[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // const [isLoading, setIsLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
   const [currentShift, setCurrentShift] = useState<Shift | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -71,16 +71,6 @@ export default function ShiftsTable({ shifts, users, onFetchShifts, onCreateShif
 
   // Filter states
   const [dayFilter, setDayFilter] = useState<string>("-");
-  
-  useEffect(() => {
-    loadShifts();
-  }, []);
-
-  const loadShifts = async () => {
-    setIsLoading(true);
-    await onFetchShifts();
-    setIsLoading(false);
-  };
 
   const handleAddShift = () => {
     setCurrentShift(null);

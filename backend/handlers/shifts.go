@@ -46,16 +46,6 @@ type ShiftOut struct {
 	UserNames    *[]string  `json:"userNames"`
 }
 
-// CsvShiftData represents the data structure from the CSV file
-// type CsvShiftData struct {
-// 	Name        string
-// 	HeadCount   uint8
-// 	Points      uint8
-// 	Description *string
-// 	Day         *string
-// 	StartTime   *string // We'll parse this from HH:mm format
-// }
-
 // CRUD
 
 func GetShiftById(db *gorm.DB, id string) (models.Shift, error) {
@@ -498,7 +488,8 @@ func processShiftRow(record []string, headers map[string]int) (models.Shift, err
 
 		// Use current date for the time value to create a full timestamp
 		now := time.Now()
-		fullTime := time.Date(now.Year(), now.Month(), now.Day(), t.Hour(), t.Minute(), 0, 0, now.Location())
+		loc, _ := time.LoadLocation("Europe/Berlin")
+		fullTime := time.Date(now.Year(), now.Month(), now.Day(), t.Hour(), t.Minute(), 0, 0, loc)
 		shift.StartTime = &fullTime
 	}
 
