@@ -121,7 +121,6 @@ const AdminPage = () => {
                 <ShiftsTable
                   users={users}
                   shifts={shifts}
-                  isLoading={isLoading}
                   onCreateShift={createShift}
                   onUpdateShift={updateShift}
                   onDeleteShift={deleteShift}

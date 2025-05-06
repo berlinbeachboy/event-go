@@ -35,6 +35,8 @@ type User struct {
 	AvatarUrlSm *string `gorm:"null" json:"avatarUrlSm"`
 	AvatarUrlLg *string `gorm:"null" json:"avatarUrlLg"`
 
+	ShiftPoints *uint16 `gorm:"->;default:0" json:"shiftPoints"`
+
 	VerificationToken *string    `gorm:"null" json:"-"`
 	TokenExpiryTime   *time.Time `gorm:"null" json:"-"`
 
@@ -74,6 +76,7 @@ type UserResponse struct {
 	AmountPaid  float32    `json:"amountPaid"`
 
 	SundayShift *string `json:"sundayShift"`
+	ShiftPoints *uint16 `json:"shiftPoints"`
 
 	AvatarUrlSm *string `json:"avatarUrlSm"`
 	AvatarUrlLg *string `json:"avatarUrlLg"`
@@ -103,10 +106,31 @@ func (u User) ToResponse() UserResponse {
 		AvatarUrlSm: u.AvatarUrlSm,
 		AvatarUrlLg: u.AvatarUrlLg,
 
+		ShiftPoints: u.ShiftPoints,
+
 		SpotTypeID: u.SpotTypeID,
 		SpotType:   u.SpotType,
 
 		CreatedAt: u.CreatedAt,
+	}
+}
+
+type UserShortResponse struct {
+	ID       uint    `json:"id"`
+	Nickname string  `json:"nickname"`
+	FullName *string `json:"fullName"`
+
+	AvatarUrlSm *string `json:"avatarUrlSm"`
+	AvatarUrlLg *string `json:"avatarUrlLg"`
+}
+
+func (u User) ToShortResponse() UserShortResponse {
+	return UserShortResponse{
+		ID:          u.ID,
+		Nickname:    u.Nickname,
+		FullName:    u.FullName,
+		AvatarUrlSm: u.AvatarUrlSm,
+		AvatarUrlLg: u.AvatarUrlLg,
 	}
 }
 
@@ -115,6 +139,15 @@ func ToUsersResponseList(users []User) []UserResponse {
 	response := make([]UserResponse, len(users))
 	for i, user := range users {
 		response[i] = user.ToResponse()
+	}
+	return response
+}
+
+// For handling lists of users
+func ToUsersShortResponseList(users []User) []UserShortResponse {
+	response := make([]UserShortResponse, len(users))
+	for i, user := range users {
+		response[i] = user.ToShortResponse()
 	}
 	return response
 }

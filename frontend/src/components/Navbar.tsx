@@ -80,6 +80,16 @@ export const Navbar = ({ onLogout }: NavBarProps) => {
                             ))} */}
 
                             {/* <MusicPlayer /> */}
+                            {user?.type === 'admin' && (
+                                <Link to="/shifts">
+                                    <Button
+                                        variant="ghost"
+                                        className="rounded-full border-solid border-2 border-black gap-2 bg-custom-aquamarine transition-all duration-200"
+                                    >
+                                        Schichten
+                                    </Button>
+                                </Link>
+                            )}
 
                             <Link to="/spot">
                                 <Button
@@ -180,6 +190,19 @@ export const Navbar = ({ onLogout }: NavBarProps) => {
                                                         className="w-full rounded-full border-solid border-2 border-black gap-2 bg-custom-aquamarine"
                                                     >
                                                         Admin Panel
+                                                    </Button>
+                                                </Link>
+                                            </SheetClose>
+                                        )}
+
+                                        {user?.type === 'admin' && (
+                                            <SheetClose asChild>
+                                                <Link to="/shifts">
+                                                    <Button
+                                                        variant="ghost"
+                                                        className="w-full rounded-full border-solid border-2 border-black gap-2 bg-custom-aquamarine"
+                                                    >
+                                                        Schichten
                                                     </Button>
                                                 </Link>
                                             </SheetClose>

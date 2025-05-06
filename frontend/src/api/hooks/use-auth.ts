@@ -2,7 +2,7 @@
   // api/hooks/use-auth.ts
   import { create } from 'zustand';
   import { axiosInstance } from '../axios-instance';
-  import { UserResponse } from '@/models/models';
+  import { Shift, UserResponse, UserShort } from '@/models/models';
   
   interface LoginData {
     username: string;
@@ -23,7 +23,9 @@
   
   interface AuthState {
     user: UserResponse | null;
+    userShorts: UserShort[] | null;
     isLoading: boolean;
+    shifts: Shift[] | null;
     error: Error | null;
     login: (data: LoginData) => Promise<void>;
     requestPasswordReset: (email: string) => Promise<void>;
@@ -31,13 +33,19 @@
     register: (data: RegisterData) => Promise<void>;
     logout: () => Promise<void>;
     fetchUser: () => Promise<void>;
+    fetchUsers: () => Promise<void>;
     updateUser: (data: Partial<UserResponse>) => Promise<void>;
+    fetchShifts: () => Promise<void>;
+    addShiftMe: (shiftId: number) => Promise<boolean>;
+    removeShiftMe: (shiftId: number) => Promise<boolean>;
   }
   
   export const useAuth = create<AuthState>((set) => ({
     user: null,
+    userShorts: null,
     isLoading: false,
     error: null,
+    shifts: null,
     
     login: async (data: LoginData) => {
       try {
@@ -112,12 +120,75 @@
     updateUser: async (data: Partial<UserResponse>) => {
       try {
         set({ isLoading: true, error: null });
-        console.log(data)
         const res_user = await axiosInstance.put<UserResponse>('/user/me', data);
         set({ user: res_user.data, isLoading: false });
       } catch (error) {
         set({ error: error as Error, isLoading: false });
         throw error;
+      }
+    },
+    fetchUsers: async () => {
+      try {
+        const { data } = await axiosInstance.get<UserShort[]>('/user/users/');
+        if (!data){
+          set({ userShorts: [], isLoading: false }) 
+        } else {
+          set({ userShorts: data, isLoading: false })
+        }
+        
+      } catch (error) {
+        set({ error: error as Error, isLoading: false });
+        console.error('Error fetching shifts:', error);
+        throw error;
+      }
+    },
+
+    fetchShifts: async () => {
+        try {
+          const { data } = await axiosInstance.get<Shift[]>('/user/shifts/');
+          // console.error('Got shifts:', data);
+          if (!data){
+            set({ shifts: [], isLoading: false }) 
+          } else {
+            set({ shifts: data, isLoading: false })
+          }
+          
+        } catch (error) {
+          set({ error: error as Error, isLoading: false });
+          console.error('Error fetching shifts:', error);
+          throw error;
+        }
+      },
+
+    addShiftMe: async (shiftId: number): Promise<boolean> => {
+      try {
+        set({ isLoading: true, error: null });
+        const  { data } = await axiosInstance.post<Shift>('/user/shifts/'+shiftId+'/me');
+        set(state => ({
+          shifts: state.shifts?.map(shift => shift.id === shiftId ? data : shift),
+          isLoading: false
+        }));
+        return true
+      } catch (error) {
+        set({ error: error as Error, isLoading: false });
+        console.log(error)
+        return false
+      }
+    },
+
+    removeShiftMe: async (shiftId: number): Promise<boolean> => {
+      try {
+        set({ isLoading: true, error: null });
+        const  { data } = await axiosInstance.delete<Shift>('/user/shifts/'+shiftId+'/me');
+        set(state => ({
+          shifts: state.shifts?.map(shift => shift.id === shiftId ? data : shift),
+          isLoading: false
+        }));
+        return true
+      } catch (error) {
+        set({ error: error as Error, isLoading: false });
+        console.log(error)
+        return false
       }
     },
   }));

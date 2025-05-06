@@ -149,7 +149,6 @@ export const useAdmin = create<AdminState>((set) => ({
     }
   },
 
-  // Mock API functions - replace these with your actual API calls
   fetchShifts: async () => {
     try {
       const { data } = await axiosInstance.get<Shift[]>('/admin/shifts/');

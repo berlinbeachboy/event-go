@@ -142,6 +142,7 @@ const AdminTable = ({
                 <TableHead className="hidden md:table-cell">Handy</TableHead>
                 <TableHead className="hidden md:table-cell">Typ </TableHead>
                 <TableHead>Spot</TableHead>
+                <TableHead>SP</TableHead>
                 <TableHead>Soli</TableHead>
                 <TableHead>Zahlung</TableHead>
                 <TableHead className="hidden md:table-cell">Letzter Login</TableHead>
@@ -185,6 +186,7 @@ const AdminTable = ({
                     </span>
                   </TableCell>
                   <TableCell>{user.spotType?.name || 'No spot'}</TableCell>
+                  <TableCell>{user.shiftPoints || '0'}</TableCell>
                   <TableCell>
                     {user.takesSoli ? (
                     <span className="text-xs">
@@ -238,40 +240,6 @@ const AdminTable = ({
                         </Button>
                         </PopoverContent>
                       </Popover>
-                    {/* <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="start">
-                        <Sheet open={isEditing} onOpenChange={setIsEditing}>
-                          <SheetTrigger asChild>
-                            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                              <Edit className="mr-2 h-4 w-4" />
-                              Update User
-                            </DropdownMenuItem>
-                          </SheetTrigger>
-                          <SheetContent className='w-64'>
-                            <SheetHeader>
-                              <SheetTitle>Update User: {user.fullName}</SheetTitle>
-                            </SheetHeader>
-                            <AdminUserForm
-                              user={user}
-                              spotTypes={spotTypes}
-                              onSubmit={(updatedData) => handleUpdateUser(user.id, updatedData)}
-                            />
-                          </SheetContent>
-                        </Sheet>
-                        <DropdownMenuItem
-                          className="text-red-600"
-                          onClick={() => handleDeleteUser(user.id)}
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          User löschen
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu> */}
                   </TableCell>
                 </TableRow>
               ))}

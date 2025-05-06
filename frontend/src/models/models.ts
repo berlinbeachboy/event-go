@@ -10,17 +10,27 @@ export interface User {
     soliAmount: number;
     donatesSoli: boolean;
     lastLogin: Date;
+    sundayShift: string | null;
     amountPaid: number;
     amountToPay: number;
 
     avatarUrlLg: string;
     avatarUrlSm: string;
 
+    shiftPoints: number;
+
     createdAt?: string;
-    updatedAt?: string;
 
     spotTypeId: number | null;
     spotType: SpotType | null;
+  }
+
+  export interface UserShort {
+    id: number;
+    nickname: string;
+    fullName: string;
+    avatarUrlLg: string;
+    avatarUrlSm: string;
   }
   
   export interface UserResponse extends Omit<User, 'updatedAt'> {

@@ -17,6 +17,7 @@ import { MusicPlayer } from './components/MusicPlayer';
 import SpotPage from './pages/spot';
 import ImprintPage from './pages/imprint';
 import PrivacyPage from './pages/privacy';
+import ShiftPage from './pages/shift';
 
 // Footer Component
 const Footer = () => (
@@ -79,6 +80,12 @@ const App = () => {
                 <Route path="/" element={<Navigate to="/home" replace />} />
                 <Route path="/register" element={<Navigate to="/home" replace />} />
                 <Route path="/home" element={<HomePage spotTypes={userSpots}/>} />
+                <Route
+                  path="/shifts"
+                  element={
+                    user.type === 'admin' ? <ShiftPage /> : <Navigate to="/home" replace />
+                  }
+                />
                 <Route path="/spot" element={<SpotPage userSpots={userSpots}/>} />
                 <Route path="/user" element={<UserPage/>} />
                 <Route path="/impressum" element={<ImprintPage/>} />

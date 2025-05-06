@@ -19,7 +19,7 @@ func staticCacheMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Apply the Cache-Control header to the static files
 		// if strings.HasPrefix(c.Request.URL.Path, "/api/avs/") {
-			
+
 		// }
 		c.Header("Cache-Control", "private, max-age=86400")
 		// Continue to the next middleware or handler
@@ -54,7 +54,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	// in DEV/TEST the backend hosts the avatars
 	// in PROD Caddy handles this
 	// if !util.EnvIsProd() {
-	// Custom Middleware 
+	// Custom Middleware
 	static := api.Group("/avs")
 	static.Use(staticCacheMiddleware())
 	static.Static("/", AvatarStoragePath)
@@ -72,6 +72,8 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	protected.GET("/spots/", GetSpots(db))
 	protected.GET("/shifts", HandleGetShifts(db))
 	protected.GET("/shifts/", HandleGetShifts(db))
+	protected.GET("/users", GetUsersShort(db))
+	protected.GET("/users/", GetUsersShort(db))
 	protected.POST("/shifts/:shift_id/me", HandleAddMeToShift(db))
 	protected.DELETE("/shifts/:shift_id/me", HandleRemoveMeFromShift(db))
 

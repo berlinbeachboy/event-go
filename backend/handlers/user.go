@@ -117,7 +117,9 @@ func GetMe(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 		var userExist models.User
-		if err := db.Preload("SpotType").First(&userExist, "username = ?", username).Error; err != nil {
+		subQuery := db.Select("sum(points)").Joins("left join shift_users on shifts.id = shift_users.shift_id").Where("shift_users.user_id = users.id").Table("shifts")
+		query := db.Select("*, (?) as shift_points", subQuery)
+		if err := query.Preload("SpotType").First(&userExist, "username = ?", username).Error; err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "User is not in DB."})
 			return
 		}
@@ -170,9 +172,10 @@ func PutMe(db *gorm.DB) gin.HandlerFunc {
 		db.Session(&gorm.Session{FullSaveAssociations: true}).Save(&userExist)
 
 		// full reload so that all fields are there for output
-		if err := db.Model(&userExist).Association("SpotType").Find(&userExist.SpotType); err != nil {
-			fmt.Println(err.Error())
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Konnte den SpotType nach Update nicht laden."})
+		subQuery := db.Select("sum(points)").Joins("left join shift_users on shifts.id = shift_users.shift_id").Where("shift_users.user_id = users.id").Table("shifts")
+		query := db.Select("*, (?) as shift_points", subQuery)
+		if err := query.Preload("SpotType").First(&userExist, "username = ?", username).Error; err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "User is not in DB."})
 			return
 		}
 		c.JSON(http.StatusOK, userExist.ToResponse())
@@ -207,11 +210,30 @@ func PutMePW(db *gorm.DB) gin.HandlerFunc {
 func GetUsers(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var users []models.User
-		if err := db.Preload("SpotType").Order("last_login desc").Find(&users).Error; err != nil {
+
+		subQuery := db.Select("sum(points)").Joins("left join shift_users on shifts.id = shift_users.shift_id").Where("shift_users.user_id = users.id").Table("shifts")
+		query := db.Select("*, (?) as shift_points", subQuery)
+		if err := query.Preload("SpotType").Order("last_login desc").Find(&users).Error; err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Bad DB query"})
 			return
 		}
+
+		// if err := db.Preload("SpotType").Order("last_login desc").Find(&users).Error; err != nil {
+		// 	c.JSON(http.StatusBadRequest, gin.H{"error": "Bad DB query"})
+		// 	return
+		// }
 		c.IndentedJSON(http.StatusOK, models.ToUsersResponseList(users))
+	}
+}
+
+func GetUsersShort(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var users []models.User
+		if err := db.Order("full_name asc").Find(&users).Error; err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Bad DB query"})
+			return
+		}
+		c.IndentedJSON(http.StatusOK, models.ToUsersShortResponseList(users))
 	}
 }
 

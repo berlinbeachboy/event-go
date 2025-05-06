@@ -38,18 +38,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Info, Pencil, Trash, Plus, Calendar, Clock, X, Check, ChevronsUpDown } from "lucide-react";
+import { Info, Pencil, Trash, Plus, Calendar, Clock, X, Check, ChevronsUpDown, Users } from "lucide-react";
 import { Shift, User } from "@/models/models";
 import CsvUpload from "./ShiftCsvUpload";
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { formatFullName, getInitials } from '@/lib/utils';
+import { formatFullName, getInitials, formatTime, compareTimeOnly } from '@/lib/utils';
 import UserPopover from "./UserPopover";
 
 // Props for the ShiftsTable component
 interface ShiftsTableProps {
   shifts: Shift[];
   users: User[];
-  isLoading: boolean;
   onCreateShift: (shiftData: Partial<Shift>) => Promise<void>;
   onUpdateShift: (shiftId: number, shiftData: Partial<Shift>) => Promise<void>;
   onDeleteShift: (shiftId: number) => Promise<void>;
@@ -57,7 +56,7 @@ interface ShiftsTableProps {
   onRemoveUserFromShift: (shiftId: number, userId: number) => Promise<boolean>;
 }
 
-export default function ShiftsTable({ shifts, users, isLoading, onCreateShift, onUpdateShift, onDeleteShift, onAddUserToShift, onRemoveUserFromShift}: ShiftsTableProps) {
+export default function ShiftsTable({ shifts, users, onCreateShift, onUpdateShift, onDeleteShift, onAddUserToShift, onRemoveUserFromShift}: ShiftsTableProps) {
 //   const [shifts, setShifts] = useState<Shift[]>([]);
   // const [isLoading, setIsLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
@@ -201,40 +200,29 @@ export default function ShiftsTable({ shifts, users, isLoading, onCreateShift, o
   });
 
 //   Sort shifts by day and time
-  const sortedShifts = [...filteredShifts].sort((a, b) => {
-    // First compare days
-    const dayOrder: {[key: string]: number} = {
-      "Freitag": 1,
-      "Samstag": 2,
-      "Sonntag": 3,
-      "Montag": 4
-    };
+  const dayOrder: {[key: string]: number} = {
+        "Freitag": 1,
+        "Samstag": 2,
+        "Sonntag": 3,
+        "Montag": 4
+      };
     
-    const dayA = a.day ? dayOrder[a.day] : 0;
-    const dayB = b.day ? dayOrder[b.day] : 0;
-    
-    if (dayA !== dayB) return dayA - dayB;
-    
-    // Then compare times
-    if (a.startTime && b.startTime) {
-      return new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
-    }
-    
-    return 0;
-  });
-
-  const formatTime = (timeString: string | null) => {
-    if (!timeString) return '—';
-    try {
-      return new Date(timeString).toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false // Set to true if you want 12-hour format
+    //   Sort shifts by day and time
+      const sortedShifts = [...filteredShifts].sort((a, b) => {
+        // First compare days
+        const dayA = a.day ? dayOrder[a.day] : 0;
+        const dayB = b.day ? dayOrder[b.day] : 0;
+        
+        if (dayA !== dayB) return dayA - dayB;
+        
+        // Then compare times
+        if (a.startTime && b.startTime) {
+          return compareTimeOnly(new Date(a.startTime), new Date(b.startTime))
+          // return new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
+        }
+        
+        return 0;
       });
-    } catch (e) {
-      return '—';
-    }
-  };
 
   const [formData, setFormData] = useState<Partial<Shift>>(
           currentShift ?? {
@@ -274,9 +262,7 @@ export default function ShiftsTable({ shifts, users, isLoading, onCreateShift, o
         </Select>
       </div>
 
-      {isLoading ? (
-        <div className="text-center py-8">Lade Schichten...</div>
-      ) : sortedShifts.length === 0 ? (
+      {sortedShifts.length === 0 ? (
         <div className="text-center py-8 text-gray-500">Noch ziemlich leer hier...</div>
       ) : (
         <div className="rounded-md border">
@@ -289,7 +275,7 @@ export default function ShiftsTable({ shifts, users, isLoading, onCreateShift, o
                 <TableHead className="hidden md:table-cell">Zeit</TableHead>
                 <TableHead className="hidden text-center md:table-cell">Punkte</TableHead>
                 <TableHead className="text-center md:hidden">Pkte</TableHead>
-                <TableHead className="text-center">X/Y</TableHead>
+                <TableHead className="text-center"></TableHead>
                 <TableHead className="hidden md:table-cell">Menschen</TableHead>
                 <TableHead className="text-right"></TableHead>
               </TableRow>
@@ -325,7 +311,7 @@ export default function ShiftsTable({ shifts, users, isLoading, onCreateShift, o
                       </PopoverTrigger>
                         <PopoverContent className="w-120">
                           <div className="max-w-xs font-medium p-2">
-                            <p className="font-semibold">Mehr Infos:</p>
+                            <p className="font-bold">Infos:</p>
                             <p>{shift.description || 'Keine Beschreibung verfügbar'}</p>
                             
                             {shift.userNames && shift.userNames.length > 0 && (
@@ -368,14 +354,14 @@ export default function ShiftsTable({ shifts, users, isLoading, onCreateShift, o
                     <div className="flex flex-wrap gap-1 w-full">
                       {shift.userNames && shift.userNames.length > 0 ? (
                         shift.userNames.slice(0, 6).map((name, index) => (
-                          <Badge key={index} variant="outline" className="flex items-center p-0 gap-1 h-11">
+                          <Badge key={index} variant="outline" className="flex items-center p-1 gap-1 h-11">
                             {/* Small Avatar Img as Popover that loads and displays larger Image */}
                             <UserPopover
                               fullname={name} 
                               nickname={findUserNickByName(name)} 
                               avatarUrlLg={findUserAvtByName(name, true)}
                               triggerElement={
-                                <Avatar className="h-10 w-10 border-2 border-gray-200 cursor-pointer">
+                                <Avatar className="h-10 w-10 border-1 border-gray-200 cursor-pointer">
                                   <AvatarImage id={"av-hid-"+index} src={findUserAvtByName(name)} />
                                   <AvatarFallback className="bg-primary text-primary-foreground text-xl">
                                     {getInitials(name)}
@@ -418,7 +404,7 @@ export default function ShiftsTable({ shifts, users, isLoading, onCreateShift, o
                               className="h-6 px-2"
                               onClick={() => setCurrentShiftForUsers(shift)}
                             >
-                              <Plus size={12} />
+                              <Users size={12} />
                             </Button>
                           </PopoverTrigger>
                           <PopoverContent className="w-120">
@@ -470,7 +456,7 @@ export default function ShiftsTable({ shifts, users, isLoading, onCreateShift, o
                         className="md:hidden h-7 w-7"
                         onClick={() => openUserManagement(shift)}
                       >
-                        <Plus size={16} />
+                        <Users size={14} />
                       </Button>
                       
                       <Button
@@ -478,7 +464,7 @@ export default function ShiftsTable({ shifts, users, isLoading, onCreateShift, o
                         className="h-7 w-7"
                         onClick={() => handleEditShift(shift)}
                       >
-                        <Pencil size={16} />
+                        <Pencil size={14} />
                       </Button>
                       <Button
                         variant="ghost"
@@ -486,7 +472,7 @@ export default function ShiftsTable({ shifts, users, isLoading, onCreateShift, o
                         onClick={() => handleDeleteShift(shift)}
                         disabled={isDeleting}
                       >
-                        <Trash size={16} />
+                        <Trash size={14} />
                       </Button>
                     </div>
                   </TableCell>
