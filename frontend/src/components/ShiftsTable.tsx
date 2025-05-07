@@ -350,7 +350,7 @@ export default function ShiftsTable({ shifts, users, onCreateShift, onUpdateShif
                     </span>
                   </TableCell>
                   {/* Cell with People in them */}
-                  <TableCell className="hidden md:table-cell">
+                  <TableCell className="hidden md:table-cell p-1">
                     <div className="flex flex-wrap gap-1 w-full">
                       {shift.userNames && shift.userNames.length > 0 ? (
                         shift.userNames.slice(0, 6).map((name, index) => (

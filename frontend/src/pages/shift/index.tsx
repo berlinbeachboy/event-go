@@ -49,6 +49,10 @@ const ShiftPage = () => {
     const [formData, setFormData] = useState({
         sundayShift: user?.sundayShift || "",
     });
+    const [confirmed, setConfirmed] = useState<boolean>(() => {
+        if (!user || !user.sundayShift) return false
+        return true
+    });
     const hasMounted = useRef(false);
     useEffect(() => {
         const fetchData = async () => {
@@ -120,6 +124,7 @@ const ShiftPage = () => {
 
       try {
         await updateUser(data);
+        setConfirmed(true)
         toast({
           title: "Hat geklappt!",
           description: "Danke für deine Infos!",
@@ -169,31 +174,32 @@ const ShiftPage = () => {
       
       return 0;
     });
+
+    
     if (!user) return null;
     return (
       <div className="flex w-full">
         <div className="flex-1 p-2 md:p-20">
         <div className="md:hidden"><br/><br></br><br/></div>
-          <div className="container mx-auto max-w-2xl md:p-8">
+          <div className="container mx-auto max-w-2xl p-2 md:p-8">
             <Card className="w-full">
-              <CardHeader>
+              <CardHeader className="p-2 md:p-4">
                 <CardTitle className="text-2xl">Infos zu den Schichten</CardTitle>
               </CardHeader>
-                <CardContent className="space-y-8">
+                <CardContent className="space-y-8 p-2 md:p-4">
                   <div className="prose prose-gray max-w-none">
                       <ul className="space-y-2 text-gray-700 text-sm">
                           <li>Jede schicht gibt je nach Aufwand entweder einen oder zwei Punkte.</li>
                           <li>Bitte tragt euch unten für Schichten ein, sodass ihr auf 2 Schichtpunkte kommt.</li>
-                          <li>Eine Schicht ist im Normalfall in 30-60 Minuten erledigt 😊</li>
                           <li>Mehr Infos zu den Schichten gibt's auf dem i-Button.</li>
                           <li>Sonntags helfen alle mit beim Aufräumen. Bitte gebt uns unten Bescheid, ob ihr eher früher abreisen wollt oder etwas länger bleiben könnt.</li>
                           <li>Vielen Dank für eure Mithilfe! ❤️</li>
                       </ul>
                   </div>
                   <div className=" space-x-2">
-                    <div className="items-center space-y-2 w-120">
+                    <div className="items-center space-y-2 w-100">
                       <Label htmlFor="sundayShift">Wie sieht's Montag mit Aufräumen bei dir aus?</Label>
-                      <div className="space-y-2 w-98">
+                      <div className="space-y-2 w-86">
                         <Select
                             value={sundayShiftSelect}
                             onValueChange={(value) => handleSelectChange(value)}
@@ -203,7 +209,7 @@ const ShiftPage = () => {
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="früh">Lieber früh - 11:00-12:30 </SelectItem>
-                                <SelectItem value="spät">Lieber spät - 12:30-14:00</SelectItem>
+                                <SelectItem value="spät">Spät ist ok - 12:30-14:00</SelectItem>
                                 <SelectItem value="kann nicht">Muss leider schon früher los :/</SelectItem>
                             </SelectContent>
                         </Select>
@@ -219,16 +225,16 @@ const ShiftPage = () => {
                       </div>
                     </div>
                     <br></br>
-                    <Button
+                    <Button disabled={!sundayShiftSelect}
                     variant="outline"
                     onClick={() => {updateSundayShift(formData)}}
                   >
-                    Speichern
+                    {confirmed ? "Speichern" : "Speichern  und Schichten anzeigen"}
                   </Button>
                   </div>
 
                   {/* Current Subscription Info */}
-                  <div className="grid gap-4 mt-6 w-98">
+                  <div className="grid gap-4 mt-6 w-86">
                     
                     <div className="flex justify-between items-center py-3 px-6 bg-muted rounded-lg">
                       <span>Deine Schichtpunkte:</span>
@@ -240,7 +246,7 @@ const ShiftPage = () => {
                         {user.shiftPoints}/2
                       </div>
                       <Button 
-                        variant="outline" 
+                        variant="ghost" 
                         className="h-7 w-7"
                         onClick={async () => await fetchUser()}
                       >
@@ -256,7 +262,8 @@ const ShiftPage = () => {
           {/* <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold">Schichten</h2>
           </div> */}
-          
+        { confirmed && (
+          <div>
           <div className="flex flex-wrap gap-2 mb-4">
             <Select value={dayFilter || ''} onValueChange={(value) => setDayFilter(value)}>
               <SelectTrigger className="w-32">
@@ -274,7 +281,7 @@ const ShiftPage = () => {
     
           {sortedShifts.length === 0 || !user? (
             <div className="text-center py-8 text-gray-500">Noch ziemlich leer hier...</div>
-          ) : (
+            ) : (
             <div className="rounded-md border">
               <Table>
                 <TableHeader>
@@ -360,7 +367,7 @@ const ShiftPage = () => {
                         </span>
                       </TableCell>
                       {/* Cell with People in them */}
-                      <TableCell className="hidden md:table-cell">
+                      <TableCell className="hidden md:table-cell p-1">
                         <div className="flex flex-wrap gap-1 w-full">
                           {shift.userNames && shift.userNames.length > 0 ? (
                             shift.userNames.slice(0, 6).map((name, index) => (
@@ -459,7 +466,7 @@ const ShiftPage = () => {
               
             </div>
             
-          )}
+          )} </div>)}
     
         </div>
       </div>

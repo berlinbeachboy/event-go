@@ -36,7 +36,8 @@ const UserPopover = ({ fullname, nickname, avatarUrlLg, triggerElement }: UserPo
                     {getInitials(fullname)}
                 </AvatarFallback>
             </Avatar>
-            <h3> <b>{nickname +"  " || 'Kein Spitzname'}</b>({formatFullName(fullname)})</h3>
+            <h3> <b>{nickname +"  " || 'Kein Spitzname'}</b></h3>
+            <h5>({formatFullName(fullname)})</h5>
         </div>
         </PopoverContent>
     </Popover>

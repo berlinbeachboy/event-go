@@ -33,7 +33,7 @@ const SpotCard = ({
     "Hausplatz": "/images/bed_mn.PNG",
     "Glamping-Tipi": "/images/tipi_mn.PNG",
     "Yogaraum": "/images/room_mn.PNG",
-    "Leider nicht dabei" : "/images/sad.PNG"
+    // "Leider nicht dabei" : "/images/sad.PNG"
   };
   
   function resolveSpotTypeImage(spotTypeName: string): string {
@@ -69,11 +69,12 @@ const SpotCard = ({
     </div>
     {resolveSpotTypeImage(spot.name) && (
         <div className="ml-0 w-28 flex-shrink-0">
+        { spot.name !== "Leider nicht dabei" &&
         <img 
             src={resolveSpotTypeImage(spot.name)} 
             alt={spot.name} 
             className="rounded-lg object-cover w-full h-32"
-        />
+        />}
         </div>
     )}
     </div>
@@ -252,7 +253,7 @@ const SpotCard = ({
                 </div>
               </div>
               <div className="flex justify-between items-center py-3 px-6 bg-muted rounded-lg">
-                <span>Zahlung bis zum 1. April an: {paymentDetails}</span>
+                <span>Zahlung bis zum 5. Mai an: {paymentDetails}</span>
               </div>
             </div>
           </div>

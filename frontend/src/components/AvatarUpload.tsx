@@ -173,7 +173,7 @@ const AvatarUpload = ({ currentUser, onAvatarUpdate}: AvatarUploadProps) => {
       
       <Button variant="outline" size="sm" onClick={triggerFileInput} className="mt-2">
         <Upload className="h-4 w-4 mr-2" />
-        Change Avatar
+        Gib Foto
       </Button>
       
       <input
@@ -187,9 +187,9 @@ const AvatarUpload = ({ currentUser, onAvatarUpdate}: AvatarUploadProps) => {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Crop Avatar</DialogTitle>
+            <DialogTitle>Crop Crop</DialogTitle>
             <DialogDescription>
-              Adjust your avatar image. The preview shows how it will appear to others.
+              Hier gucke wie aussieht.
             </DialogDescription>
           </DialogHeader>
           

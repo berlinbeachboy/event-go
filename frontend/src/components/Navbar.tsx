@@ -155,21 +155,6 @@ export const Navbar = ({ onLogout }: NavBarProps) => {
                                 </SheetTrigger>
                                 <SheetContent className="w-64 bg-gradient-to-br from-custom-light-cyan to-custom-aquamarine/90 backdrop-blur-md border-custom-mauve/40">
                                     <div className="flex flex-col gap-4 mt-8">
-                                        {/* Mobile Navigation Items */}
-                                        {/* {navigationItems.map((item) => (
-                                            <SheetClose key={item.name} asChild>
-                                                <Link to={item.path}>
-                                                    <Button
-                                                        variant="ghost"
-                                                        className="w-full rounded-full border-solid border-2 border-black gap-2 bg-custom-aquamarine"
-                                                    >
-                                                        {item.name}
-                                                    </Button>
-                                                </Link>
-                                            </SheetClose>
-                                        ))} */}
-
-                                        {/* <MusicPlayer /> */}
 
                                         <SheetClose asChild>
                                                 <Link to="/spot">
