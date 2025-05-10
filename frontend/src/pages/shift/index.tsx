@@ -189,16 +189,17 @@ const ShiftPage = () => {
                 <CardContent className="space-y-8 p-2 md:p-4">
                   <div className="prose prose-gray max-w-none">
                       <ul className="space-y-2 text-gray-700 text-sm">
-                          <li>Jede schicht gibt je nach Aufwand entweder einen oder zwei Punkte.</li>
+                          <li>Jede Schicht gibt je nach Aufwand entweder einen oder zwei Punkte.</li>
                           <li>Bitte tragt euch unten für Schichten ein, sodass ihr auf 2 Schichtpunkte kommt.</li>
                           <li>Mehr Infos zu den Schichten gibt's auf dem i-Button.</li>
-                          <li>Sonntags helfen alle mit beim Aufräumen. Bitte gebt uns unten Bescheid, ob ihr eher früher abreisen wollt oder etwas länger bleiben könnt.</li>
+                          <li>Sonntags helfen alle mit beim Aufräumen. Es gibt frühere und spätere Aufräumschichten. </li>
+                          <li>Bitte gebt uns unten Bescheid, ob ihr Montags früher abreisen wollt oder etwas länger bleiben könnt.</li>
                           <li>Vielen Dank für eure Mithilfe! ❤️</li>
                       </ul>
                   </div>
                   <div className=" space-x-2">
                     <div className="items-center space-y-2 w-100">
-                      <Label htmlFor="sundayShift">Wie sieht's Montag mit Aufräumen bei dir aus?</Label>
+                      <Label htmlFor="sundayShift">Wie sieht's Montag bei dir aus? Kannst du auch später noch ändern. {":-)"}</Label>
                       <div className="space-y-2 w-86">
                         <Select
                             value={sundayShiftSelect}
@@ -210,7 +211,7 @@ const ShiftPage = () => {
                             <SelectContent>
                                 <SelectItem value="früh">Lieber früh - 11:00-12:30 </SelectItem>
                                 <SelectItem value="spät">Spät ist ok - 12:30-14:00</SelectItem>
-                                <SelectItem value="kann nicht">Muss leider schon früher los :/</SelectItem>
+                                <SelectItem value="kann nicht">Muss leider schon vor 11 Uhr los :/</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>

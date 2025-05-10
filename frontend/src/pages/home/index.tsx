@@ -1,4 +1,6 @@
 import BalloonGame from '@/components/BallonGame';
+// import EventSchedule from '@/components/Schedule';
+// import { cn } from '@/lib/utils';
 import { SpotType } from '@/models/models';
 import { motion } from 'framer-motion';
 import { Calendar, MapPin, Users, Clock} from 'lucide-react';
@@ -32,29 +34,37 @@ export const HomePage = ({spotTypes}: HomePageProps) => {
     }
     // const programItems = [
     //     {
-    //         time: "Donnerstag",
+    //         day: "Freitag",
     //         events: [
-    //             { name: "Anreise", description: "Ab 14 Uhr", icon: Sun },
-    //             { name: "Abendessen", description: "19 Uhr", icon: Utensils },
-    //             { name: "Clubkeller", description: "Ab 22 Uhr", icon: Music },
+    //             { name: "Arrival", time: "15:00", hours: 3.5 ,color: "blue-100", description: "everybody arriving", icon: Sun },
+    //             { name: "Dinner", time: "18:30", hours: 1.5 ,color: "green-100", description: "legga legga", icon: Utensils },
+    //             { name: "Diashow",  time: "20:00", hours: 1.5 ,color: "green-100", description: "Nostalgie mit Tascha T", icon: Music },
+    //             { name: "Wintergarten",  time: "21:30", hours: 1.5 ,color: "green-100", description: "Good Music", icon: Music },
     //         ]
     //     },
     //     {
-    //         time: "Freitag",
+    //         day: "Samstag",
     //         events: [
-    //             { name: "Frühstück", description: "Ab 9 Uhr", icon: Utensils },
-    //             { name: "Olympiade", description: "14 Uhr", icon: Utensils },
-    //             { name: "Abendessen", description: "19 Uhr", icon: Utensils },
-    //             { name: "Party", description: "Ab 22 Uhr", icon: Music },
+    //             { name: "Breakfast", time: "11:00", hours: 2 ,color: "blue-100", description: "placeholder", icon: Utensils },
+    //             { name: "Games", time: "13:00", hours: 3 ,color: "blue-100", description: "placeholder", icon: Utensils },
+    //             { name: "Dinner", time: "19:00", hours: 2 ,color: "blue-100", description: "placeholder", icon: Utensils },
+    //             { name: "Party", time: "20:00", hours: 3.5 ,color: "blue-100", description: "placeholder", icon: Music },
     //         ]
     //     },
     //     {
-    //         time: "Samstag",
+    //         day: "Sonntag",
     //         events: [
-    //             { name: "Brunch", description: "Ab 10 Uhr", icon: Utensils },
-    //             { name: "Pool Time", description: "Ab 14 Uhr", icon: Sun },
-    //             { name: "BBQ", description: "19 Uhr", icon: Utensils },
-    //             { name: "Bingo Night", description: "Ab 22 Uhr", icon: Utensils },
+    //             { name: "Brunch", time: "11:00", hours: 2 ,color: "blue-100", description: "placeholder", icon: Utensils },
+    //             { name: "Pool Time", time: "15:00", hours: 2 ,color: "blue-100", description: "placeholder", icon: Sun },
+    //             { name: "BBQ", time: "19:00", hours: 2 ,color: "blue-100", description: "placeholder", icon: Utensils },
+    //             { name: "Bingo Night", time: "21:00", hours: 4 ,color: "blue-100", description: "placeholder", icon: Utensils },
+    //         ]
+    //     },
+    //     {
+    //         day: "Montag",
+    //         events: [
+    //             { name: "Frühstück", time: "10:00", hours: 1 ,color: "blue-100", description: "placeholder", icon: Utensils },
+    //             { name: "Aufräumen", time: "11:00", hours: 3 ,color: "yellow-100", description: "placeholder", icon: Sun }
     //         ]
     //     }
     // ];
@@ -75,7 +85,7 @@ export const HomePage = ({spotTypes}: HomePageProps) => {
             {/* Hero Section */}
             {/* Content Container */}
             <div className="relative z-10">
-                <br></br><br></br><br></br><br></br><br></br><br></br><br></br>
+                <br></br><br></br><br></br>
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -178,14 +188,14 @@ export const HomePage = ({spotTypes}: HomePageProps) => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {programItems.map((day) => (
                         <motion.div
-                            key={day.time}
+                            key={day.day}
                             whileHover={{ y: -5 }}
                             className="p-6 border border-gray-200 rounded-lg hover:shadow-lg transition-shadow"
                         >
-                            <h3 className="text-xl font-medium text-black mb-4">{day.time}</h3>
+                            <h3 className="text-xl font-medium text-black mb-4">{day.day}</h3>
                             <div className="space-y-4">
                                 {day.events.map((event, index) => (
-                                    <div key={index} className="flex items-start space-x-3">
+                                    <div key={index} className={cn("flex items-start space-x-3 border border-gray-200 rounded-lg " + "bg-"+event.color)}>
                                         <event.icon className="h-5 w-5 text-gray-600 mt-1" />
                                         <div>
                                             <p className="font-medium text-black">{event.name}</p>
@@ -198,6 +208,7 @@ export const HomePage = ({spotTypes}: HomePageProps) => {
                     ))}
                 </div>
             </motion.div> */}
+            {/* <EventSchedule></EventSchedule> */}
 
             {/* Gallery Section */}
             <motion.div

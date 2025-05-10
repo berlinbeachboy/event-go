@@ -139,10 +139,11 @@ const AdminTable = ({
                 <TableHead>Vor- und Nachname</TableHead>
                 <TableHead className="hidden sm:table-cell">Username</TableHead>
                 <TableHead>Spitzname</TableHead>
-                <TableHead className="hidden md:table-cell">Handy</TableHead>
+                {/* <TableHead className="hidden md:table-cell">Handy</TableHead> */}
                 <TableHead className="hidden md:table-cell">Typ </TableHead>
                 <TableHead>Spot</TableHead>
                 <TableHead>SP</TableHead>
+                <TableHead>Mo</TableHead>
                 <TableHead>Soli</TableHead>
                 <TableHead>Zahlung</TableHead>
                 <TableHead className="hidden md:table-cell">Letzter Login</TableHead>
@@ -177,7 +178,7 @@ const AdminTable = ({
                   <TableCell>{user.fullName}</TableCell>
                   <TableCell className="hidden sm:table-cell">{user.username}</TableCell>
                   <TableCell>{user.nickname}</TableCell>
-                  <TableCell className="hidden md:table-cell">{user.phone}</TableCell>
+                  {/* <TableCell className="hidden md:table-cell">{user.phone}</TableCell> */}
                   <TableCell className="hidden md:table-cell">
                     <span className={`px-2 py-1 rounded-full text-xs ${
                       user.type === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
@@ -187,6 +188,27 @@ const AdminTable = ({
                   </TableCell>
                   <TableCell>{user.spotType?.name || 'No spot'}</TableCell>
                   <TableCell>{user.shiftPoints || '0'}</TableCell>
+                  <TableCell className='p-1'>
+                  {user.sundayShift &&
+                  <Popover>
+                      <PopoverTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-6 w-6 px-2"
+                        >
+                          {user.sundayShift == "früh" ? "F" : user.sundayShift == "spät" ? "L" : "X"}
+                        </Button>
+                      </PopoverTrigger>
+                        <PopoverContent className="w-120">
+                          <div className="max-w-xs font-medium p-2">
+                            <p>{user.sundayShift || ''}</p>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+
+                  }
+                  </TableCell>
                   <TableCell>
                     {user.takesSoli ? (
                     <span className="text-xs">

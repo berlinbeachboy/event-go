@@ -353,7 +353,7 @@ export default function ShiftsTable({ shifts, users, onCreateShift, onUpdateShif
                   <TableCell className="hidden md:table-cell p-1">
                     <div className="flex flex-wrap gap-1 w-full">
                       {shift.userNames && shift.userNames.length > 0 ? (
-                        shift.userNames.slice(0, 6).map((name, index) => (
+                        shift.userNames.slice(0, 8).map((name, index) => (
                           <Badge key={index} variant="outline" className="flex items-center p-1 gap-1 h-11">
                             {/* Small Avatar Img as Popover that loads and displays larger Image */}
                             <UserPopover
@@ -390,9 +390,9 @@ export default function ShiftsTable({ shifts, users, onCreateShift, onUpdateShif
                         <span className="text-gray-500 text-sm">Noch niemand</span>
                       )}
                       
-                      {shift.userNames && shift.userNames.length > 6 && (
+                      {shift.userNames && shift.userNames.length > 8 && (
                         <Badge variant="outline" className="bg-gray-100">
-                          +{shift.userNames.length - 6} mehr
+                          +{shift.userNames.length - 8} mehr
                         </Badge>
                       )}
                       <div className={shift.currentCount >= shift.headCount ? "hidden" : ""}>
