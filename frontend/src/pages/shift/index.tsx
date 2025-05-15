@@ -47,6 +47,7 @@ const ShiftPage = () => {
 
 
     const [formData, setFormData] = useState({
+        arrival: user?.arrival || "",
         sundayShift: user?.sundayShift || "",
     });
     const [confirmed, setConfirmed] = useState<boolean>(() => {
@@ -141,7 +142,7 @@ const ShiftPage = () => {
     const handleSelectChange = (value: string): void => {
       const existVal = (user?.sundayShift === "früh" || user?.sundayShift === "spät") ? "Dein Grund" : user?.sundayShift
       const formVal = (value === "früh" || value === "spät") ? value : existVal || "Dein Grund"
-      setFormData({sundayShift: formVal})
+      setFormData({...formData, sundayShift: formVal})
       setSundayShiftSelect(value)
     };
   
@@ -192,13 +193,50 @@ const ShiftPage = () => {
                           <li>Jede Schicht gibt je nach Aufwand entweder einen oder zwei Punkte.</li>
                           <li>Bitte tragt euch unten für Schichten ein, sodass ihr auf 2 Schichtpunkte kommt.</li>
                           <li>Mehr Infos zu den Schichten gibt's auf dem i-Button.</li>
-                          <li>Sonntags helfen alle mit beim Aufräumen. Es gibt frühere und spätere Aufräumschichten. </li>
+                          <li>Montags helfen alle mit beim Aufräumen. </li>
                           <li>Bitte gebt uns unten Bescheid, ob ihr Montags früher abreisen wollt oder etwas länger bleiben könnt.</li>
                           <li>Vielen Dank für eure Mithilfe! ❤️</li>
                       </ul>
                   </div>
                   <div className=" space-x-2">
-                    <div className="items-center space-y-2 w-100">
+                    {/* <div className="items-center space-y-2 w-100">
+                      <Label htmlFor="sundayShift">Weißt du schon wann du wahrscheinlich kommst?</Label>
+                      <div className="space-y-2 w-86">
+                        <Select
+                            value={formData.arrival}
+                            onValueChange={(value) => setFormData({... formData, arrival: value})}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Bitte auswählen :)" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="Freitag">Freitag</SelectItem>
+                                <SelectItem value="Samstag">Samstag</SelectItem>
+                                <SelectItem value="Weiß nicht">Weiß noch nicht</SelectItem>
+                            </SelectContent>
+                        </Select>
+                      </div>
+                      
+                    </div> */}
+
+                    <div className="items-center space-y-2 w-88">
+                      <Label htmlFor="sundayShift">Weißt du schon wann du wahrscheinlich kommst?</Label>
+                      <div className="space-y-2 w-86">
+                        <Select
+                            value={formData.arrival}
+                            onValueChange={(value) => setFormData({... formData, arrival: value})}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Bitte auswählen :)" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="Fr">Freitag</SelectItem>
+                                <SelectItem value="Sa">Samstag</SelectItem>
+                                <SelectItem value="?">Weiß noch nicht</SelectItem>
+                            </SelectContent>
+                        </Select>
+                      </div>
+                      <br></br>
                       <Label htmlFor="sundayShift">Wie sieht's Montag bei dir aus? Kannst du auch später noch ändern. {":-)"}</Label>
                       <div className="space-y-2 w-86">
                         <Select
@@ -214,19 +252,19 @@ const ShiftPage = () => {
                                 <SelectItem value="kann nicht">Muss leider schon vor 11 Uhr los :/</SelectItem>
                             </SelectContent>
                         </Select>
-                    </div>
+                      </div>
                       <div className={formData.sundayShift == 'früh' || formData.sundayShift == 'spät' || !formData.sundayShift ? 'hidden' : 'items-center'}>
                       <Label htmlFor="sundayShiftInput">Warum musst du früher los?</Label>
                         <Input
                           className='w-full text-sm'
                           id="sundayShiftInput"
                           value={formData.sundayShift}
-                          onChange={(e) => setFormData({sundayShift: e.target.value})}
+                          onChange={(e) => setFormData({...formData, sundayShift: e.target.value})}
                         />
                       </div>
                     </div>
                     <br></br>
-                    <Button disabled={!sundayShiftSelect}
+                    <Button disabled={!sundayShiftSelect || !formData.arrival}
                     variant="outline"
                     onClick={() => {updateSundayShift(formData)}}
                   >

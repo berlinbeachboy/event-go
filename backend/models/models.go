@@ -32,6 +32,7 @@ type User struct {
 	IsActivated bool       `gorm:"not null;default:false" json:"-"`
 
 	SundayShift *string `gorm:"null" json:"sundayShift"`
+	Arrival     *string `gorm:"null" json:"arrival"`
 	AvatarUrlSm *string `gorm:"null" json:"avatarUrlSm"`
 	AvatarUrlLg *string `gorm:"null" json:"avatarUrlLg"`
 
@@ -76,6 +77,7 @@ type UserResponse struct {
 	AmountPaid  float32    `json:"amountPaid"`
 
 	SundayShift *string `json:"sundayShift"`
+	Arrival     *string `json:"arrival"`
 	ShiftPoints *uint16 `json:"shiftPoints"`
 
 	AvatarUrlSm *string `json:"avatarUrlSm"`
@@ -103,6 +105,7 @@ func (u User) ToResponse() UserResponse {
 		AmountPaid:  u.AmountPaid,
 
 		SundayShift: u.SundayShift,
+		Arrival:     u.Arrival,
 		AvatarUrlSm: u.AvatarUrlSm,
 		AvatarUrlLg: u.AvatarUrlLg,
 

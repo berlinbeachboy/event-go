@@ -18,6 +18,7 @@ import SpotPage from './pages/spot';
 import ImprintPage from './pages/imprint';
 import PrivacyPage from './pages/privacy';
 import ShiftPage from './pages/shift';
+import SchedulePage from './pages/schedule';
 
 // Footer Component
 const Footer = () => (
@@ -84,6 +85,12 @@ const App = () => {
                   path="/shifts"
                   element={
                     user.type === 'admin' ? <ShiftPage /> : <Navigate to="/home" replace />
+                  }
+                />
+                <Route
+                  path="/schedule"
+                  element={
+                    user.type === 'admin' ? <SchedulePage /> : <Navigate to="/home" replace />
                   }
                 />
                 <Route path="/spot" element={<SpotPage userSpots={userSpots}/>} />

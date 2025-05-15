@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { ReactElement, useState } from 'react';
 import { Sun, Music, Utensils } from 'lucide-react';
 
 // Helper function to convert time string to hours (numeric)
@@ -27,10 +27,10 @@ const getEventStyle = (event: Event, conflictInfo: ConflictInfo | null = null) =
   const baseTime = 9;
   
   // Calculate top position (start time)
-  const top = (startHour - baseTime) * 60; // 60px per hour
+  const top = (startHour - baseTime) * 36; // 60px per hour
   
   // Calculate height (duration)
-  const height = event.hours * 60;
+  const height = event.hours * 36;
   
   // Default to full width
   let width = '100%';
@@ -38,7 +38,7 @@ const getEventStyle = (event: Event, conflictInfo: ConflictInfo | null = null) =
   
   // If there's a conflict, adjust width and position
   if (conflictInfo) {
-    width = '48%'; // Each overlapping event takes up roughly half the space
+    width = '49%'; // Each overlapping event takes up roughly half the space
     left = conflictInfo.position === 'left' ? '0%' : '50%';
   }
   
@@ -63,6 +63,8 @@ const getColorClass = (colorString: string): string => {
   return colorMap[colorString] || 'bg-gray-100 border-gray-200';
 };
 
+
+
 export default function EventSchedule() {
   const [activeDay, setActiveDay] = useState('Freitag');
   
@@ -71,8 +73,8 @@ export default function EventSchedule() {
       day: "Freitag",
       events: [
         { name: "Arrival", time: "15:00", hours: 3.5, color: "blue-100", description: "everybody arriving", icon: Sun },
-        { name: "Dinner", time: "18:30", hours: 1.5, color: "green-100", description: "legga legga", icon: Utensils },
-        { name: "Diashow", time: "20:00", hours: 1.5, color: "green-100", description: "Nostalgie mit Tascha T", icon: Music },
+        { name: "Dinner", time: "18:30", hours: 1, color: "green-100", description: "legga legga", icon: Utensils },
+        { name: "Diashow", time: "20:00", hours: 1, color: "green-100", description: "Nostalgie mit Tascha T", icon: Music },
         { name: "Wintergarten", time: "21:30", hours: 1.5, color: "green-100", description: "Good Music", icon: Music },
       ]
     },
@@ -123,16 +125,17 @@ export default function EventSchedule() {
   const endTime = Math.ceil(latestEndTime);
   
   // Generate time markers with half-hour marks
-  const timeMarkers = [];
+  const timeMarkers: ReactElement[] = [];
   for (let hour = startTime; hour <= endTime; hour++) {
     // Full hour marker
+    const hourP = hour >= 24 ? hour - 24 : hour 
     timeMarkers.push(
       <div 
         key={`${hour}:00`} 
-        className="border-t border-gray-200 text-xs text-gray-500 relative"
-        style={{ height: '30px' }}
+        className="text-xs text-gray-500 relative"
+        style={{ height: '18px' }}
       >
-        <span className="absolute -top-2 -left-16 w-14 text-right">{`${hour.toString().padStart(2, '0')}:00`}</span>
+        <span className="absolute -top-2 w-10 text-right">{`${hourP.toString().padStart(2, '0')}:00`}</span>
       </div>
     );
     
@@ -141,21 +144,111 @@ export default function EventSchedule() {
       timeMarkers.push(
         <div 
           key={`${hour}:30`} 
-          className="border-t border-gray-200 border-dashed text-xs text-gray-500 relative"
-          style={{ height: '30px' }}
+          className="text-xs text-gray-500 relative"
+          style={{ height: '18px' }}
         >
-          <span className="absolute -top-2 -left-16 w-14 text-right text-gray-400">{`${hour.toString().padStart(2, '0')}:30`}</span>
+          <span className="absolute -top-2 w-10 text-right text-gray-400">{`${hourP.toString().padStart(2, '0')}:30`}</span>
         </div>
       );
     }
   }
 
+  const renderDay = (dayStr: string): ReactElement => {
+    return (<div className="flex-1 relative min-h-96 border-l ml-1 border-gray-200">
+    {/* Time grid lines */}
+      <div className="absolute inset-0">
+        {timeMarkers.map((_, index) => (
+          <div 
+            key={index} 
+            className={`border-t ${index % 2 === 0 ? 'border-gray-200' : 'border-gray-200 border-dashed'}`}
+            style={{ height: '18px' }}
+          />
+        ))}
+      </div>
+  
+    {/* Event items - positioned absolutely with conflict detection */}
+    {(() => {
+      const dayEvents = programItems.find(day => day.day === dayStr)?.events || [];
+      
+      // Find overlapping events
+      const eventsWithConflicts = dayEvents.map((event, index) => {
+        const eventStart = timeToHours(event.time);
+        const eventEnd = eventStart + event.hours;
+        
+        // Check for overlaps with other events
+        const conflicts = dayEvents.filter((otherEvent, otherIndex) => {
+          if (index === otherIndex) return false;
+          
+          const otherStart = timeToHours(otherEvent.time);
+          const otherEnd = otherStart + otherEvent.hours;
+          
+          // Check if events overlap
+          return (eventStart < otherEnd && eventEnd > otherStart);
+        });
+        
+        // Determine if this event has conflicts
+        const hasConflict = conflicts.length > 0;
+        
+        // For events with conflicts, determine if they should be positioned left or right
+        let conflictInfo = null;
+        if (hasConflict) {
+          // Find the conflicting event index
+          const conflictIndex = dayEvents.findIndex((otherEvent, otherIndex) => {
+            if (index === otherIndex) return false;
+            
+            const otherStart = timeToHours(otherEvent.time);
+            const otherEnd = otherStart + otherEvent.hours;
+            
+            return (eventStart < otherEnd && eventEnd > otherStart);
+          });
+          
+          // Position based on index comparison (first event goes left, second goes right)
+          conflictInfo = {
+            position: index < conflictIndex ? 'left' : 'right'
+          };
+        }
+        
+        return {
+          ...event,
+          conflictInfo
+        };
+      });
+      
+      // Render events with proper positioning
+      return eventsWithConflicts.map((event, index) => {
+        const style = getEventStyle(event, event.conflictInfo);
+        
+        return (
+          <div
+            key={index}
+            className={`absolute p-0 rounded-lg border shadow-sm transition-all hover:shadow-md ${getColorClass(event.color)}`}
+            style={style}
+          >
+            <div className="flex items-start space-x-2">
+              <event.icon className="h-4 w-4 text-gray-600 flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <div className="flex justify-between items-start flex-wrap gap-1">
+                  <p className="text-sm font-medium text-black truncate">{event.name}</p>
+                  {/* <span className="text-xs font-medium bg-white px-2 py-0 rounded-full whitespace-nowrap">
+                    {event.time} ({event.hours}h)
+                  </span> */}
+                </div>
+                <p className="text-xs text-gray-600 truncate">{event.description}</p>
+              </div>
+            </div>
+          </div>
+        );
+      });
+    })()}
+  </div>)
+  }
+
   return (
-    <div className="max-w-6xl mx-auto px-4 py-16">
+    <div className="max-w-6xl mx-auto px-1 py-16">
       <h2 className="text-3xl font-medium text-black mb-8">Programm</h2>
       
       {/* Day selector tabs */}
-      <div className="flex space-x-2 border-b border-gray-200 mb-6">
+      <div className="flex space-x-2 border-b border-gray-200 mb-6 md:hidden">
         {programItems.map((day) => (
           <button
             key={day.day}
@@ -174,98 +267,13 @@ export default function EventSchedule() {
       {/* Time grid */}
       <div className="flex">
         {/* Time axis */}
-        <div className="w-16 relative mr-4">
+        <div className="w-11 relative">
           {timeMarkers}
         </div>
-        
         {/* Events container */}
-        <div className="flex-1 relative min-h-96 border-l border-gray-200">
-          {/* Time grid lines */}
-          <div className="absolute inset-0">
-            {timeMarkers.map((_, index) => (
-              <div 
-                key={index} 
-                className={`border-t ${index % 2 === 0 ? 'border-gray-200' : 'border-gray-200 border-dashed'}`}
-                style={{ height: '30px' }}
-              />
-            ))}
-          </div>
-          
-          {/* Event items - positioned absolutely with conflict detection */}
-          {(() => {
-            const dayEvents = programItems.find(day => day.day === activeDay)?.events || [];
-            
-            // Find overlapping events
-            const eventsWithConflicts = dayEvents.map((event, index) => {
-              const eventStart = timeToHours(event.time);
-              const eventEnd = eventStart + event.hours;
-              
-              // Check for overlaps with other events
-              const conflicts = dayEvents.filter((otherEvent, otherIndex) => {
-                if (index === otherIndex) return false;
-                
-                const otherStart = timeToHours(otherEvent.time);
-                const otherEnd = otherStart + otherEvent.hours;
-                
-                // Check if events overlap
-                return (eventStart < otherEnd && eventEnd > otherStart);
-              });
-              
-              // Determine if this event has conflicts
-              const hasConflict = conflicts.length > 0;
-              
-              // For events with conflicts, determine if they should be positioned left or right
-              let conflictInfo = null;
-              if (hasConflict) {
-                // Find the conflicting event index
-                const conflictIndex = dayEvents.findIndex((otherEvent, otherIndex) => {
-                  if (index === otherIndex) return false;
-                  
-                  const otherStart = timeToHours(otherEvent.time);
-                  const otherEnd = otherStart + otherEvent.hours;
-                  
-                  return (eventStart < otherEnd && eventEnd > otherStart);
-                });
-                
-                // Position based on index comparison (first event goes left, second goes right)
-                conflictInfo = {
-                  position: index < conflictIndex ? 'left' : 'right'
-                };
-              }
-              
-              return {
-                ...event,
-                conflictInfo
-              };
-            });
-            
-            // Render events with proper positioning
-            return eventsWithConflicts.map((event, index) => {
-              const style = getEventStyle(event, event.conflictInfo);
-              
-              return (
-                <div
-                  key={index}
-                  className={`absolute p-3 rounded-lg border shadow-sm transition-all hover:shadow-md ${getColorClass(event.color)}`}
-                  style={style}
-                >
-                  <div className="flex items-start space-x-2">
-                    <event.icon className="h-5 w-5 text-gray-600 mt-1 flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-start flex-wrap gap-1">
-                        <p className="font-medium text-black truncate">{event.name}</p>
-                        <span className="text-xs font-medium bg-white px-2 py-1 rounded-full whitespace-nowrap">
-                          {event.time} ({event.hours}h)
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-600 mt-1 truncate">{event.description}</p>
-                    </div>
-                  </div>
-                </div>
-              );
-            });
-          })()}
-        </div>
+        {programItems.map((dd, _) => renderDay(dd.day))}
+        
+        
       </div>
       
       {/* Legend */}

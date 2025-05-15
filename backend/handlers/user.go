@@ -25,6 +25,7 @@ type UserUpdate struct {
 	TakesSoli   *bool    `json:"takesSoli"`
 	DonatesSoli *bool    `json:"donatesSoli"`
 	SundayShift *string  `json:"sundayShift"`
+	Arrival     *string  `json:"arrival"`
 	SpotTypeID  *uint    `json:"spotTypeId"`
 }
 
@@ -74,6 +75,9 @@ func updateUser(ue *models.User, uu UserUpdate) {
 	}
 	if uu.SundayShift != nil {
 		ue.SundayShift = uu.SundayShift
+	}
+	if uu.Arrival != nil {
+		ue.Arrival = uu.Arrival
 	}
 	if uu.SpotTypeID != nil && int(*uu.SpotTypeID) == 0 {
 		ue.SpotTypeID = nil

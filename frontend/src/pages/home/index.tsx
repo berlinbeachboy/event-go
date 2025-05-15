@@ -1,5 +1,5 @@
 import BalloonGame from '@/components/BallonGame';
-// import EventSchedule from '@/components/Schedule';
+import EventSchedule from '@/components/Schedule';
 // import { cn } from '@/lib/utils';
 import { SpotType } from '@/models/models';
 import { motion } from 'framer-motion';
@@ -208,7 +208,7 @@ export const HomePage = ({spotTypes}: HomePageProps) => {
                     ))}
                 </div>
             </motion.div> */}
-            {/* <EventSchedule></EventSchedule> */}
+            <EventSchedule></EventSchedule>
 
             {/* Gallery Section */}
             <motion.div

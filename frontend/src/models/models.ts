@@ -11,6 +11,7 @@ export interface User {
     donatesSoli: boolean;
     lastLogin: Date;
     sundayShift: string | null;
+    arrival: string | null;
     amountPaid: number;
     amountToPay: number;
 

@@ -144,6 +144,7 @@ const AdminTable = ({
                 <TableHead>Spot</TableHead>
                 <TableHead>SP</TableHead>
                 <TableHead>Mo</TableHead>
+                <TableHead>Arr</TableHead>
                 <TableHead>Soli</TableHead>
                 <TableHead>Zahlung</TableHead>
                 <TableHead className="hidden md:table-cell">Letzter Login</TableHead>
@@ -209,6 +210,7 @@ const AdminTable = ({
 
                   }
                   </TableCell>
+                  <TableCell>{user.arrival || '?'}</TableCell>
                   <TableCell>
                     {user.takesSoli ? (
                     <span className="text-xs">

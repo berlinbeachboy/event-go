@@ -91,6 +91,17 @@ export const Navbar = ({ onLogout }: NavBarProps) => {
                                 </Link>
                             )}
 
+                            {user?.type === 'admin' && (
+                                <Link to="/schedule">
+                                    <Button
+                                        variant="ghost"
+                                        className="rounded-full border-solid border-2 border-black gap-2 bg-custom-aquamarine transition-all duration-200"
+                                    >
+                                        Programm
+                                    </Button>
+                                </Link>
+                            )}
+
                             <Link to="/spot">
                                 <Button
                                     variant="ghost"
@@ -188,6 +199,19 @@ export const Navbar = ({ onLogout }: NavBarProps) => {
                                                         className="w-full rounded-full border-solid border-2 border-black gap-2 bg-custom-aquamarine"
                                                     >
                                                         Schichten
+                                                    </Button>
+                                                </Link>
+                                            </SheetClose>
+                                        )}
+
+                                        {user?.type === 'admin' && (
+                                            <SheetClose asChild>
+                                                <Link to="/schedule">
+                                                    <Button
+                                                        variant="ghost"
+                                                        className="w-full rounded-full border-solid border-2 border-black gap-2 bg-custom-aquamarine"
+                                                    >
+                                                        Programm
                                                     </Button>
                                                 </Link>
                                             </SheetClose>
