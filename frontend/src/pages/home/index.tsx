@@ -208,7 +208,7 @@ export const HomePage = ({spotTypes}: HomePageProps) => {
                     ))}
                 </div>
             </motion.div> */}
-            <EventSchedule></EventSchedule>
+            {/* <EventSchedule></EventSchedule> */}
 
             {/* Gallery Section */}
             <motion.div
