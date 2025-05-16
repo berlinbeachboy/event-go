@@ -83,15 +83,11 @@ const App = () => {
                 <Route path="/home" element={<HomePage spotTypes={userSpots}/>} />
                 <Route
                   path="/shifts"
-                  element={
-                    user.type === 'admin' ? <ShiftPage /> : <Navigate to="/home" replace />
-                  }
+                  element={<ShiftPage />}
                 />
                 <Route
                   path="/schedule"
-                  element={
-                    user.type === 'admin' ? <SchedulePage /> : <Navigate to="/home" replace />
-                  }
+                  element={<SchedulePage />}
                 />
                 <Route path="/spot" element={<SpotPage userSpots={userSpots}/>} />
                 <Route path="/user" element={<UserPage/>} />
