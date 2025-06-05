@@ -19,6 +19,7 @@ import ImprintPage from './pages/imprint';
 import PrivacyPage from './pages/privacy';
 import ShiftPage from './pages/shift';
 import SchedulePage from './pages/schedule';
+import DjsPage from './pages/djs';
 
 // Footer Component
 const Footer = () => (
@@ -88,6 +89,10 @@ const App = () => {
                 <Route
                   path="/schedule"
                   element={<SchedulePage />}
+                />
+                <Route
+                  path="/timetable"
+                  element={<DjsPage />}
                 />
                 <Route path="/spot" element={<SpotPage userSpots={userSpots}/>} />
                 <Route path="/user" element={<UserPage/>} />

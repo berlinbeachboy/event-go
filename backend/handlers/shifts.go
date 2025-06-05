@@ -267,12 +267,12 @@ func HandleAddMeToShift(db *gorm.DB) gin.HandlerFunc {
 		userId, exists := c.Get("user_id")
 		userId2 := userId.(uint)
 		if !exists {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to retrieve user"})
 			return
 		}
 
 		if err := AddUserToShift(db, uint(shiftIDUint), userId2); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 

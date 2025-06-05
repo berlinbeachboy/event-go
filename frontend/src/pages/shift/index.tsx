@@ -147,7 +147,6 @@ const ShiftPage = () => {
     };
   
     const filteredShifts = shifts ? shifts?.filter(shift => {
-      if (shift && shift.day === "Montag") return false;
       if (shift && dayFilter !== "-" && shift.day !== dayFilter) return false;
       return true;
     }) : [];

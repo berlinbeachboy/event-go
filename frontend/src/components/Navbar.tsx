@@ -88,6 +88,15 @@ export const Navbar = ({ onLogout }: NavBarProps) => {
                                 </Button>
                             </Link>
 
+                            <Link to="/timetable">
+                                <Button
+                                    variant="ghost"
+                                    className="rounded-full border-solid border-2 border-black gap-2 bg-custom-aquamarine transition-all duration-200"
+                                >
+                                    Timetable
+                                </Button>
+                            </Link>
+
                             <Link to="/schedule">
                                 <Button
                                     variant="ghost"
@@ -204,6 +213,17 @@ export const Navbar = ({ onLogout }: NavBarProps) => {
                                                     className="w-full rounded-full border-solid border-2 border-black gap-2 bg-custom-aquamarine"
                                                 >
                                                     Programm
+                                                </Button>
+                                            </Link>
+                                        </SheetClose>
+
+                                        <SheetClose asChild>
+                                            <Link to="/timetable">
+                                                <Button
+                                                    variant="ghost"
+                                                    className="w-full rounded-full border-solid border-2 border-black gap-2 bg-custom-aquamarine"
+                                                >
+                                                    Timetable
                                                 </Button>
                                             </Link>
                                         </SheetClose>
